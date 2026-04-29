@@ -11,6 +11,23 @@
 
 ---
 
+## 2026-04-30  アプリ画面のダミーモックアップを追加
+
+- 新セクション `App Screens` を Solutions と Video の間に追加
+    - `resources/js/components/lp/AppScreens.tsx` — 3画面のスマホフレームモックアップ
+    - 1画面目: `app.pldl.or.jp/my-qr` 相当（スタッフQR・拠点・ID 表示）
+    - 2画面目: `app.pldl.or.jp/admin/attendance-intents` 相当（参加予定・送迎管理）
+    - 3画面目: `app.pldl.or.jp/admin/chats` 相当（保護者チャットスレッド）
+    - 表示している氏名・施設名・メッセージ・QRコードは **すべてダミー**（実在しない）
+    - QRはSVGで生成した視覚イメージのみで、スキャンしても無効
+- 参考にしたソース（C:\work\pldl）：
+    - `resources/views/my_qr/show.blade.php`
+    - `resources/views/admin/attendance_intents/react.blade.php`
+    - `resources/js/pages/admin/AttendanceIntentsApp.jsx`
+    - `resources/views/admin/chats/index.blade.php`
+- CSS: `.lp-screens`, `.lp-screen-card`, `.lp-phoneframe*`, `.lp-mock*` を追加。スマホフレーム260px / 画面高480pxの統一フォーマット
+- pages/GakudoLp.tsx に `<AppScreens />` を組み込み
+
 ## 2026-04-30  PLDLロゴを撤去
 
 - 依頼により PLDL のブランドロゴ画像を LP から全削除

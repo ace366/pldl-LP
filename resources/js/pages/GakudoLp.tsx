@@ -4,6 +4,7 @@ import Hero from '../components/lp/Hero';
 import WhyPldl from '../components/lp/WhyPldl';
 import FieldIssues from '../components/lp/FieldIssues';
 import Solutions from '../components/lp/Solutions';
+import AppScreens from '../components/lp/AppScreens';
 import VideoSection from '../components/lp/VideoSection';
 import AfterEffects from '../components/lp/AfterEffects';
 import Differentiation from '../components/lp/Differentiation';
@@ -27,6 +28,7 @@ const GakudoLp: React.FC<Props> = ({ settings }) => {
                 <WhyPldl />
                 <FieldIssues />
                 <Solutions />
+                <AppScreens />
                 <VideoSection settings={settings} />
                 <AfterEffects />
                 <Differentiation />
