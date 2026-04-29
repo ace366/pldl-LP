@@ -1,4 +1,4 @@
-﻿import Checkbox from '@/components/Checkbox';
+import Checkbox from '@/components/Checkbox';
 import InputError from '@/components/InputError';
 import InputLabel from '@/components/InputLabel';
 import PrimaryButton from '@/components/PrimaryButton';
@@ -30,7 +30,11 @@ export default function Login({
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title="ログイン" />
+
+            <h1 className="mb-4 text-base font-bold text-gray-800 dark:text-gray-100">
+                管理画面ログイン
+            </h1>
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
@@ -40,7 +44,7 @@ export default function Login({
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="メールアドレス" />
 
                     <TextInput
                         id="email"
@@ -57,7 +61,7 @@ export default function Login({
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value="パスワード（数字4桁）" />
 
                     <TextInput
                         id="password"
@@ -66,6 +70,9 @@ export default function Login({
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="current-password"
+                        inputMode="numeric"
+                        pattern="\d{4}"
+                        maxLength={4}
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
@@ -85,7 +92,7 @@ export default function Login({
                             }
                         />
                         <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
-                            Remember me
+                            ログイン状態を保持する
                         </span>
                     </label>
                 </div>
@@ -96,12 +103,12 @@ export default function Login({
                             href={route('password.request')}
                             className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
                         >
-                            Forgot your password?
+                            パスワードをお忘れの方
                         </Link>
                     )}
 
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
+                        ログイン
                     </PrimaryButton>
                 </div>
             </form>

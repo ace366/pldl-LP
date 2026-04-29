@@ -1,4 +1,4 @@
-﻿import InputError from '@/components/InputError';
+import InputError from '@/components/InputError';
 import InputLabel from '@/components/InputLabel';
 import PrimaryButton from '@/components/PrimaryButton';
 import TextInput from '@/components/TextInput';
@@ -24,11 +24,18 @@ export default function Register() {
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            <Head title="新規登録" />
+
+            <h1 className="mb-4 text-base font-bold text-gray-800 dark:text-gray-100">
+                管理者アカウント新規登録
+            </h1>
+            <p className="mb-6 text-xs text-gray-600 dark:text-gray-400">
+                LP管理画面（/admin/lp-settings）にアクセスするためのアカウントを作成します。
+            </p>
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value="お名前" />
 
                     <TextInput
                         id="name"
@@ -45,7 +52,7 @@ export default function Register() {
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="メールアドレス" />
 
                     <TextInput
                         id="email"
@@ -62,7 +69,7 @@ export default function Register() {
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value="パスワード（数字4桁）" />
 
                     <TextInput
                         id="password"
@@ -71,9 +78,15 @@ export default function Register() {
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
+                        inputMode="numeric"
+                        pattern="\d{4}"
+                        maxLength={4}
                         onChange={(e) => setData('password', e.target.value)}
                         required
                     />
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        例：1234（半角数字4桁）
+                    </p>
 
                     <InputError message={errors.password} className="mt-2" />
                 </div>
@@ -81,7 +94,7 @@ export default function Register() {
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="パスワード（確認用）"
                     />
 
                     <TextInput
@@ -91,6 +104,9 @@ export default function Register() {
                         value={data.password_confirmation}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
+                        inputMode="numeric"
+                        pattern="\d{4}"
+                        maxLength={4}
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
                         }
@@ -108,11 +124,11 @@ export default function Register() {
                         href={route('login')}
                         className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
                     >
-                        Already registered?
+                        すでに登録済みの方
                     </Link>
 
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
+                        登録する
                     </PrimaryButton>
                 </div>
             </form>

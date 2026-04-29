@@ -1,4 +1,4 @@
-﻿import InputError from '@/components/InputError';
+import InputError from '@/components/InputError';
 import InputLabel from '@/components/InputLabel';
 import PrimaryButton from '@/components/PrimaryButton';
 import TextInput from '@/components/TextInput';
@@ -30,11 +30,11 @@ export default function ResetPassword({
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Head title="パスワード再設定" />
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="メールアドレス" />
 
                     <TextInput
                         id="email"
@@ -50,7 +50,7 @@ export default function ResetPassword({
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value="新しいパスワード（数字4桁）" />
 
                     <TextInput
                         id="password"
@@ -59,6 +59,9 @@ export default function ResetPassword({
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
+                        inputMode="numeric"
+                        pattern="\d{4}"
+                        maxLength={4}
                         isFocused={true}
                         onChange={(e) => setData('password', e.target.value)}
                     />
@@ -69,7 +72,7 @@ export default function ResetPassword({
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="パスワード（確認用）"
                     />
 
                     <TextInput
@@ -78,6 +81,9 @@ export default function ResetPassword({
                         value={data.password_confirmation}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
+                        inputMode="numeric"
+                        pattern="\d{4}"
+                        maxLength={4}
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
                         }
@@ -91,7 +97,7 @@ export default function ResetPassword({
 
                 <div className="mt-4 flex items-center justify-end">
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        Reset Password
+                        再設定する
                     </PrimaryButton>
                 </div>
             </form>

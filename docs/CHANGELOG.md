@@ -11,6 +11,23 @@
 
 ---
 
+## 2026-04-30  管理画面ログイン系の日本語化 + パスワードを数字4桁に変更
+
+- パスワードバリデーションを `Rules\Password::defaults()`（min:8 + 複雑度）から `digits:4`（半角数字4桁）に緩和
+    - 対象: `RegisteredUserController::store`, `NewPasswordController::store`, `PasswordController::update`
+- フロント（Breeze の Inertia + React）の Auth/Profile 画面をすべて日本語化
+    - `pages/Auth/Register.tsx`, `Login.tsx`, `ForgotPassword.tsx`, `ResetPassword.tsx`, `ConfirmPassword.tsx`, `VerifyEmail.tsx`
+    - `pages/Profile/Edit.tsx`, `Profile/Partials/UpdateProfileInformationForm.tsx`, `UpdatePasswordForm.tsx`, `DeleteUserForm.tsx`
+    - パスワード入力欄に `inputMode="numeric"`, `pattern="\d{4}"`, `maxLength={4}` を追加（スマホで数字キーパッド表示）
+- `layouts/AuthenticatedLayout.tsx` のナビ: Dashboard → 管理画面、Profile → プロフィール、Log Out → ログアウト
+- 日本語ロケールファイルを新規作成
+    - `lang/ja/validation.php` — Laravel 全バリデーションメッセージ（`required`/`email`/`digits`/`confirmed` 等）
+    - `lang/ja/auth.php` — `auth.failed`, `auth.password`, `auth.throttle`
+    - `lang/ja/passwords.php` — パスワード再設定関連メッセージ
+- 動作確認済
+    - `POST /register { password: '1234' }` → 302（成功）、`gakudo_lp_contacts` 用とは別の `users` テーブルに保存
+    - `POST /register { password: '12' }` → 302（バリデーションエラーで戻る、登録されない）
+
 ## 2026-04-30  黄色ベースに再テーマ化 + /register エラー修正
 
 - ブランドカラーを緑から黄色（PLDLロゴの長靴色）に変更
