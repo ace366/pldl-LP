@@ -11,6 +11,23 @@
 
 ---
 
+## 2026-04-30  黄色ベースに再テーマ化 + /register エラー修正
+
+- ブランドカラーを緑から黄色（PLDLロゴの長靴色）に変更
+    - `--lp-color-primary`: `#1f7a4d` → `#f5b81a`
+    - `--lp-color-primary-strong`: `#155e3a` → `#b45309`（amber-700。テキスト用）
+    - `--lp-color-primary-soft`: `#e6f4ec` → `#fef3c7`
+    - 新規 `--lp-color-on-primary`: `#0f172a`（黄色背景上の文字色）
+- 主要 CTA ボタンの文字を「default 状態でも読める」形に：
+    - `.lp-btn--primary` の文字色を `#fff` → `#0f172a`（黄色＋濃紺）。hover時は濃いamberに白文字。
+    - `.lp-plan__ribbon`, `.lp-mock__chip--filter.is-on`, `.lp-header__brand-mark`, `.lp-hero__phone-row--head` も同様にダーク文字へ
+    - `.lp-section__eyebrow`, `.lp-hero__title-em`, `.lp-effect__label--after`, `.lp-plan__features li::before` を amber-700 に揃えて視認性確保
+- 緑系のグラデ・ボーダー（Hero 背景・運営団体カード・Video サムネ・Avatar 等）をすべて amber/yellow 系へ置換
+- /register が `Vite manifest: resources/js/Pages/Auth/Register.tsx` で 500 になっていた問題を修正
+    - 原因: `resources/views/app.blade.php` の `@vite()` ディレクティブが大文字 `Pages/` を参照していた
+    - 修正: 小文字 `pages/` に統一（先日の Pages → pages リネームに合わせる）
+    - 確認: `/register`, `/login`, `/gakudo` すべて 200
+
 ## 2026-04-30  アプリ画面のダミーモックアップを追加
 
 - 新セクション `App Screens` を Solutions と Video の間に追加
