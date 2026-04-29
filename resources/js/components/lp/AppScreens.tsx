@@ -39,9 +39,39 @@ const AppScreens: React.FC = () => {
                     </ScreenCard>
 
                     <ScreenCard
-                        eyebrow="03 / Chat"
+                        eyebrow="03 / QR Scan"
+                        title="児童QRスキャン受付"
+                        body="カメラでQRを読み取って受付を記録。手入力フォールバック・音声案内・なぞなぞ表示にも対応。"
+                    >
+                        <PhoneFrame label="attendance/scan">
+                            <ScanScreen />
+                        </PhoneFrame>
+                    </ScreenCard>
+
+                    <ScreenCard
+                        eyebrow="04 / Children"
+                        title="児童名簿（検索・絞り込み）"
+                        body="氏名・学年・学校・在籍・アレルギー有無で素早く絞り込み。並び替えにも対応。"
+                    >
+                        <PhoneFrame label="admin/children">
+                            <ChildrenListScreen />
+                        </PhoneFrame>
+                    </ScreenCard>
+
+                    <ScreenCard
+                        eyebrow="05 / TEL note"
+                        title="TEL票・きょうだい管理"
+                        body="保護者対応の履歴を電話／面談／メール別に記録。きょうだいは1タップで往復できます。"
+                    >
+                        <PhoneFrame label="children/{id}/tel">
+                            <ChildTelScreen />
+                        </PhoneFrame>
+                    </ScreenCard>
+
+                    <ScreenCard
+                        eyebrow="06 / Chat"
                         title="保護者チャット"
-                        body="保護者とのやり取りはスレッド管理。未読数・既読状況・児童ごとの履歴をまとめて確認できます。"
+                        body="保護者とのやり取りはスレッド管理。未読数・既読状況・児童ごとの履歴をまとめて確認。"
                     >
                         <PhoneFrame label="admin/chats">
                             <ChatsScreen />
@@ -250,7 +280,162 @@ const AttendanceIntentsScreen: React.FC = () => {
     );
 };
 
-/* ===================== Screen 3: Chats ===================== */
+/* ===================== Screen 3: QR Scan ===================== */
+
+const ScanScreen: React.FC = () => (
+    <div className="lp-mock lp-mock--scan">
+        <div className="lp-mock__app-header">
+            <span className="lp-mock__app-back">‹</span>
+            <span className="lp-mock__app-title">出席登録（QR読み取り）</span>
+            <span className="lp-mock__chip lp-mock__chip--filter is-on lp-mock__chip--tts">音声案内 ON</span>
+        </div>
+
+        <div className="lp-mock__scan-camera">
+            <div className="lp-mock__scan-frame">
+                <span className="lp-mock__scan-corner lp-mock__scan-corner--tl"></span>
+                <span className="lp-mock__scan-corner lp-mock__scan-corner--tr"></span>
+                <span className="lp-mock__scan-corner lp-mock__scan-corner--bl"></span>
+                <span className="lp-mock__scan-corner lp-mock__scan-corner--br"></span>
+                <span className="lp-mock__scan-line"></span>
+            </div>
+            <p className="lp-mock__scan-hint">明るい場所で、まっすぐかざしてください</p>
+        </div>
+
+        <div className="lp-mock__scan-result">
+            <p className="lp-mock__scan-eyebrow">読み取り結果</p>
+            <p className="lp-mock__scan-name">なかむら こうた <span>（ID 1052）</span></p>
+            <p className="lp-mock__scan-sub">サンプル小学校 ／ 3年</p>
+            <p className="lp-mock__scan-msg">登録が完了しました。</p>
+        </div>
+
+        <div className="lp-mock__scan-manual">
+            <input className="lp-mock__search" placeholder="QRカード忘れ用：CHILD:1234" disabled />
+            <button className="lp-mock__chip lp-mock__chip--filter is-on" type="button" disabled>送信</button>
+        </div>
+    </div>
+);
+
+/* ===================== Screen 4: Children list ===================== */
+
+const ChildrenListScreen: React.FC = () => {
+    const rows = [
+        { grade: '1', code: '1041', name: 'いとう ゆい',     base: 'まなびや', allergy: '',        sib: 1 },
+        { grade: '2', code: '1052', name: 'なかむら こうた', base: 'まなびや', allergy: '卵',      sib: 0 },
+        { grade: '3', code: '1078', name: 'さとう だいち',   base: 'のぞみ',   allergy: '',        sib: 2 },
+        { grade: '4', code: '1099', name: 'やまもと そう',   base: 'まなびや', allergy: '小麦',    sib: 0 },
+        { grade: '5', code: '1102', name: 'たかはし みゆ',   base: 'のぞみ',   allergy: '',        sib: 1 },
+    ];
+    return (
+        <div className="lp-mock lp-mock--children">
+            <div className="lp-mock__app-header">
+                <span className="lp-mock__app-back">‹</span>
+                <span className="lp-mock__app-title">児童管理</span>
+                <span className="lp-mock__app-menu">＋</span>
+            </div>
+
+            <div className="lp-mock__filter lp-mock__filter--wrap">
+                <input className="lp-mock__search" placeholder="🔎 氏名 / ふりがな" disabled />
+                <button className="lp-mock__chip lp-mock__chip--filter is-on" type="button" disabled>1年</button>
+                <button className="lp-mock__chip lp-mock__chip--filter" type="button" disabled>在籍のみ</button>
+                <button className="lp-mock__chip lp-mock__chip--filter lp-mock__chip--alert" type="button" disabled>アレルギー</button>
+            </div>
+
+            <table className="lp-mock__table">
+                <thead>
+                    <tr>
+                        <th>学年</th>
+                        <th>氏名</th>
+                        <th>拠点</th>
+                        <th>その他</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows.map((r) => (
+                        <tr key={r.code}>
+                            <td className="lp-mock__td-grade">{r.grade}年</td>
+                            <td className="lp-mock__td-name">
+                                <strong>{r.name}</strong>
+                                <span>ID {r.code}</span>
+                            </td>
+                            <td>{r.base}</td>
+                            <td className="lp-mock__td-tags">
+                                {r.allergy && <span className="lp-mock__pill lp-mock__pill--red">{r.allergy}</span>}
+                                {r.sib > 0 && <span className="lp-mock__pill lp-mock__pill--ok">兄弟{r.sib}</span>}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            <p className="lp-mock__table-foot">{rows.length} 件 ／ 並び替え可</p>
+        </div>
+    );
+};
+
+/* ===================== Screen 5: Child TEL note ===================== */
+
+const ChildTelScreen: React.FC = () => {
+    const siblings = [
+        { name: 'さとう ひなた', kana: 'サトウ ヒナタ' },
+        { name: 'さとう そうた', kana: 'サトウ ソウタ' },
+    ];
+    const logs = [
+        { ch: 'tel',     title: 'お迎え時間 17:30 へ変更',   author: '田中 先生', at: '04/30 10:14' },
+        { ch: 'meeting', title: '面談（学校との連携相談）', author: '田中 先生', at: '04/22 16:00' },
+        { ch: 'mail',    title: 'アレルギー追加のご連絡',   author: '佐藤 主任', at: '04/18 09:30' },
+    ];
+    const chLabel = { tel: '電話', meeting: '面談', mail: 'メール' } as const;
+    const chClass = { tel: 'lp-mock__pill--ok', meeting: 'lp-mock__pill--amber', mail: 'lp-mock__pill--blue' } as const;
+
+    return (
+        <div className="lp-mock lp-mock--tel">
+            <div className="lp-mock__app-header">
+                <span className="lp-mock__app-back">‹ 児童一覧</span>
+                <span className="lp-mock__app-title">TEL票</span>
+                <span className="lp-mock__chip lp-mock__chip--soft">編集</span>
+            </div>
+
+            <div className="lp-mock__tel-head">
+                <div className="lp-mock__tel-name">
+                    <strong>さとう だいち</strong>
+                    <span className="lp-mock__pill lp-mock__pill--ok">在籍</span>
+                </div>
+                <div className="lp-mock__tel-meta">
+                    <span>3年</span>・<span>まなびや</span>・<span>サンプル小</span>
+                </div>
+                <div className="lp-mock__tel-siblings">
+                    <span className="lp-mock__tel-sib-eyebrow">きょうだい</span>
+                    {siblings.map((s) => (
+                        <span key={s.name} className="lp-mock__tel-sib">
+                            <em>{s.kana}</em>
+                            <strong>{s.name}</strong>
+                        </span>
+                    ))}
+                </div>
+            </div>
+
+            <div className="lp-mock__tel-history">
+                <p className="lp-mock__tel-history-head">履歴（最新 → 過去）</p>
+                {logs.map((l, i) => (
+                    <div key={i} className="lp-mock__tel-log">
+                        <div className="lp-mock__tel-log-head">
+                            <span className={`lp-mock__pill ${chClass[l.ch as keyof typeof chClass]}`}>
+                                {chLabel[l.ch as keyof typeof chLabel]}
+                            </span>
+                            <strong>{l.title}</strong>
+                        </div>
+                        <div className="lp-mock__tel-log-meta">
+                            <span>入力者：{l.author}</span>
+                            <span>{l.at}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+/* ===================== Screen 6: Chats ===================== */
 
 const ChatsScreen: React.FC = () => {
     const threads = [
