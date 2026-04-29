@@ -11,6 +11,20 @@
 
 ---
 
+## 2026-04-30  ブランド・ビジュアル素材を統合
+
+- `C:\work\pldl\public\images\` から PLDL 公式ロゴ・機能アイコン群を `public/images/` にコピー
+    - 公式ロゴ: `ver1.png`, `ver2.png`, `1200_400.jpg`, `1080_1350.jpg`, `1920_1080.jpg`, `512_512.jpg`
+    - 機能アイコン: `attendance.png`, `QR.png`, `send.png`, `school.png`, `guardian.png`, `parents.png`, `login.png`, `info.png`, `base.png`, `car.png`, `press.png`, `new.png`, `save.png`, `add_school.png`, `add_guardian.png`, `expansion.png`
+- LPコンポーネントへの組み込み：
+    - Header: テキスト「PLDL」マークを `ver2.png` ロゴに差し替え
+    - Hero: 「運営団体ロゴ」カード（`ver1.png`）を視覚要素として追加。電話モックアップの各行にも機能アイコンを表示
+    - WhyPldl: 各カードに丸アイコン（school / press / guardian / info）を表示。運営団体カードに公式ロゴを大きく配置
+    - FieldIssues: 絵文字アイコンを実画像（press / car / attendance / save / parents）に差し替え
+    - Solutions: 各機能カードに対応アイコン（press / car / QR / send / save / info）を表示
+    - Footer: 公式ロゴ（`ver1.png`）を白背景パネルで配置
+- スタイル追加: `.lp-header__brand-logo`, `.lp-hero__brand-card`, `.lp-card--with-icon`, `.lp-card__icon`, `.lp-org-card__logo`, `.lp-feature__icon`, `.lp-footer__org-logo` 等
+
 ## 2026-04-30  初版構築
 
 - Laravel 11 プロジェクトを `C:\work\PLDL-LP` に新規作成

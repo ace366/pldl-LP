@@ -5,6 +5,11 @@ const Footer: React.FC = () => {
         <footer className="lp-footer">
             <div className="lp-container">
                 <div className="lp-footer__brand">
+                    <img
+                        className="lp-footer__org-logo"
+                        src="/images/ver1.png"
+                        alt="NPO法人 Playful Learning Design Lab."
+                    />
                     <p className="lp-footer__org-eyebrow">運営団体</p>
                     <h3 className="lp-footer__org-title">
                         NPO法人 Playful Learning Design Lab.
