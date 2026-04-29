@@ -837,6 +837,296 @@ body { padding: 24px 0; }
     font-size: 10pt;
 }
 
+/* ============================================================
+   ADDED: App Screens / Capabilities / Comparison
+   ============================================================ */
+
+/* --- App Screens (6 phone tiles) --- */
+.screens-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+}
+.screen-tile {
+    background: #fff;
+    border: 1px solid var(--c-border);
+    border-radius: 12px;
+    padding: 10px 10px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.screen-tile__eyebrow {
+    margin: 0;
+    font-size: 8pt;
+    font-weight: 800;
+    color: var(--c-orange);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+.screen-tile__title {
+    margin: 0;
+    font-size: 10.5pt;
+    font-weight: 800;
+    color: var(--c-navy);
+    line-height: 1.4;
+}
+.screen-tile__body {
+    margin: 0;
+    font-size: 8.5pt;
+    color: var(--c-muted);
+    line-height: 1.55;
+}
+
+/* --- Mini phone frame for pamphlet --- */
+.mini-phone {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 130px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #1f2937, #0f172a);
+    padding: 6px 6px 8px;
+    position: relative;
+}
+.mini-phone__notch {
+    position: absolute;
+    top: 4px; left: 50%; transform: translateX(-50%);
+    width: 36px; height: 6px;
+    background: #0b1220;
+    border-radius: 0 0 6px 6px;
+}
+.mini-phone__screen {
+    background: #f5f7fb;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    font-size: 7pt;
+    color: #1f2937;
+}
+.mini-phone__bar {
+    background: #fff;
+    border-bottom: 1px solid var(--c-border);
+    padding: 5px 6px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 6.5pt;
+    font-weight: 700;
+    color: var(--c-navy);
+}
+.mini-phone__bar-url {
+    background: #e2e8f0; color: #475569;
+    padding: 1px 4px; border-radius: 999px;
+    font-size: 6pt; font-weight: 600;
+}
+.mini-phone__body {
+    flex: 1;
+    padding: 6px;
+    overflow: hidden;
+}
+
+/* Mock content (pamphlet-only minimal versions) */
+.mp-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 3px 6px;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px solid var(--c-border);
+    margin-bottom: 4px;
+    font-size: 7pt;
+}
+.mp-row--head { background: var(--c-navy); color: #fff; border-color: var(--c-navy); font-weight: 700; }
+.mp-row--ok { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+.mp-row--alert { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+.mp-row--soft { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+.mp-row strong { font-weight: 700; }
+.mp-pill {
+    background: var(--c-blue-soft); color: var(--c-navy);
+    border: 1px solid var(--c-blue-line);
+    padding: 0 5px; border-radius: 999px;
+    font-size: 6.5pt; font-weight: 700;
+}
+.mp-pill--orange { background: var(--c-orange-soft); color: var(--c-orange); border-color: var(--c-orange-line); }
+.mp-pill--red { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+.mp-pill--green { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+.mp-qr {
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border-radius: 6px; padding: 4px;
+    border: 1px solid var(--c-border);
+    margin: 4px auto;
+    width: 60px; height: 60px;
+}
+.mp-qr-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    width: 100%; height: 100%;
+}
+.mp-qr-grid span { background: #0f172a; }
+.mp-qr-grid span.l { background: transparent; }
+.mp-card {
+    background: #fff;
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    padding: 5px 6px;
+    margin-bottom: 4px;
+}
+.mp-card__title { font-size: 7.5pt; font-weight: 700; color: var(--c-navy); }
+.mp-card__sub { font-size: 6.5pt; color: var(--c-soft); }
+
+.mp-scan-frame {
+    position: relative;
+    width: 70px; height: 70px;
+    margin: 4px auto;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border-radius: 6px;
+}
+.mp-scan-frame::before, .mp-scan-frame::after {
+    content: ""; position: absolute;
+    width: 12px; height: 12px;
+    border: 2px solid var(--c-orange);
+}
+.mp-scan-frame::before { top: 4px; left: 4px; border-right: 0; border-bottom: 0; }
+.mp-scan-frame::after { bottom: 4px; right: 4px; border-left: 0; border-top: 0; }
+.mp-scan-line {
+    position: absolute; left: 8px; right: 8px; top: 50%;
+    height: 2px; background: var(--c-orange); opacity: .8;
+}
+.mp-scan-result {
+    background: #1e293b; color: #fff;
+    border-radius: 6px; padding: 4px 6px;
+    font-size: 6.5pt;
+}
+.mp-scan-result strong { display: block; font-size: 7.5pt; }
+.mp-scan-result span { color: #cbd5e1; }
+
+.mp-tab {
+    display: inline-block;
+    background: var(--c-blue);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-size: 6.5pt;
+    margin-right: 3px;
+    font-weight: 700;
+}
+
+.screens-note {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: var(--c-blue-soft);
+    border: 1px solid var(--c-blue-line);
+    border-radius: 10px;
+    color: var(--c-navy);
+    font-size: 9pt;
+    line-height: 1.7;
+    text-align: center;
+}
+
+/* --- Capabilities --- */
+.cap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.cap-group {
+    background: #fff;
+    border: 1px solid var(--c-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+.cap-group__eyebrow {
+    margin: 0 0 2px;
+    color: var(--c-orange);
+    font-size: 8pt;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+.cap-group__title {
+    margin: 0 0 8px;
+    color: var(--c-navy);
+    font-size: 12pt;
+    font-weight: 800;
+}
+.cap-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.cap-item {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    gap: 6px;
+    align-items: flex-start;
+}
+.cap-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--c-blue-soft);
+    color: var(--c-blue);
+    font-size: 7.5pt;
+    font-weight: 800;
+    border: 1px solid var(--c-blue-line);
+    white-space: nowrap;
+}
+.cap-item__title { margin: 0; font-size: 9.5pt; font-weight: 700; color: var(--c-navy); line-height: 1.4; }
+.cap-item__body { margin: 1px 0 0; font-size: 8pt; color: var(--c-muted); line-height: 1.55; }
+
+/* --- Differentiation table --- */
+.diff-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--c-border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 9pt;
+}
+.diff-table thead th {
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 800;
+    font-size: 9pt;
+    letter-spacing: .04em;
+}
+.diff-table thead th:first-child { background: #f1f5f9; color: var(--c-soft); }
+.diff-table thead th.is-us { background: var(--c-navy); color: #fff; }
+.diff-table thead th.is-them { background: #475569; color: #fff; }
+.diff-table tbody td {
+    padding: 7px 10px;
+    border-top: 1px solid var(--c-border);
+    vertical-align: top;
+    line-height: 1.55;
+    font-size: 8.5pt;
+}
+.diff-table tbody td.diff-label {
+    color: var(--c-soft);
+    font-weight: 700;
+    background: #f8fafc;
+    width: 26%;
+}
+.diff-table tbody td.diff-us {
+    color: var(--c-navy);
+    font-weight: 700;
+}
+.diff-table tbody td.diff-them {
+    color: var(--c-soft);
+}
+.diff-note {
+    margin-top: 10px;
+    color: var(--c-soft);
+    font-size: 8.5pt;
+    line-height: 1.6;
+}
+
 /* ---------- Print specific ---------- */
 @media print {
     html, body {
@@ -1028,7 +1318,7 @@ body { padding: 24px 0; }
 
     <div class="page__footer">
         <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
-        <span class="page__num">P. <em>02</em> / 08</span>
+        <span class="page__num">P. <em>02</em> / 11</span>
     </div>
 </section>
 
@@ -1038,7 +1328,7 @@ body { padding: 24px 0; }
 <section class="page">
     <p class="eyebrow">02 ／ 解決策</p>
     <h2 class="section-title">PLDLの仕組みでできること
-        <small>学童に必要な機能だけを、シンプルにまとめました。</small>
+        <small>学童に必要な機能を、ひと通り揃えています。</small>
     </h2>
 
     <div class="feature-grid">
@@ -1052,56 +1342,333 @@ body { padding: 24px 0; }
         <article class="feature">
             <span class="feature__num">02</span>
             <div>
-                <h3 class="feature__title">お迎え変更管理</h3>
-                <p class="feature__body">誰が、何時に、どの方法で迎えに来るかをスタッフ全員に共有。引継ぎ漏れを防ぎます。</p>
+                <h3 class="feature__title">お迎え変更・送迎管理</h3>
+                <p class="feature__body">誰が・何時に・どの方法で迎えに来るかをスタッフ全員で共有。乗車済みもタップで記録。</p>
             </div>
         </article>
         <article class="feature">
             <span class="feature__num">03</span>
             <div>
-                <h3 class="feature__title">QR出席確認</h3>
-                <p class="feature__body">QRをかざすだけで出席を記録。紙の出席簿への二重記入をなくせます。</p>
+                <h3 class="feature__title">QR出席確認・手入力対応</h3>
+                <p class="feature__body">QRをかざすだけで受付。カード忘れには手入力フォールバックも標準で用意しています。</p>
             </div>
         </article>
         <article class="feature">
             <span class="feature__num">04</span>
             <div>
-                <h3 class="feature__title">保護者通知</h3>
-                <p class="feature__body">お知らせ・献立・写真などを一斉通知。確認状況もまとめて把握できます。</p>
+                <h3 class="feature__title">保護者通知・お知らせ</h3>
+                <p class="feature__body">お知らせ・献立・写真を一斉通知。LINE連携・既読確認・画像添付に対応します。</p>
             </div>
         </article>
         <article class="feature">
             <span class="feature__num">05</span>
             <div>
-                <h3 class="feature__title">月次CSV出力</h3>
-                <p class="feature__body">出席日数・延長時間などをワンクリックで集計し、CSVで出力。請求業務を短縮します。</p>
+                <h3 class="feature__title">月次CSV／PDF出力</h3>
+                <p class="feature__body">出席日数・延長時間などをワンクリックで集計。CSV／PDFで切り口を選んで出力できます。</p>
             </div>
         </article>
         <article class="feature">
             <span class="feature__num">06</span>
             <div>
-                <h3 class="feature__title">履歴保存</h3>
-                <p class="feature__body">欠席連絡や変更のやり取りはすべて履歴として残るため、属人化を解消できます。</p>
+                <h3 class="feature__title">TEL票・履歴保存</h3>
+                <p class="feature__body">電話／面談／メール等のやり取りを履歴で記録。誰でも経緯を確認でき、属人化を解消します。</p>
+            </div>
+        </article>
+        <article class="feature">
+            <span class="feature__num">07</span>
+            <div>
+                <h3 class="feature__title">きょうだい・複数保護者</h3>
+                <p class="feature__body">きょうだい児童の関連付け、続柄ごとの保護者複数登録に対応。家族単位で運用できます。</p>
+            </div>
+        </article>
+        <article class="feature">
+            <span class="feature__num">08</span>
+            <div>
+                <h3 class="feature__title">アレルギー・緊急情報</h3>
+                <p class="feature__body">アレルギー有無・緊急連絡先・特記事項を一画面で。検索の絞り込みにも使えます。</p>
+            </div>
+        </article>
+        <article class="feature">
+            <span class="feature__num">09</span>
+            <div>
+                <h3 class="feature__title">権限管理・スタッフ勤怠</h3>
+                <p class="feature__body">ロール別の閲覧／編集制御。出勤QR・シフト・給与までまとめて運用できます。</p>
             </div>
         </article>
     </div>
 
     <p class="feature-note">
-        ※ ご利用施設の運用に合わせて、機能の表示・非表示や項目の調整が可能です。<br>
-        　お困りごとに合わせて、必要な機能から段階的にご導入いただけます。
+        ※ ご利用施設の運用に合わせて、機能の表示・非表示や項目の調整が可能です。お困りごとに合わせて、必要な機能から段階的にご導入いただけます。
     </p>
 
     <div class="page__footer">
         <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
-        <span class="page__num">P. <em>03</em> / 08</span>
+        <span class="page__num">P. <em>03</em> / 11</span>
     </div>
 </section>
 
 <!-- =====================================================
-     PAGE 4 / TRUST
+     PAGE 4 / APP SCREENS (NEW)
      ===================================================== -->
 <section class="page">
-    <p class="eyebrow">03 ／ 運営団体について</p>
+    <p class="eyebrow">03 ／ アプリ画面</p>
+    <h2 class="section-title">スマホで、現場の動きをそのまま管理
+        <small>実際の運用イメージです（表示内容はすべてダミーです）。</small>
+    </h2>
+
+    <div class="screens-grid">
+        <!-- Screen 01: My QR -->
+        <article class="screen-tile">
+            <div class="mini-phone">
+                <span class="mini-phone__notch"></span>
+                <div class="mini-phone__screen">
+                    <div class="mini-phone__bar">
+                        <span>マイページ</span>
+                        <span class="mini-phone__bar-url">my-qr</span>
+                    </div>
+                    <div class="mini-phone__body" style="display:flex;flex-direction:column;align-items:center;">
+                        <div class="mp-card" style="width:100%;text-align:center;">
+                            <div class="mp-card__title">スタッフQR</div>
+                        </div>
+                        <div class="mp-qr">
+                            <div class="mp-qr-grid">
+                                <span></span><span></span><span></span><span class="l"></span><span></span><span></span><span></span>
+                                <span></span><span class="l"></span><span></span><span></span><span class="l"></span><span class="l"></span><span></span>
+                                <span></span><span></span><span></span><span class="l"></span><span></span><span></span><span></span>
+                                <span class="l"></span><span></span><span class="l"></span><span></span><span class="l"></span><span></span><span class="l"></span>
+                                <span></span><span></span><span></span><span class="l"></span><span></span><span></span><span></span>
+                                <span></span><span class="l"></span><span></span><span></span><span class="l"></span><span class="l"></span><span></span>
+                                <span></span><span></span><span></span><span class="l"></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                        <div class="mp-card" style="width:100%;text-align:center;">
+                            <div class="mp-card__sub">出勤打刻専用</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="screen-tile__eyebrow">01 ／ Staff QR</p>
+            <h3 class="screen-tile__title">スタッフ出勤QR</h3>
+            <p class="screen-tile__body">マイページのQRをかざして打刻。紙のタイムカードを廃止できます。</p>
+        </article>
+
+        <!-- Screen 02: Attendance intents -->
+        <article class="screen-tile">
+            <div class="mini-phone">
+                <span class="mini-phone__notch"></span>
+                <div class="mini-phone__screen">
+                    <div class="mini-phone__bar">
+                        <span>参加予定・送迎</span>
+                        <span class="mini-phone__bar-url">intents</span>
+                    </div>
+                    <div class="mini-phone__body">
+                        <div class="mp-row mp-row--head"><span>本日の出席</span><strong>38/42</strong></div>
+                        <div class="mp-row mp-row--alert"><span>さとう だいち</span><span class="mp-pill mp-pill--red">未到着</span></div>
+                        <div class="mp-row mp-row--soft"><span>たかはし みゆ</span><span class="mp-pill mp-pill--orange">送迎 未</span></div>
+                        <div class="mp-row mp-row--ok"><span>やまもと そう</span><span class="mp-pill mp-pill--green">出席</span></div>
+                        <div class="mp-row mp-row--ok"><span>なかがわ あおい</span><span class="mp-pill mp-pill--green">乗車済</span></div>
+                    </div>
+                </div>
+            </div>
+            <p class="screen-tile__eyebrow">02 ／ Attendance</p>
+            <h3 class="screen-tile__title">参加予定・送迎管理</h3>
+            <p class="screen-tile__body">拠点別に出席・送迎要否・乗車済みをひと目で。タップで状態を更新。</p>
+        </article>
+
+        <!-- Screen 03: Scan -->
+        <article class="screen-tile">
+            <div class="mini-phone">
+                <span class="mini-phone__notch"></span>
+                <div class="mini-phone__screen" style="background:#0b1220;color:#e2e8f0;">
+                    <div class="mini-phone__bar" style="background:#0f172a;color:#fff;border-bottom-color:#1e293b;">
+                        <span style="color:#fff;">QR読み取り</span>
+                        <span class="mini-phone__bar-url" style="background:#155e3a;color:#d1fae5;">音声 ON</span>
+                    </div>
+                    <div class="mini-phone__body" style="display:flex;flex-direction:column;gap:4px;">
+                        <div class="mp-scan-frame">
+                            <span class="mp-scan-line"></span>
+                        </div>
+                        <div class="mp-scan-result">
+                            <strong>なかむら こうた</strong>
+                            <span>サンプル小 ／ 3年</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="screen-tile__eyebrow">03 ／ QR Scan</p>
+            <h3 class="screen-tile__title">児童QRスキャン受付</h3>
+            <p class="screen-tile__body">カメラ＋手入力に対応。受付時に音声で名前を読み上げ。</p>
+        </article>
+
+        <!-- Screen 04: Children list -->
+        <article class="screen-tile">
+            <div class="mini-phone">
+                <span class="mini-phone__notch"></span>
+                <div class="mini-phone__screen">
+                    <div class="mini-phone__bar">
+                        <span>児童管理</span>
+                        <span class="mini-phone__bar-url">children</span>
+                    </div>
+                    <div class="mini-phone__body">
+                        <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px;">
+                            <span class="mp-pill">学年</span>
+                            <span class="mp-pill">在籍</span>
+                            <span class="mp-pill mp-pill--red">アレルギー</span>
+                        </div>
+                        <div class="mp-row"><span>1年 いとう ゆい</span><span class="mp-pill mp-pill--green">兄弟</span></div>
+                        <div class="mp-row"><span>2年 なかむら こうた</span><span class="mp-pill mp-pill--red">卵</span></div>
+                        <div class="mp-row"><span>3年 さとう だいち</span><span class="mp-pill mp-pill--green">兄弟2</span></div>
+                        <div class="mp-row"><span>4年 やまもと そう</span><span class="mp-pill mp-pill--red">小麦</span></div>
+                    </div>
+                </div>
+            </div>
+            <p class="screen-tile__eyebrow">04 ／ Children</p>
+            <h3 class="screen-tile__title">児童名簿（検索・絞り込み）</h3>
+            <p class="screen-tile__body">学年・在籍・アレルギーで絞り込み。並び替えにも対応。</p>
+        </article>
+
+        <!-- Screen 05: TEL note -->
+        <article class="screen-tile">
+            <div class="mini-phone">
+                <span class="mini-phone__notch"></span>
+                <div class="mini-phone__screen">
+                    <div class="mini-phone__bar">
+                        <span>TEL票</span>
+                        <span class="mini-phone__bar-url">tel</span>
+                    </div>
+                    <div class="mini-phone__body">
+                        <div class="mp-card">
+                            <div class="mp-card__title">さとう だいち <span class="mp-pill mp-pill--green" style="font-size:6pt;">在籍</span></div>
+                            <div class="mp-card__sub">3年 ／ まなびや教室</div>
+                            <div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap;">
+                                <span class="mp-pill mp-pill--green">きょうだい：ひなた</span>
+                                <span class="mp-pill mp-pill--green">そうた</span>
+                            </div>
+                        </div>
+                        <div class="mp-row"><span class="mp-tab">電話</span><span style="font-size:6.5pt;">お迎え 17:30 へ変更</span></div>
+                        <div class="mp-row"><span class="mp-tab" style="background:var(--c-orange)">面談</span><span style="font-size:6.5pt;">学校との連携相談</span></div>
+                        <div class="mp-row"><span class="mp-tab" style="background:var(--c-blue-2)">メール</span><span style="font-size:6.5pt;">アレルギー追加連絡</span></div>
+                    </div>
+                </div>
+            </div>
+            <p class="screen-tile__eyebrow">05 ／ TEL Note</p>
+            <h3 class="screen-tile__title">TEL票・きょうだい管理</h3>
+            <p class="screen-tile__body">対応履歴を電話／面談／メール別に保存。きょうだいへ1タップで往復。</p>
+        </article>
+
+        <!-- Screen 06: Chats -->
+        <article class="screen-tile">
+            <div class="mini-phone">
+                <span class="mini-phone__notch"></span>
+                <div class="mini-phone__screen">
+                    <div class="mini-phone__bar">
+                        <span>保護者チャット</span>
+                        <span class="mini-phone__bar-url">chats</span>
+                    </div>
+                    <div class="mini-phone__body">
+                        <div class="mp-card">
+                            <div style="display:flex;justify-content:space-between;">
+                                <div class="mp-card__title">さとう ご両親</div>
+                                <span class="mp-pill mp-pill--red" style="font-size:6pt;">2</span>
+                            </div>
+                            <div class="mp-card__sub">本日お迎えが17:30に…</div>
+                        </div>
+                        <div class="mp-card">
+                            <div class="mp-card__title">たかはし ご両親</div>
+                            <div class="mp-card__sub">明日は出席します。</div>
+                        </div>
+                        <div class="mp-card">
+                            <div style="display:flex;justify-content:space-between;">
+                                <div class="mp-card__title">やまもと ご両親</div>
+                                <span class="mp-pill mp-pill--red" style="font-size:6pt;">1</span>
+                            </div>
+                            <div class="mp-card__sub">アレルギーの確認…</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="screen-tile__eyebrow">06 ／ Chat</p>
+            <h3 class="screen-tile__title">保護者チャット</h3>
+            <p class="screen-tile__body">スレッド管理・未読数・既読状況。児童ごとの履歴も確認できます。</p>
+        </article>
+    </div>
+
+    <p class="screens-note">
+        ※ 表示中の名前・施設名・QRコード・メッセージはすべてダミーです。実際の運用データではありません。
+    </p>
+
+    <div class="page__footer">
+        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__num">P. <em>04</em> / 11</span>
+    </div>
+</section>
+
+<!-- =====================================================
+     PAGE 5 / CAPABILITIES (NEW)
+     ===================================================== -->
+<section class="page">
+    <p class="eyebrow">04 ／ さらにできること</p>
+    <h2 class="section-title">運営に必要なものを、ひと通り
+        <small>基本機能のほかに、現場で「あって良かった」と感じる細部を揃えています。</small>
+    </h2>
+
+    <div class="cap-grid">
+        <article class="cap-group">
+            <p class="cap-group__eyebrow">For Office</p>
+            <h3 class="cap-group__title">事務・運営をやさしく</h3>
+            <ul class="cap-list">
+                <li class="cap-item"><span class="cap-tag">締め</span><div><h4 class="cap-item__title">月次締め処理</h4><p class="cap-item__body">対象月の出席・延長・欠席をまとめて確定。請求やシフト計算の元データを安定させます。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">CSV</span><div><h4 class="cap-item__title">CSV／PDF 一括出力</h4><p class="cap-item__body">月次・施設別・児童別など切り口を選んで出力。請求や行政提出にもそのまま使えます。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">権限</span><div><h4 class="cap-item__title">ロール別権限管理</h4><p class="cap-item__body">管理者・主任・現場スタッフごとに「閲覧のみ／編集可」を細かく設定できます。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">通知</span><div><h4 class="cap-item__title">お知らせ編集・画像添付</h4><p class="cap-item__body">献立や行事のお知らせを画像付きで配信。スマホでも崩れずに読めます。</p></div></li>
+            </ul>
+        </article>
+
+        <article class="cap-group">
+            <p class="cap-group__eyebrow">For Field Staff</p>
+            <h3 class="cap-group__title">現場スタッフをやさしく</h3>
+            <ul class="cap-list">
+                <li class="cap-item"><span class="cap-tag">QR</span><div><h4 class="cap-item__title">スタッフ出勤QR</h4><p class="cap-item__body">マイページのQRをかざすだけで打刻。紙のタイムカードを廃止できます。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">シフト</span><div><h4 class="cap-item__title">シフト管理（カレンダー）</h4><p class="cap-item__body">月ごとのシフトを画面上で作成・編集。スタッフは自分の予定を確認できます。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">勤怠</span><div><h4 class="cap-item__title">勤怠ログ・修正履歴</h4><p class="cap-item__body">打刻ログ・修正履歴を残し、後追いの確認もしやすい形で保管します。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">給与</span><div><h4 class="cap-item__title">給与・源泉インポート</h4><p class="cap-item__body">時給・通勤手当・源泉徴収のCSV取り込みに対応。月末作業を圧縮します。</p></div></li>
+            </ul>
+        </article>
+
+        <article class="cap-group">
+            <p class="cap-group__eyebrow">For Families</p>
+            <h3 class="cap-group__title">保護者をやさしく</h3>
+            <ul class="cap-list">
+                <li class="cap-item"><span class="cap-tag">LINE</span><div><h4 class="cap-item__title">LINE連携・通知</h4><p class="cap-item__body">専用アプリ不要。LINEから通知を受け取り、お迎え変更や欠席連絡もスマホ完結。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">兄弟</span><div><h4 class="cap-item__title">きょうだい・複数保護者</h4><p class="cap-item__body">きょうだいの紐付け・続柄を保ったまま、保護者を複数登録できます。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">本人</span><div><h4 class="cap-item__title">プロフィール／アバター</h4><p class="cap-item__body">保護者・児童のプロフィールやアイコン画像を保護者自身で更新できます。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">予定</span><div><h4 class="cap-item__title">日別の利用予定登録</h4><p class="cap-item__body">「この日だけ来る」「連休はお休み」など、日別の利用予定をまとめて登録。</p></div></li>
+            </ul>
+        </article>
+
+        <article class="cap-group">
+            <p class="cap-group__eyebrow">For Children</p>
+            <h3 class="cap-group__title">子どもにやさしく</h3>
+            <ul class="cap-list">
+                <li class="cap-item"><span class="cap-tag">QR</span><div><h4 class="cap-item__title">児童QRカード</h4><p class="cap-item__body">受付QRをかざすだけ。文字入力に頼らず、低学年でも自分で受付できます。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">音声</span><div><h4 class="cap-item__title">受付音声案内（TTS）</h4><p class="cap-item__body">受付時に名前を音声で読み上げ。視認性が落ちる時間帯でも安心です。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">あそび</span><div><h4 class="cap-item__title">なぞなぞ表示</h4><p class="cap-item__body">受付後に小さななぞなぞを表示。義務的な打刻を、ささやかなワクワクへ。</p></div></li>
+                <li class="cap-item"><span class="cap-tag">UI</span><div><h4 class="cap-item__title">大きなタップ領域</h4><p class="cap-item__body">片手で操作できるよう、ボタンや余白を大きく・指で押しやすく設計しています。</p></div></li>
+            </ul>
+        </article>
+    </div>
+
+    <div class="page__footer">
+        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__num">P. <em>05</em> / 11</span>
+    </div>
+</section>
+
+<!-- =====================================================
+     PAGE 6 / TRUST
+     ===================================================== -->
+<section class="page">
+    <p class="eyebrow">05 ／ 運営団体について</p>
     <h2 class="section-title">現場を知らないIT会社ではありません
         <small>教育現場で実際に運営する団体が、課題から開発しています。</small>
     </h2>
@@ -1144,15 +1711,15 @@ body { padding: 24px 0; }
 
     <div class="page__footer">
         <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
-        <span class="page__num">P. <em>04</em> / 08</span>
+        <span class="page__num">P. <em>06</em> / 11</span>
     </div>
 </section>
 
 <!-- =====================================================
-     PAGE 5 / BEFORE - AFTER
+     PAGE 7 / BEFORE - AFTER
      ===================================================== -->
 <section class="page">
-    <p class="eyebrow">04 ／ 期待できる変化</p>
+    <p class="eyebrow">06 ／ 期待できる変化</p>
     <h2 class="section-title">導入で期待できる変化
         <small>「電話・紙・口頭」から、現場にやさしい運用へ。</small>
     </h2>
@@ -1199,15 +1766,60 @@ body { padding: 24px 0; }
 
     <div class="page__footer">
         <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
-        <span class="page__num">P. <em>05</em> / 08</span>
+        <span class="page__num">P. <em>07</em> / 11</span>
     </div>
 </section>
 
 <!-- =====================================================
-     PAGE 6 / PRICING
+     PAGE 8 / DIFFERENTIATION (NEW)
      ===================================================== -->
 <section class="page">
-    <p class="eyebrow">05 ／ 料金</p>
+    <p class="eyebrow">07 ／ 他社との比較</p>
+    <h2 class="section-title">他社サービスと、ここが違います
+        <small>現場で実運営しているからこそ気づいた細部に、確かな差があります。</small>
+    </h2>
+
+    <table class="diff-table">
+        <thead>
+            <tr>
+                <th>項目</th>
+                <th class="is-us">PLDLの学童DX</th>
+                <th class="is-them">一般的なITサービス</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td class="diff-label">開発元</td><td class="diff-us">教育現場を運営する NPO（PLDL）</td><td class="diff-them">IT企業・営業会社</td></tr>
+            <tr><td class="diff-label">相談相手</td><td class="diff-us">開発者本人と直接相談できる</td><td class="diff-them">営業窓口経由・担当者交代あり</td></tr>
+            <tr><td class="diff-label">現場知見</td><td class="diff-us">実際の運営から仕様を設計</td><td class="diff-them">一般的なヒアリングベース</td></tr>
+            <tr><td class="diff-label">QRカード忘れ対応</td><td class="diff-us">手入力フォールバック標準搭載</td><td class="diff-them">スキャン不可のままになりがち</td></tr>
+            <tr><td class="diff-label">受付の体験</td><td class="diff-us">音声案内・なぞなぞ表示で子どもにやさしく</td><td class="diff-them">事務的な打刻のみ</td></tr>
+            <tr><td class="diff-label">きょうだい管理</td><td class="diff-us">きょうだい紐付け・1タップで往復</td><td class="diff-them">別々の児童として個別管理</td></tr>
+            <tr><td class="diff-label">保護者通知</td><td class="diff-us">LINE連携・既読確認・画像添付対応</td><td class="diff-them">メール通知中心・確認状況不明</td></tr>
+            <tr><td class="diff-label">送迎対応</td><td class="diff-us">送迎要否・乗車済みを画面で共有</td><td class="diff-them">紙やホワイトボードで管理</td></tr>
+            <tr><td class="diff-label">TEL票・履歴</td><td class="diff-us">電話／面談／メールを履歴で保存</td><td class="diff-them">個人ノート任せで属人化</td></tr>
+            <tr><td class="diff-label">出力</td><td class="diff-us">CSV／PDF を月次・施設別に出力</td><td class="diff-them">CSVのみ・固定フォーマット</td></tr>
+            <tr><td class="diff-label">スタッフ運用</td><td class="diff-us">出勤QR・シフト・給与まで一体運用</td><td class="diff-them">別システムを併用しがち</td></tr>
+            <tr><td class="diff-label">権限管理</td><td class="diff-us">ロール別の閲覧／編集を細かく制御</td><td class="diff-them">管理者・一般の2段階のみ</td></tr>
+            <tr><td class="diff-label">改善方針</td><td class="diff-us">現場の声を継続的に反映（NPO自身が利用）</td><td class="diff-them">機能要望はチケット待ち</td></tr>
+            <tr><td class="diff-label">スタンス</td><td class="diff-us">相談型・押し売りなし</td><td class="diff-them">商談クロージング型</td></tr>
+        </tbody>
+    </table>
+
+    <p class="diff-note">
+        ※ 比較対象は一般的に学童・教育施設で見かけるITサービスの傾向をまとめたものです。個別の他社サービスを指すものではありません。
+    </p>
+
+    <div class="page__footer">
+        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__num">P. <em>08</em> / 11</span>
+    </div>
+</section>
+
+<!-- =====================================================
+     PAGE 9 / PRICING
+     ===================================================== -->
+<section class="page">
+    <p class="eyebrow">08 ／ 料金</p>
     <h2 class="section-title">施設規模に合わせた月額制
         <small>スモールスタート可能。必要な機能から段階導入できます。</small>
     </h2>
@@ -1276,15 +1888,15 @@ body { padding: 24px 0; }
 
     <div class="page__footer">
         <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
-        <span class="page__num">P. <em>06</em> / 08</span>
+        <span class="page__num">P. <em>09</em> / 11</span>
     </div>
 </section>
 
 <!-- =====================================================
-     PAGE 7 / FLOW
+     PAGE 10 / FLOW
      ===================================================== -->
 <section class="page">
-    <p class="eyebrow">06 ／ 導入の流れ</p>
+    <p class="eyebrow">09 ／ 導入の流れ</p>
     <h2 class="section-title">ご利用開始まで簡単4ステップ
         <small>押し売りはいたしません。施設に合うかをご一緒に確認します。</small>
     </h2>
@@ -1331,15 +1943,15 @@ body { padding: 24px 0; }
 
     <div class="page__footer">
         <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
-        <span class="page__num">P. <em>07</em> / 08</span>
+        <span class="page__num">P. <em>10</em> / 11</span>
     </div>
 </section>
 
 <!-- =====================================================
-     PAGE 8 / FINAL CTA
+     PAGE 11 / FINAL CTA
      ===================================================== -->
 <section class="page">
-    <p class="eyebrow">07 ／ ご相談はこちらから</p>
+    <p class="eyebrow">10 ／ ご相談はこちらから</p>
     <h2 class="section-title">まずは現場に合うかご確認ください
         <small>ご相談・ご質問のみでも、お気軽にご連絡ください。</small>
     </h2>
@@ -1387,7 +1999,7 @@ body { padding: 24px 0; }
 
     <div class="page__footer">
         <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
-        <span class="page__num">P. <em>08</em> / 08</span>
+        <span class="page__num">P. <em>11</em> / 11</span>
     </div>
 </section>
 
