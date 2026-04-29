@@ -54,11 +54,6 @@ const Hero: React.FC<Props> = ({ settings }) => {
                 </p>
 
                 <div className="lp-hero__visual">
-                    <figure className="lp-hero__brand-card" aria-label="NPO法人 Playful Learning Design Lab. ロゴ">
-                        <img src="/images/ver1.png" alt="NPO法人 Playful Learning Design Lab." />
-                        <figcaption>運営団体ロゴ</figcaption>
-                    </figure>
-
                     <div className="lp-hero__phone" aria-hidden="true">
                         <div className="lp-hero__phone-screen">
                             <div className="lp-hero__phone-row lp-hero__phone-row--head">

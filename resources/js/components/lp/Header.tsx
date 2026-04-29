@@ -26,13 +26,10 @@ const Header: React.FC<Props> = ({ settings }) => {
         <header className={`lp-header${scrolled ? ' is-scrolled' : ''}`}>
             <div className="lp-header__inner">
                 <a href="#top" className="lp-header__brand" aria-label="NPO法人 Playful Learning Design Lab.">
-                    <img
-                        src="/images/ver2.png"
-                        alt="NPO法人 Playful Learning Design Lab."
-                        className="lp-header__brand-logo"
-                        width="160"
-                        height="84"
-                    />
+                    <span className="lp-header__brand-mark" aria-hidden="true">PLDL</span>
+                    <span className="lp-header__brand-text">
+                        NPO法人 Playful Learning Design Lab.
+                    </span>
                 </a>
 
                 <nav className={`lp-header__nav${open ? ' is-open' : ''}`}>

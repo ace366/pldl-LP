@@ -53,29 +53,22 @@ const WhyPldl: React.FC = () => {
 
                 <aside className="lp-org-card" aria-label="運営団体">
                     <div className="lp-org-card__inner">
-                        <img
-                            className="lp-org-card__logo"
-                            src="/images/ver1.png"
-                            alt="NPO法人 Playful Learning Design Lab."
-                        />
-                        <div>
-                            <p className="lp-org-card__eyebrow">運営団体</p>
-                            <h3 className="lp-org-card__title">
-                                NPO法人 Playful Learning Design Lab.（PLDL）
-                            </h3>
-                            <p className="lp-org-card__body">
-                                子どもたちの学びのワクワクを育み、安心して過ごせる居場所づくり・学びの場づくりに取り組む法人です。
-                                現場で実際に運営・活動する中で見えてきた課題をもとに、本システムを開発しています。
-                            </p>
-                            <a
-                                className="lp-btn lp-btn--ghost lp-btn--sm"
-                                href="https://pldl.or.jp/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                PLDLの活動を見る →
-                            </a>
-                        </div>
+                        <p className="lp-org-card__eyebrow">運営団体</p>
+                        <h3 className="lp-org-card__title">
+                            NPO法人 Playful Learning Design Lab.（PLDL）
+                        </h3>
+                        <p className="lp-org-card__body">
+                            子どもたちの学びのワクワクを育み、安心して過ごせる居場所づくり・学びの場づくりに取り組む法人です。
+                            現場で実際に運営・活動する中で見えてきた課題をもとに、本システムを開発しています。
+                        </p>
+                        <a
+                            className="lp-btn lp-btn--ghost lp-btn--sm"
+                            href="https://pldl.or.jp/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            PLDLの活動を見る →
+                        </a>
                     </div>
                 </aside>
             </div>
