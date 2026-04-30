@@ -361,6 +361,8 @@ textarea.input { min-height: 70px; resize: vertical; }
     border: 1px solid var(--c-border);
 }
 .link-icon:hover { background: var(--c-blue-soft); color: var(--c-blue); border-color: var(--c-blue-line); }
+.link-icon--mail { background: var(--c-orange-soft); color: var(--c-orange); border-color: var(--c-orange-line); font-weight: 800; }
+.link-icon--mail:hover { background: var(--c-orange); color: #fff; }
 
 .next-date { font-size: 12px; color: var(--c-text); }
 .next-date--soon { color: var(--c-orange); font-weight: 700; }

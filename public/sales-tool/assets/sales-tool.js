@@ -552,7 +552,7 @@
             if (q) {
                 const blob = [
                     it.facility, it.prefecture, it.city, it.address,
-                    it.phone, it.memo, it.type,
+                    it.phone, it.email, it.memo, it.type,
                 ].join(' ').toLowerCase();
                 if (!blob.includes(q)) return false;
             }
@@ -593,6 +593,8 @@
 
     function linkIcons(it) {
         const parts = [];
+        if (it.email && /@/.test(it.email))
+            parts.push(`<a class="link-icon link-icon--mail" href="mailto:${escape(it.email)}" title="メール送信: ${escape(it.email)}">@</a>`);
         if (isUrl(it.websiteUrl))     parts.push(`<a class="link-icon" href="${escape(it.websiteUrl)}"     target="_blank" rel="noopener" title="Webサイト">🌐</a>`);
         if (isUrl(it.contactFormUrl)) parts.push(`<a class="link-icon" href="${escape(it.contactFormUrl)}" target="_blank" rel="noopener" title="問い合わせフォーム">✉</a>`);
         if (isUrl(it.gmapUrl))        parts.push(`<a class="link-icon" href="${escape(it.gmapUrl)}"        target="_blank" rel="noopener" title="Googleマップ">📍</a>`);
@@ -659,6 +661,7 @@
                     ${it.prefecture || it.city ? `<dt>エリア</dt><dd>${escape([it.prefecture, it.city].filter(Boolean).join(' '))}</dd>` : ''}
                     ${it.address ? `<dt>住所</dt><dd>${escape(it.address)}</dd>` : ''}
                     ${it.phone ? `<dt>電話</dt><dd>${escape(it.phone)}</dd>` : ''}
+                    ${it.email ? `<dt>メール</dt><dd><a href="mailto:${escape(it.email)}">${escape(it.email)}</a></dd>` : ''}
                     ${it.type ? `<dt>種別</dt><dd>${escape(it.type)}</dd>` : ''}
                     ${it.nextActionAt ? `<dt>次回</dt><dd>${nextDateCell(it.nextActionAt)}</dd>` : ''}
                     ${it.memo ? `<dt>メモ</dt><dd>${escape(it.memo)}</dd>` : ''}
@@ -739,7 +742,7 @@
         el('modal-title').textContent = editing ? '施設を編集' : '施設を追加';
         el('btn-delete').hidden = !editing;
 
-        const fields = ['id','facility','prefecture','city','address','phone',
+        const fields = ['id','facility','prefecture','city','address','phone','email',
                         'websiteUrl','contactFormUrl','gmapUrl','type',
                         'priority','status','firstSentAt','nextActionAt','memo'];
         const data = item || { status: '未送信' };
@@ -771,7 +774,7 @@
 
     function readForm() {
         const data = {};
-        ['id','facility','prefecture','city','address','phone',
+        ['id','facility','prefecture','city','address','phone','email',
          'websiteUrl','contactFormUrl','gmapUrl','type',
          'priority','status','firstSentAt','nextActionAt','memo'].forEach((k) => {
             const elField = form.elements[k];
@@ -799,6 +802,7 @@
             ['city','市区町村'],
             ['address','住所'],
             ['phone','電話番号'],
+            ['email','メールアドレス'],
             ['websiteUrl','Webサイト'],
             ['contactFormUrl','問い合わせフォーム'],
             ['gmapUrl','GoogleMap'],
@@ -1092,6 +1096,7 @@
  * @property {string} [city]
  * @property {string} [address]
  * @property {string} [phone]
+ * @property {string} [email]
  * @property {string} [websiteUrl]
  * @property {string} [contactFormUrl]
  * @property {string} [gmapUrl]

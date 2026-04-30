@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=noto-sans-jp:400,500,700,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/sales-tool.css?v=9">
+<link rel="stylesheet" href="assets/sales-tool.css?v=10">
 </head>
 <body>
 
@@ -67,7 +67,7 @@
                 type="search"
                 class="input input--search"
                 id="filter-q"
-                placeholder="施設名 / 住所 / 都道府県 / 市区町村 / メモ"
+                placeholder="施設名 / 住所 / 都道府県 / 市区町村 / メール / メモ"
                 autocomplete="off"
             >
             <select class="input input--select" id="filter-priority">
@@ -172,6 +172,11 @@
                 </label>
 
                 <label class="field field--span-2">
+                    <span class="field__label">メールアドレス <span class="field__hint">任意・営業送信先</span></span>
+                    <input class="input" type="email" name="email" maxlength="255" placeholder="contact@example.com" autocomplete="off">
+                </label>
+
+                <label class="field field--span-2">
                     <span class="field__label">WebサイトURL</span>
                     <input class="input" type="url" name="websiteUrl" maxlength="500" placeholder="https://...">
                 </label>
@@ -263,6 +268,6 @@
 <!-- ========== Toast ========== -->
 <div class="toast" id="toast" hidden></div>
 
-<script src="assets/sales-tool.js?v=9"></script>
+<script src="assets/sales-tool.js?v=10"></script>
 </body>
 </html>
