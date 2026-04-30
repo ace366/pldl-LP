@@ -45,8 +45,9 @@ class GakudoLpContactController extends Controller
         // Honeypot — 人間に見えない hidden field "website" を bot は埋めてくる。
         // 値が入っていたら受付成功を装って静かに無視する（200 を返してログだけ残す）。
         if ($request->filled('website')) {
-            Log::info('LP contact honeypot triggered', [
+            Log::warning('LP contact honeypot triggered', [
                 'ip' => $request->ip(),
+                'ua' => substr((string) $request->userAgent(), 0, 200),
                 'website' => substr((string) $request->input('website'), 0, 200),
             ]);
             return response()->json([
