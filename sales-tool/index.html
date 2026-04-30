@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>営業リスト | PLDL Sales Tool</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link href="https://fonts.bunny.net/css?family=noto-sans-jp:400,500,700,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sales-tool.css">
+</head>
+<body>
+
+<!-- ========== Header ========== -->
+<header class="app-header">
+    <div class="app-header__inner">
+        <div class="app-header__brand">
+            <span class="brand-mark">PLDL</span>
+            <span class="brand-text">営業リスト管理</span>
+        </div>
+        <nav class="app-header__nav">
+            <button type="button" class="btn btn--ghost btn--sm" id="btn-export-json" title="JSON 書き出し">JSON 書き出し</button>
+            <button type="button" class="btn btn--ghost btn--sm" id="btn-import-json" title="JSON 取り込み">JSON 取り込み</button>
+            <button type="button" class="btn btn--ghost btn--sm" id="btn-export-csv" title="CSV 書き出し">CSV 書き出し</button>
+            <input type="file" id="import-json-file" accept=".json,application/json" hidden>
+        </nav>
+    </div>
+</header>
+
+<main class="app-main">
+
+    <!-- ========== KPI Cards ========== -->
+    <section class="kpi-grid" aria-label="進捗ダッシュボード">
+        <div class="kpi-card kpi-card--primary">
+            <div class="kpi-card__head">
+                <span class="kpi-card__label">登録件数</span>
+                <span class="kpi-card__sub">/ 100 目標</span>
+            </div>
+            <div class="kpi-card__num"><span id="kpi-total">0</span><span class="kpi-card__unit">件</span></div>
+            <div class="progress">
+                <div class="progress__bar" id="kpi-progress" style="width:0%"></div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-card__label">Sランク</div>
+            <div class="kpi-card__num"><span id="kpi-s">0</span><span class="kpi-card__unit">件</span></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-card__label">未送信</div>
+            <div class="kpi-card__num"><span id="kpi-untouched">0</span><span class="kpi-card__unit">件</span></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-card__label">返信あり</div>
+            <div class="kpi-card__num"><span id="kpi-replied">0</span><span class="kpi-card__unit">件</span></div>
+        </div>
+        <div class="kpi-card kpi-card--ok">
+            <div class="kpi-card__label">契約</div>
+            <div class="kpi-card__num"><span id="kpi-contracted">0</span><span class="kpi-card__unit">件</span></div>
+        </div>
+    </section>
+
+    <!-- ========== Toolbar ========== -->
+    <section class="toolbar">
+        <div class="toolbar__filters">
+            <input
+                type="search"
+                class="input input--search"
+                id="filter-q"
+                placeholder="施設名 / 住所 / 都道府県 / 市区町村 / メモ"
+                autocomplete="off"
+            >
+            <select class="input input--select" id="filter-priority">
+                <option value="">優先度（すべて）</option>
+                <option value="S">S</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+            </select>
+            <select class="input input--select" id="filter-status">
+                <option value="">ステータス（すべて）</option>
+                <option value="未送信">未送信</option>
+                <option value="送信済み">送信済み</option>
+                <option value="返信あり">返信あり</option>
+                <option value="商談">商談</option>
+                <option value="契約">契約</option>
+                <option value="見送り">見送り</option>
+                <option value="対象外">対象外</option>
+            </select>
+        </div>
+        <div class="toolbar__actions">
+            <button type="button" class="btn btn--primary btn--lg" id="btn-add">+ 新規追加</button>
+        </div>
+    </section>
+
+    <!-- ========== List ========== -->
+    <section class="list-wrap" aria-live="polite">
+        <div class="list-empty" id="list-empty" hidden>
+            まだ登録された施設はありません。「+ 新規追加」から始めましょう。
+        </div>
+
+        <!-- Desktop table -->
+        <table class="data-table" id="data-table" hidden>
+            <thead>
+                <tr>
+                    <th class="col-priority">優先</th>
+                    <th class="col-status">ステータス</th>
+                    <th class="col-facility">施設名</th>
+                    <th class="col-area">エリア</th>
+                    <th class="col-type">種別</th>
+                    <th class="col-links">リンク</th>
+                    <th class="col-next">次回</th>
+                    <th class="col-actions"></th>
+                </tr>
+            </thead>
+            <tbody id="data-tbody"></tbody>
+        </table>
+
+        <!-- Mobile cards -->
+        <div class="card-list" id="card-list" hidden></div>
+    </section>
+</main>
+
+<!-- ========== Modal: Edit / Add ========== -->
+<div class="modal" id="modal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <header class="modal__head">
+            <h2 class="modal__title" id="modal-title">施設を追加</h2>
+            <button type="button" class="modal__close" aria-label="閉じる" data-close>×</button>
+        </header>
+        <form id="form" class="modal__body">
+            <input type="hidden" name="id" value="">
+
+            <div class="form-grid">
+                <label class="field field--span-2">
+                    <span class="field__label">施設名 <em class="req">必須</em></span>
+                    <input class="input" type="text" name="facility" required maxlength="100">
+                </label>
+
+                <label class="field">
+                    <span class="field__label">都道府県</span>
+                    <input class="input" type="text" name="prefecture" list="prefectures" maxlength="20">
+                </label>
+                <label class="field">
+                    <span class="field__label">市区町村</span>
+                    <input class="input" type="text" name="city" maxlength="50">
+                </label>
+
+                <label class="field field--span-2">
+                    <span class="field__label">住所</span>
+                    <input class="input" type="text" name="address" maxlength="200">
+                </label>
+
+                <label class="field">
+                    <span class="field__label">電話番号</span>
+                    <input class="input" type="tel" name="phone" maxlength="30">
+                </label>
+                <label class="field">
+                    <span class="field__label">種別</span>
+                    <select class="input" name="type">
+                        <option value="">選択してください</option>
+                        <option value="民間学童">民間学童</option>
+                        <option value="放課後児童クラブ">放課後児童クラブ</option>
+                        <option value="NPO">NPO</option>
+                        <option value="法人運営">法人運営</option>
+                        <option value="公立/自治体系">公立/自治体系</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </label>
+
+                <label class="field field--span-2">
+                    <span class="field__label">WebサイトURL</span>
+                    <input class="input" type="url" name="websiteUrl" maxlength="500" placeholder="https://...">
+                </label>
+                <label class="field field--span-2">
+                    <span class="field__label">問い合わせフォームURL</span>
+                    <input class="input" type="url" name="contactFormUrl" maxlength="500" placeholder="https://...">
+                </label>
+                <label class="field field--span-2">
+                    <span class="field__label">GoogleマップURL</span>
+                    <input class="input" type="url" name="gmapUrl" maxlength="500" placeholder="https://maps.google.com/...">
+                </label>
+
+                <label class="field">
+                    <span class="field__label">優先度
+                        <button type="button" class="link-btn" id="btn-suggest-priority" title="種別・URLの有無から優先度を自動判定">自動判定</button>
+                    </span>
+                    <select class="input" name="priority">
+                        <option value="">未設定</option>
+                        <option value="S">S</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span class="field__label">営業ステータス</span>
+                    <select class="input" name="status">
+                        <option value="未送信">未送信</option>
+                        <option value="送信済み">送信済み</option>
+                        <option value="返信あり">返信あり</option>
+                        <option value="商談">商談</option>
+                        <option value="契約">契約</option>
+                        <option value="見送り">見送り</option>
+                        <option value="対象外">対象外</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    <span class="field__label">初回送信日</span>
+                    <input class="input" type="date" name="firstSentAt">
+                </label>
+                <label class="field">
+                    <span class="field__label">次回対応日</span>
+                    <input class="input" type="date" name="nextActionAt">
+                </label>
+
+                <label class="field field--span-2">
+                    <span class="field__label">メモ</span>
+                    <textarea class="input" name="memo" rows="3" maxlength="2000"></textarea>
+                </label>
+            </div>
+
+            <footer class="modal__foot">
+                <button type="button" class="btn btn--danger" id="btn-delete" hidden>削除</button>
+                <span style="flex:1"></span>
+                <button type="button" class="btn btn--ghost" data-close>キャンセル</button>
+                <button type="submit" class="btn btn--primary">保存</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
+<datalist id="prefectures">
+    <option value="北海道"><option value="青森県"><option value="岩手県"><option value="宮城県"><option value="秋田県">
+    <option value="山形県"><option value="福島県"><option value="茨城県"><option value="栃木県"><option value="群馬県">
+    <option value="埼玉県"><option value="千葉県"><option value="東京都"><option value="神奈川県"><option value="新潟県">
+    <option value="富山県"><option value="石川県"><option value="福井県"><option value="山梨県"><option value="長野県">
+    <option value="岐阜県"><option value="静岡県"><option value="愛知県"><option value="三重県"><option value="滋賀県">
+    <option value="京都府"><option value="大阪府"><option value="兵庫県"><option value="奈良県"><option value="和歌山県">
+    <option value="鳥取県"><option value="島根県"><option value="岡山県"><option value="広島県"><option value="山口県">
+    <option value="徳島県"><option value="香川県"><option value="愛媛県"><option value="高知県"><option value="福岡県">
+    <option value="佐賀県"><option value="長崎県"><option value="熊本県"><option value="大分県"><option value="宮崎県">
+    <option value="鹿児島県"><option value="沖縄県">
+</datalist>
+
+<!-- ========== Toast ========== -->
+<div class="toast" id="toast" hidden></div>
+
+<script src="assets/sales-tool.js"></script>
+</body>
+</html>
