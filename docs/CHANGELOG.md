@@ -11,6 +11,19 @@
 
 ---
 
+## 2026-04-30  問い合わせ通知メールの改行が消える件 / .bat の LF 起因事故
+
+### 通知メールの改行問題
+`GakudoLpContactReceived` の `Content` が `view:` で渡されており、HTML として送信されていたため、メールクライアントが改行を空白扱いして本文が一行に潰れていた。`text:` に切替してプレーンテキスト送信に修正。
+
+### `.bat` の LF 改行で WPS Office が連続起動する事故
+`deploy_pldl_lp_to_sakura.bat` を LF 改行で保存していたため、`cmd.exe` が各行先頭1〜2文字を脱落させて文字化けトークン (`tlocal`, `EM`, `t` 等) を生成→ファイル名と誤認識→**.bat 関連付けの WPS Office Spreadsheet が起動を繰り返す**事故が発生。
+
+- 該当 .bat を CRLF に再保存
+- `.gitattributes` に `*.bat / *.cmd text eol=crlf` を追加し再発防止
+
+---
+
 ## 2026-04-30  本番 SMTP（さくら）動作確認 + テンプレ修正
 
 `MAIL_USERNAME=no-reply@pldl.or.jp / pass=t366bbmh` で 535 認証失敗していた件、ユーザー確認の結果 **`t366bbmh` は `support@top-ace-picard.sakura.ne.jp` のパスワード**だった。
