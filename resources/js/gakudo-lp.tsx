@@ -21,6 +21,7 @@ if (mount) {
         gaMeasurementId: '',
         gscVerification: '',
         privacyPolicy: '',
+        pamphletUrl: '',
         contactEndpoint: asset('/gakudo/contact'),
     };
 

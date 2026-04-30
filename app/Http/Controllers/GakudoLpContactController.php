@@ -33,6 +33,7 @@ class GakudoLpContactController extends Controller
             'gscVerification'     => $val('gsc_verification'),
             'noindex'             => $bool('noindex'),
             'privacyPolicy'       => $val('privacy_policy'),
+            'pamphletUrl'         => $val('pamphlet_url'),
             'contactEndpoint'     => route('gakudo-lp.contact'),
         ];
 

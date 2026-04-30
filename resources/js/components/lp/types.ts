@@ -11,5 +11,6 @@ export type LpSettings = {
     gaMeasurementId: string;
     gscVerification: string;
     privacyPolicy: string;
+    pamphletUrl: string;
     contactEndpoint: string;
 };

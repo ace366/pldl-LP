@@ -11,6 +11,20 @@
 
 ---
 
+## 2026-04-30  パンフレット PDF + LP からダウンロード導線
+
+### PDF
+- `docs/pamphlet.html` を Chrome headless (`--print-to-pdf`) で `public/downloads/pldl-gakudo-pamphlet.pdf` に変換 (1.14MB / 11ページ A4)
+- パンフレット側は `@page A4 portrait` / `print-color-adjust:exact` / `page-break-after:always` 等が組まれていたためそのまま通った
+- 再生成は `tools/build-pamphlet-pdf.bat` を実行（Chrome 同梱パスから headless 起動）
+
+### LP からの導線
+- マイグレーション `2026_04_30_000005_add_pamphlet_url_to_lp_settings`: `lp_settings.pamphlet_url` (default `/downloads/pldl-gakudo-pamphlet.pdf`、group=cta) を追加
+- Hero に「📄 資料をダウンロード（PDF）」ボタンを追加。`pamphlet_url` が空のときは非表示。`download` 属性 + `target="_blank"` で別タブ DL
+- 管理画面「CTA / 外部リンク」セクションから URL 編集可能（外部の DL ホスティングに切替もできる）
+
+---
+
 ## 2026-04-30  管理画面に問い合わせ一覧 / 詳細を追加
 
 - 一覧 `/admin/contacts`: ステータスタブ（すべて / 新規 / 連絡済み / デモ予定 / 契約 / 失注）+ 検索（施設名・担当者名・メール・電話）+ 20件ページネーション。各行 pill でステータス可視化

@@ -38,6 +38,17 @@ const Hero: React.FC<Props> = ({ settings }) => {
                     <a className="lp-btn lp-btn--secondary lp-btn--lg" href="#video">
                         3分紹介を見る
                     </a>
+                    {settings.pamphletUrl && (
+                        <a
+                            className="lp-btn lp-btn--ghost lp-btn--lg"
+                            href={asset(settings.pamphletUrl)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                        >
+                            <span aria-hidden="true">📄</span> 資料をダウンロード（PDF）
+                        </a>
+                    )}
                     {settings.lineConsultUrl && (
                         <a
                             className="lp-btn lp-btn--ghost lp-btn--lg"
