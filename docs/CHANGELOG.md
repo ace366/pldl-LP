@@ -11,6 +11,31 @@
 
 ---
 
+## 2026-04-30  「3分紹介動画」関連を一括削除（動画未完成のため）
+
+動画コンテンツの完成が未定のため、関連する文言・UI・設定を全部位から削除。
+
+### LP
+- `resources/js/pages/GakudoLp.tsx` から `<VideoSection />` を取り外し
+- `resources/js/components/lp/VideoSection.tsx` 自体を削除
+- `Hero.tsx` の「3分紹介を見る」二次 CTA ボタンを削除、Hero 下のシーケンス案内を「15分デモ → 無料トライアル の順でご案内します。」に短縮
+
+### 問い合わせ
+- ContactForm の希望内容プルダウンから `'video' = 3分動画を見たい` を削除
+- 通知メール (`emails/gakudo-lp/contact-received.blade.php`) の purpose ラベル表からも削除
+- 管理画面詳細 (`Admin/GakudoLpContactsAdminController`) の purposeMap からも削除
+
+### 設定
+- マイグレーション `2026_04_30_000006_remove_intro_video_url_setting` で `lp_settings.intro_video_url` 行を削除
+- Controller payload から `introVideoUrl` を除去、`LpSettings` 型 / 既定値からも除去
+- `docs/SETTINGS.md` の対応行を削除
+
+### 営業ツール
+- `public/sales-tool/assets/sales-tool.js` の営業文テンプレから「3分の紹介動画または」を削り、「15分ほどのオンラインデモでご紹介可能です。」に短縮
+- アセット cache-bust を `?v=5` に
+
+---
+
 ## 2026-04-30  営業リストツールを public/ 配下に移して本番公開
 
 `sales-tool/` ディレクトリを `public/sales-tool/` に移動。本番からも `https://top-ace-picard.sakura.ne.jp/pldl-lp/sales-tool/` で開けるようにした。

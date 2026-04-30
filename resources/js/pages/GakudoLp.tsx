@@ -6,7 +6,6 @@ import FieldIssues from '../components/lp/FieldIssues';
 import Solutions from '../components/lp/Solutions';
 import AppScreens from '../components/lp/AppScreens';
 import Capabilities from '../components/lp/Capabilities';
-import VideoSection from '../components/lp/VideoSection';
 import AfterEffects from '../components/lp/AfterEffects';
 import Differentiation from '../components/lp/Differentiation';
 import Pricing from '../components/lp/Pricing';
@@ -31,7 +30,6 @@ const GakudoLp: React.FC<Props> = ({ settings }) => {
                 <Solutions />
                 <AppScreens />
                 <Capabilities />
-                <VideoSection settings={settings} />
                 <AfterEffects />
                 <Differentiation />
                 <Pricing settings={settings} />

@@ -21,7 +21,6 @@ class GakudoLpContactController extends Controller
 
         $payload = [
             'lineConsultUrl'      => $val('line_consult_url'),
-            'introVideoUrl'       => $val('intro_video_url'),
             'documentRequestUrl'  => $val('document_request_url'),
             'fvCtaText'           => $val('fv_cta_text', '無料デモを予約する'),
             'campaignText'        => $val('campaign_text'),

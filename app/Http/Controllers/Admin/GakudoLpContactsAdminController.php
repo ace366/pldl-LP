@@ -88,7 +88,6 @@ class GakudoLpContactsAdminController extends Controller
     private function purposeMap(): array
     {
         return [
-            'video'    => '3分動画を見たい',
             'document' => '資料がほしい',
             'demo'     => '15分デモを見たい',
             'price'    => '料金を相談したい',

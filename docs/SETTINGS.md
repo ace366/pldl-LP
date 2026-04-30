@@ -18,7 +18,6 @@ LP 側の見た目・動作に影響する、管理画面（`/admin/lp-settings`
 |---|---|---|---|
 | `admin_notify_email` | email | 管理者通知メールアドレス | 問い合わせ受信通知メール（`GakudoLpContactReceived`）の送信先 |
 | `line_consult_url` | url | LINE相談URL | ファーストビュー / 受付停止時の代替連絡先リンク |
-| `intro_video_url` | url | 3分紹介動画URL | 「3分動画」セクションのサムネイルからの遷移先 |
 | `document_request_url` | url | 資料請求URL | 任意。CTAから別動線で誘導する場合に使用 |
 | `ga_measurement_id` | text | Google Analytics ID | `G-XXXXXXXXXX` 形式。設定すると Blade で gtag が出力される |
 | `gsc_verification` | text | Search Console verification | `<meta name="google-site-verification">` の値 |

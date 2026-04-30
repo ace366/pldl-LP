@@ -6,7 +6,6 @@ type Props = { settings: LpSettings };
 type Status = 'idle' | 'sending' | 'success' | 'error';
 
 const purposes = [
-    { value: 'video',    label: '3分動画を見たい' },
     { value: 'document', label: '資料がほしい' },
     { value: 'demo',     label: '15分デモを見たい' },
     { value: 'price',    label: '料金を相談したい' },

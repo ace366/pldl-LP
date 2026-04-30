@@ -35,9 +35,6 @@ const Hero: React.FC<Props> = ({ settings }) => {
                     <a className="lp-btn lp-btn--primary lp-btn--lg" href="#contact">
                         {settings.fvCtaText || '無料デモを予約する'}
                     </a>
-                    <a className="lp-btn lp-btn--secondary lp-btn--lg" href="#video">
-                        3分紹介を見る
-                    </a>
                     {settings.pamphletUrl && (
                         <a
                             className="lp-btn lp-btn--ghost lp-btn--lg"
@@ -62,7 +59,7 @@ const Hero: React.FC<Props> = ({ settings }) => {
                 </div>
 
                 <p className="lp-hero__note">
-                    押し売りはしません。3分動画 → 15分デモ → 無料トライアル の順でご案内します。
+                    押し売りはしません。15分デモ → 無料トライアル の順でご案内します。
                 </p>
 
                 <div className="lp-hero__visual">

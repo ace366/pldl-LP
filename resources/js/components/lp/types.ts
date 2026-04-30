@@ -1,6 +1,5 @@
 export type LpSettings = {
     lineConsultUrl: string;
-    introVideoUrl: string;
     documentRequestUrl: string;
     fvCtaText: string;
     campaignText: string;

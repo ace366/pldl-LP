@@ -1,7 +1,6 @@
 @php
 $labels = \App\Models\GakudoLpContact::statusLabels();
 $purposeMap = [
-    'video'    => '3分動画を見たい',
     'document' => '資料がほしい',
     'demo'     => '15分デモを見たい',
     'price'    => '料金を相談したい',

@@ -10,7 +10,6 @@ if (mount) {
 
     let settings: LpSettings = {
         lineConsultUrl: '',
-        introVideoUrl: '',
         documentRequestUrl: '',
         fvCtaText: '無料デモを予約する',
         campaignText: '',
