@@ -9,6 +9,7 @@
     // Storage
     // --------------------------------------------------------------
     const STORAGE_KEY = 'pldl_sales_list_v1';
+    const FILTERS_KEY = 'pldl_sales_filters_v1';
 
     /** @returns {Array<Item>} */
     function loadAll() {
@@ -26,6 +27,26 @@
     /** @param {Array<Item>} items */
     function saveAll(items) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function loadFilters() {
+        try {
+            const raw = localStorage.getItem(FILTERS_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return null;
+            return parsed;
+        } catch {
+            return null;
+        }
+    }
+
+    function saveFilters() {
+        localStorage.setItem(FILTERS_KEY, JSON.stringify({
+            q: filters.q,
+            priority: filters.priority,
+            status: filters.status,
+        }));
     }
 
     function uid() {
@@ -498,14 +519,17 @@
 
     el('filter-q').addEventListener('input', (e) => {
         filters.q = e.target.value;
+        saveFilters();
         render();
     });
     el('filter-priority').addEventListener('change', (e) => {
         filters.priority = e.target.value;
+        saveFilters();
         render();
     });
     el('filter-status').addEventListener('change', (e) => {
         filters.status = e.target.value;
+        saveFilters();
         render();
     });
 
@@ -589,6 +613,24 @@
         if (f) importJson(f);
         e.target.value = '';
     });
+
+    // Restore previously saved filters and reflect them in the inputs.
+    (function restoreFilters() {
+        const saved = loadFilters();
+        if (!saved) return;
+        if (typeof saved.q === 'string') {
+            filters.q = saved.q;
+            el('filter-q').value = saved.q;
+        }
+        if (PRIORITIES.includes(saved.priority)) {
+            filters.priority = saved.priority;
+            el('filter-priority').value = saved.priority;
+        }
+        if (STATUSES.includes(saved.status)) {
+            filters.status = saved.status;
+            el('filter-status').value = saved.status;
+        }
+    })();
 
     // Initial render
     render();
