@@ -49,6 +49,95 @@
         }));
     }
 
+    // --------------------------------------------------------------
+    // City suggestions (都道府県 → 市区町村)
+    //
+    // HeartRails Express API (free, no auth, CORS). Cached per
+    // prefecture in localStorage for 30 days to avoid repeat calls.
+    // --------------------------------------------------------------
+    const CITIES_CACHE_KEY = 'pldl_sales_cities_cache_v1';
+    const CITIES_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+    const HEARTRAILS_URL = 'https://geoapi.heartrails.com/api/json?method=getCities&prefecture=';
+    const cityCacheMem = {};
+
+    function loadCityCacheStore() {
+        try {
+            const raw = localStorage.getItem(CITIES_CACHE_KEY);
+            return raw ? (JSON.parse(raw) || {}) : {};
+        } catch { return {}; }
+    }
+    function persistCityCache(store) {
+        try { localStorage.setItem(CITIES_CACHE_KEY, JSON.stringify(store)); } catch {}
+    }
+
+    /**
+     * @param {string} prefecture
+     * @returns {Promise<string[]>}
+     */
+    async function fetchCities(prefecture) {
+        if (!prefecture) return [];
+        if (cityCacheMem[prefecture]) return cityCacheMem[prefecture];
+
+        const store = loadCityCacheStore();
+        const cached = store[prefecture];
+        if (cached && cached.expiry > Date.now() && Array.isArray(cached.cities)) {
+            cityCacheMem[prefecture] = cached.cities;
+            return cached.cities;
+        }
+
+        try {
+            const res = await fetch(HEARTRAILS_URL + encodeURIComponent(prefecture));
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const json = await res.json();
+            const locs = (json && json.response && Array.isArray(json.response.location))
+                ? json.response.location : [];
+            const cities = Array.from(new Set(locs.map((l) => l.city).filter(Boolean)));
+            cities.sort((a, b) => a.localeCompare(b, 'ja'));
+
+            cityCacheMem[prefecture] = cities;
+            store[prefecture] = { cities, expiry: Date.now() + CITIES_TTL_MS };
+            persistCityCache(store);
+            return cities;
+        } catch (err) {
+            console.warn('city fetch failed for', prefecture, err);
+            return [];
+        }
+    }
+
+    function setCityDatalist(cities) {
+        const dl = el('cities-datalist');
+        if (!dl) return;
+        dl.innerHTML = cities.map((c) => `<option value="${escape(c)}"></option>`).join('');
+    }
+
+    let cityFetchToken = 0;
+    function refreshCityDatalist(prefecture) {
+        const hint = el('city-hint');
+        const myToken = ++cityFetchToken;
+        if (!prefecture) {
+            setCityDatalist([]);
+            if (hint) hint.hidden = true;
+            return;
+        }
+        if (hint && !cityCacheMem[prefecture]) {
+            hint.hidden = false;
+            hint.textContent = '読み込み中…';
+        }
+        fetchCities(prefecture).then((cities) => {
+            if (myToken !== cityFetchToken) return; // outdated request
+            setCityDatalist(cities);
+            if (hint) {
+                if (cities.length > 0) {
+                    hint.hidden = false;
+                    hint.textContent = `${cities.length}件`;
+                } else {
+                    hint.hidden = false;
+                    hint.textContent = '候補なし（自由入力可）';
+                }
+            }
+        });
+    }
+
     function uid() {
         return 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     }
@@ -360,6 +449,9 @@
             elField.value = data[k] ?? '';
         });
 
+        // Pre-load city candidates for the existing prefecture (edit case)
+        refreshCityDatalist(data.prefecture || '');
+
         modal.hidden = false;
         document.body.style.overflow = 'hidden';
         setTimeout(() => {
@@ -580,6 +672,17 @@
         deleteItem(id);
         closeModal();
         showToast('削除しました');
+    });
+
+    // Prefecture changed → refetch city candidates
+    let prefDebounce;
+    form.elements['prefecture'].addEventListener('input', (e) => {
+        const v = e.target.value.trim();
+        clearTimeout(prefDebounce);
+        prefDebounce = setTimeout(() => refreshCityDatalist(v), 250);
+    });
+    form.elements['prefecture'].addEventListener('change', (e) => {
+        refreshCityDatalist(e.target.value.trim());
     });
 
     // Suggest priority

@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=noto-sans-jp:400,500,700,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/sales-tool.css?v=6">
+<link rel="stylesheet" href="assets/sales-tool.css?v=7">
 </head>
 <body>
 
@@ -143,8 +143,10 @@
                     <input class="input" type="text" name="prefecture" list="prefectures" maxlength="20">
                 </label>
                 <label class="field">
-                    <span class="field__label">市区町村</span>
-                    <input class="input" type="text" name="city" maxlength="50">
+                    <span class="field__label">市区町村
+                        <span class="field__hint" id="city-hint" hidden>読み込み中…</span>
+                    </span>
+                    <input class="input" type="text" name="city" list="cities-datalist" autocomplete="off" maxlength="50">
                 </label>
 
                 <label class="field field--span-2">
@@ -245,9 +247,11 @@
     <option value="鹿児島県"><option value="沖縄県">
 </datalist>
 
+<datalist id="cities-datalist"></datalist>
+
 <!-- ========== Toast ========== -->
 <div class="toast" id="toast" hidden></div>
 
-<script src="assets/sales-tool.js?v=6"></script>
+<script src="assets/sales-tool.js?v=7"></script>
 </body>
 </html>

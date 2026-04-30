@@ -509,6 +509,12 @@ textarea.input { min-height: 70px; resize: vertical; }
     padding: 1px 6px;
     border-radius: 999px;
 }
+.field__hint {
+    margin-left: 8px;
+    font-size: 10px;
+    color: var(--c-soft);
+    font-weight: 500;
+}
 
 /* ---------- Toast ---------- */
 .toast {
