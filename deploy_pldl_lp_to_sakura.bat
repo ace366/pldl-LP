@@ -16,7 +16,7 @@ REM ====================
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set TS=%%i
 
 set STAGING_DIR=%TEMP%\pldl_lp_staging_%TS%
-set ZIP_FILE=%TEMP%\pldl_lp_%TS%.zip
+set ARCHIVE_FILE=%TEMP%\pldl_lp_%TS%.tar.gz
 
 echo ========================================
 echo PLDL-LP deploy start
@@ -86,13 +86,13 @@ if %RC% GEQ 8 (
 
 if exist "%STAGING_DIR%\bootstrap\cache" del /q "%STAGING_DIR%\bootstrap\cache\*" >nul 2>nul
 if exist "%STAGING_DIR%\storage" rmdir /s /q "%STAGING_DIR%\storage"
-if exist "%ZIP_FILE%" del /q "%ZIP_FILE%"
+if exist "%ARCHIVE_FILE%" del /q "%ARCHIVE_FILE%"
 
 echo.
-echo [3/6] Create zip...
-powershell -NoProfile -Command "Compress-Archive -Path '%STAGING_DIR%\*' -DestinationPath '%ZIP_FILE%' -Force"
-if not exist "%ZIP_FILE%" (
-  echo ERROR: zip file not created
+echo [3/6] Create tar.gz...
+"%SystemRoot%\System32\tar.exe" -czf "%ARCHIVE_FILE%" -C "%STAGING_DIR%" .
+if not exist "%ARCHIVE_FILE%" (
+  echo ERROR: archive file not created
   pause
   exit /b 1
 )
@@ -115,16 +115,16 @@ if errorlevel 1 (
   exit /b 1
 )
 
-scp -i "%SSH_KEY%" "%ZIP_FILE%" %SSH_USER%@%SSH_HOST%:%REMOTE_TMP_DIR%/pldl_lp_%TS%.zip
+scp -i "%SSH_KEY%" "%ARCHIVE_FILE%" %SSH_USER%@%SSH_HOST%:%REMOTE_TMP_DIR%/pldl_lp_%TS%.tar.gz
 if errorlevel 1 (
-  echo ERROR: zip upload failed
+  echo ERROR: archive upload failed
   pause
   exit /b 1
 )
 
 echo.
 echo [6/6] Run remote deploy...
-ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "bash %REMOTE_SCRIPT% %REMOTE_APP_DIR% %REMOTE_TMP_DIR%/pldl_lp_%TS%.zip %TS%"
+ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "bash %REMOTE_SCRIPT% %REMOTE_APP_DIR% %REMOTE_TMP_DIR%/pldl_lp_%TS%.tar.gz %TS%"
 if errorlevel 1 (
   echo ERROR: remote deploy failed
   pause
@@ -153,7 +153,7 @@ echo   ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "cd %REMOTE_APP_DIR% ^&^& php ar
 echo.
 
 if exist "%STAGING_DIR%" rmdir /s /q "%STAGING_DIR%"
-if exist "%ZIP_FILE%" del /q "%ZIP_FILE%"
+if exist "%ARCHIVE_FILE%" del /q "%ARCHIVE_FILE%"
 
 pause
 endlocal

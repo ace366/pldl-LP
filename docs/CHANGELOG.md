@@ -11,6 +11,13 @@
 
 ---
 
+## 2026-04-30  デプロイスクリプトを zip → tar.gz に切替
+
+PowerShell `Compress-Archive` 経由のZIPだとさくら側 `unzip` で失敗するケースがあったため、Windows 同梱の BSD tar (`%SystemRoot%\System32\tar.exe`) で `tar.gz` を作成する方式に変更。
+
+- 初回デプロイで `unzip -oq` が `set -e` で失敗 → tar.gz では成功確認済み
+- `bat` 側は GNU tar が `C:\` をリモートホスト解釈してしまうので必ず System32 の tar.exe を使う
+
 ## 2026-04-30  さくらレンタルサーバー向けデプロイスクリプト追加
 
 manaloom の deploy 方式を踏襲し、ローカルから一発で `/home/top-ace-picard/www/pldl-lp` へアップロードできる構成を追加。

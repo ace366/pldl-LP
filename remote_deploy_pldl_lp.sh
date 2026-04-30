@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REMOTE_APP_DIR="$1"
-ZIP_FILE="$2"
+ARCHIVE_FILE="$2"
 TS="$3"
 
 BACKUP_DIR="${REMOTE_APP_DIR}_backups"
@@ -10,10 +10,10 @@ WORK_DIR="/tmp/pldl_lp_release_${TS}"
 
 echo "[REMOTE] start"
 echo "[REMOTE] app dir: ${REMOTE_APP_DIR}"
-echo "[REMOTE] zip:     ${ZIP_FILE}"
+echo "[REMOTE] archive: ${ARCHIVE_FILE}"
 
-if [ ! -f "${ZIP_FILE}" ]; then
-  echo "[REMOTE][ERROR] zip not found"
+if [ ! -f "${ARCHIVE_FILE}" ]; then
+  echo "[REMOTE][ERROR] archive not found"
   exit 1
 fi
 
@@ -34,9 +34,9 @@ if [ -d "${REMOTE_APP_DIR}/app" ]; then
     -C "${REMOTE_APP_DIR}" .
 fi
 
-# ---- Unzip new release ----
-echo "[REMOTE] unzip new release"
-unzip -oq "${ZIP_FILE}" -d "${WORK_DIR}"
+# ---- Extract new release ----
+echo "[REMOTE] extract new release"
+tar -xzf "${ARCHIVE_FILE}" -C "${WORK_DIR}"
 
 # ---- Replace code directories (vendor / storage / .env / sqlite are preserved) ----
 # public/build is part of the deploy, so refresh it cleanly.
@@ -79,7 +79,7 @@ chmod -R 775 "${REMOTE_APP_DIR}/storage" "${REMOTE_APP_DIR}/bootstrap/cache" 2>/
 
 # ---- Cleanup ----
 rm -rf "${WORK_DIR}"
-rm -f "${ZIP_FILE}"
+rm -f "${ARCHIVE_FILE}"
 
 # Trim old backups (keep last 10)
 ls -1t "${BACKUP_DIR}"/backup_*.tar.gz 2>/dev/null | tail -n +11 | xargs -r rm -f
