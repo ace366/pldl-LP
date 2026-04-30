@@ -27,7 +27,7 @@ class GakudoLpContactReceived extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.gakudo-lp.contact-received',
+            text: 'emails.gakudo-lp.contact-received',
             with: [
                 'contact' => $this->contact,
             ],

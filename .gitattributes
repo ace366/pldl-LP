@@ -1,5 +1,11 @@
 * text=auto eol=lf
 
+# Windows batch files must use CRLF — cmd.exe drops the first chars of
+# each line under LF-only and runs garbage through file association
+# (which on this machine launches WPS Office's spreadsheet).
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html
