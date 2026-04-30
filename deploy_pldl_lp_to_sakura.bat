@@ -11,6 +11,10 @@ set SSH_HOST=www2916.sakura.ne.jp
 set REMOTE_APP_DIR=/home/top-ace-picard/www/pldl-lp
 set REMOTE_TMP_DIR=/home/top-ace-picard/www/tmp/pldl_lp_deploy
 set REMOTE_SCRIPT=/home/top-ace-picard/www/tmp/pldl_lp_deploy/remote_deploy_pldl_lp.sh
+
+set LOCAL_BASE_URL=http://localhost:8000
+set PROD_BASE_URL=https://top-ace-picard.sakura.ne.jp/pldl-lp
+set SMOKE_PATHS=/gakudo /register /login
 REM ====================
 
 for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"') do set TS=%%i
@@ -52,7 +56,28 @@ if errorlevel 1 (
 )
 
 echo.
-echo [1/6] npm run build (Vite)...
+echo [0/7] Pre-deploy local smoke test...
+set LOCAL_OK=1
+for %%P in (%SMOKE_PATHS%) do (
+  for /f %%C in ('curl -s -o NUL -w "%%{http_code}" --max-time 4 "%LOCAL_BASE_URL%%%P" 2^>NUL') do (
+    if "%%C"=="200" (
+      echo   OK   %LOCAL_BASE_URL%%%P
+    ) else (
+      echo   WARN %LOCAL_BASE_URL%%%P returned %%C
+      set LOCAL_OK=0
+    )
+  )
+)
+if "%LOCAL_OK%"=="0" (
+  echo.
+  echo Local server did not pass smoke test.
+  echo If your local dev server is not running, this is expected — press Enter to continue.
+  echo If it IS running, abort with Ctrl+C and fix locally before deploying.
+  pause
+)
+
+echo.
+echo [1/7] npm run build (Vite)...
 pushd "%LOCAL_PROJECT%"
 call npm run build
 if errorlevel 1 (
@@ -70,7 +95,7 @@ if not exist "%LOCAL_PROJECT%\public\build" (
 )
 
 echo.
-echo [2/6] Copy project to staging...
+echo [2/7] Copy project to staging...
 if exist "%STAGING_DIR%" rmdir /s /q "%STAGING_DIR%"
 mkdir "%STAGING_DIR%"
 
@@ -89,7 +114,7 @@ if exist "%STAGING_DIR%\storage" rmdir /s /q "%STAGING_DIR%\storage"
 if exist "%ARCHIVE_FILE%" del /q "%ARCHIVE_FILE%"
 
 echo.
-echo [3/6] Create tar.gz...
+echo [3/7] Create tar.gz...
 "%SystemRoot%\System32\tar.exe" -czf "%ARCHIVE_FILE%" -C "%STAGING_DIR%" .
 if not exist "%ARCHIVE_FILE%" (
   echo ERROR: archive file not created
@@ -98,7 +123,7 @@ if not exist "%ARCHIVE_FILE%" (
 )
 
 echo.
-echo [4/6] Create remote tmp dir...
+echo [4/7] Create remote tmp dir...
 ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "mkdir -p %REMOTE_TMP_DIR%"
 if errorlevel 1 (
   echo ERROR: failed to create remote tmp dir
@@ -107,7 +132,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo [5/6] Upload remote deploy script and zip...
+echo [5/7] Upload remote deploy script and archive...
 scp -i "%SSH_KEY%" "%LOCAL_PROJECT%\remote_deploy_pldl_lp.sh" %SSH_USER%@%SSH_HOST%:%REMOTE_SCRIPT%
 if errorlevel 1 (
   echo ERROR: remote deploy script upload failed
@@ -123,12 +148,34 @@ if errorlevel 1 (
 )
 
 echo.
-echo [6/6] Run remote deploy...
-ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "bash %REMOTE_SCRIPT% %REMOTE_APP_DIR% %REMOTE_TMP_DIR%/pldl_lp_%TS%.tar.gz %TS%"
+echo [6/7] Run remote deploy and rebuild caches...
+ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "bash %REMOTE_SCRIPT% %REMOTE_APP_DIR% %REMOTE_TMP_DIR%/pldl_lp_%TS%.tar.gz %TS% && cd %REMOTE_APP_DIR% && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache"
 if errorlevel 1 (
   echo ERROR: remote deploy failed
   pause
   exit /b 1
+)
+
+echo.
+echo [7/7] Post-deploy production smoke test...
+set PROD_OK=1
+for %%P in (%SMOKE_PATHS%) do (
+  for /f %%C in ('curl -s -o NUL -w "%%{http_code}" --max-time 8 "%PROD_BASE_URL%%%P" 2^>NUL') do (
+    if "%%C"=="200" (
+      echo   OK   %PROD_BASE_URL%%%P
+    ) else (
+      echo   FAIL %PROD_BASE_URL%%%P returned %%C
+      set PROD_OK=0
+    )
+  )
+)
+if "%PROD_OK%"=="0" (
+  echo.
+  echo *** WARNING: production smoke test FAILED. Roll back if site is broken: ***
+  echo     ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST%
+  echo     ls -t %REMOTE_APP_DIR%_backups/^| head -3
+  echo     # restore latest backup_*.tar.gz over %REMOTE_APP_DIR%
+  echo.
 )
 
 echo.

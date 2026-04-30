@@ -11,6 +11,24 @@
 
 ---
 
+## 2026-04-30  ローカル/本番の切り分けを自動化（再発防止）
+
+ローカル ↔ 本番でハマる事故を減らすため、3 段で防御を入れた。
+
+### 1. 環境ガード（自動判定）
+`AppServiceProvider::boot()` が `APP_URL` のパス成分を見て、サブパス公開モード／単一オリジンモードを自動切替（`URL::forceRootUrl` と `URL::forceScheme('https')`）。`.env` のコピペで本番と取り違えても自動で安全側に倒れる。
+
+### 2. デプロイ前後のスモークテスト
+`deploy_pldl_lp_to_sakura.bat` を 6 ステップ → 8 ステップ ([0..7]) に拡張:
+- **[0/7] Pre-deploy local smoke test** — `http://localhost:8000/{gakudo,register,login}` を curl して 200 か確認。失敗時は確認プロンプトで一時停止
+- **[7/7] Post-deploy production smoke test** — `https://top-ace-picard.sakura.ne.jp/pldl-lp/{gakudo,register,login}` を curl して 200 か確認。失敗時はロールバック手順を表示
+- ステップ [6] にサーバー側 `optimize:clear → config:cache → route:cache → view:cache` を統合（旧 bat は別途手動実行が必要だった）
+
+### 3. .env.example のコメント整備
+ローカル／本番の判定ルールを冒頭に明記。`docs/sakura-env.production.txt` も別途存在する旨を案内。
+
+---
+
 ## 2026-04-30  ローカル `/register` が真っ白になる問題を修正
 
 `AppServiceProvider::boot()` の `URL::forceRootUrl(config('app.url'))` をローカル (APP_URL=`http://127.0.0.1:8000`) でも無条件で効かせていたため、ブラウザを `http://localhost:8000` で開くと JS/CSS の `<script src>`/`<link href>` が `127.0.0.1:8000` を指してしまい **CORS で React がマウントされず blank** だった。
