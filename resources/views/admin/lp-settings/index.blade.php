@@ -192,6 +192,7 @@
             'campaign'     => 'キャンペーン表示',
             'reception'    => '受付状況',
             'seo'          => 'SEO / 検索エンジン',
+            'legal'        => '法務 / プライバシーポリシー',
         ];
         $groups = $settings->groupBy(fn ($s) => $s->group ?: 'other');
     @endphp

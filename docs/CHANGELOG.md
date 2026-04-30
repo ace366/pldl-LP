@@ -11,6 +11,16 @@
 
 ---
 
+## 2026-04-30  LP問い合わせフォーム拡張: プライバシーポリシーモーダル
+
+同意チェック文言の「プライバシーポリシー」リンククリックでモーダル展開。閉じるのは ✕ ボタン / ESC / オーバーレイクリック / 「閉じる」ボタンのいずれか。
+
+- マイグレーション `2026_04_30_000004_add_privacy_policy_to_lp_settings`: `lp_settings.privacy_policy` (textarea, group=legal) を追加。デフォルト本文は日本の個人情報保護法準拠のひな形（取得情報・利用目的・第三者提供・委託・安全管理・保管期間・開示請求・窓口）
+- 管理画面 (`/admin/lp-settings`) に **「法務 / プライバシーポリシー」** グループとして自動表示、textarea で編集可能
+- ContactForm.tsx にモーダル UI、`useEffect` で ESC キーと `body.overflow=hidden` 制御を組み込み
+
+---
+
 ## 2026-04-30  LP問い合わせフォーム拡張: noindex / honeypot / rate limit
 
 ### noindex 制御（管理画面から ON/OFF）

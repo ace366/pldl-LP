@@ -32,6 +32,7 @@ class GakudoLpContactController extends Controller
             'gaMeasurementId'     => $val('ga_measurement_id'),
             'gscVerification'     => $val('gsc_verification'),
             'noindex'             => $bool('noindex'),
+            'privacyPolicy'       => $val('privacy_policy'),
             'contactEndpoint'     => route('gakudo-lp.contact'),
         ];
 

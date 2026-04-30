@@ -10,5 +10,6 @@ export type LpSettings = {
     receptionClosedMsg: string;
     gaMeasurementId: string;
     gscVerification: string;
+    privacyPolicy: string;
     contactEndpoint: string;
 };

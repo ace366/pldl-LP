@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import type { LpSettings } from './types';
 
 type Props = { settings: LpSettings };
@@ -39,12 +39,27 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
     const [message, setMessage] = useState('');
     const [agree, setAgree] = useState(false);
     const [website, setWebsite] = useState(''); // honeypot — keep hidden, must stay empty
+    const [policyOpen, setPolicyOpen] = useState(false);
 
     const [status, setStatus] = useState<Status>('idle');
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [serverMessage, setServerMessage] = useState('');
 
     const utm = useMemo(() => readUtm(), []);
+
+    useEffect(() => {
+        if (!policyOpen) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setPolicyOpen(false);
+        };
+        document.addEventListener('keydown', onKey);
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.removeEventListener('keydown', onKey);
+            document.body.style.overflow = prevOverflow;
+        };
+    }, [policyOpen]);
 
     if (settings.receptionClosed) {
         return (
@@ -279,7 +294,14 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                             onChange={(e) => setAgree(e.target.checked)}
                         />
                         <span>
-                            個人情報の取り扱いに同意します。本フォームでお預かりした内容は、ご相談対応の目的のみに使用します。
+                            <button
+                                type="button"
+                                className="lp-checkbox__policy-link"
+                                onClick={() => setPolicyOpen(true)}
+                            >
+                                プライバシーポリシー
+                            </button>
+                            に同意します。
                         </span>
                     </label>
 
@@ -297,6 +319,46 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                     </div>
                 </form>
             </div>
+
+            {policyOpen && (
+                <div
+                    className="lp-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="lp-policy-title"
+                    onClick={() => setPolicyOpen(false)}
+                >
+                    <div className="lp-modal__panel" onClick={(e) => e.stopPropagation()}>
+                        <header className="lp-modal__head">
+                            <h3 id="lp-policy-title" className="lp-modal__title">プライバシーポリシー</h3>
+                            <button
+                                type="button"
+                                className="lp-modal__close"
+                                aria-label="閉じる"
+                                onClick={() => setPolicyOpen(false)}
+                            >
+                                ×
+                            </button>
+                        </header>
+                        <div className="lp-modal__body">
+                            {settings.privacyPolicy
+                                ? settings.privacyPolicy.split(/\r?\n/).map((line, i) => (
+                                    <p key={i} className="lp-modal__line">{line || ' '}</p>
+                                ))
+                                : <p>プライバシーポリシーが未設定です。管理画面から設定してください。</p>}
+                        </div>
+                        <footer className="lp-modal__foot">
+                            <button
+                                type="button"
+                                className="lp-btn lp-btn--ghost"
+                                onClick={() => setPolicyOpen(false)}
+                            >
+                                閉じる
+                            </button>
+                        </footer>
+                    </div>
+                </div>
+            )}
         </section>
     );
 };

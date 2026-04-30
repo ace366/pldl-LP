@@ -20,6 +20,7 @@ if (mount) {
         receptionClosedMsg: '',
         gaMeasurementId: '',
         gscVerification: '',
+        privacyPolicy: '',
         contactEndpoint: asset('/gakudo/contact'),
     };
 
