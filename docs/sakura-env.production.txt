@@ -1,0 +1,59 @@
+# =====================================================
+# さくらレンタルサーバー本番用 .env
+# 配置先: /home/top-ace-picard/www/pldl-lp/.env
+# 初回のみ手動配置。以後デプロイで上書きされない（.bat 側で除外済み）。
+# =====================================================
+
+APP_NAME="PLDL Gakudo LP"
+APP_ENV=production
+APP_KEY=
+# ↑ 初回のみ空のままにしておき、サーバーで `php artisan key:generate` を実行
+APP_DEBUG=false
+APP_TIMEZONE=Asia/Tokyo
+APP_URL=https://pldl.or.jp
+
+APP_LOCALE=ja
+APP_FALLBACK_LOCALE=ja
+APP_FAKER_LOCALE=ja_JP
+
+APP_MAINTENANCE_DRIVER=file
+
+BCRYPT_ROUNDS=12
+
+LOG_CHANNEL=stack
+LOG_STACK=single
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=warning
+
+# ----- DB (SQLite, 絶対パス) -----
+DB_CONNECTION=sqlite
+DB_DATABASE=/home/top-ace-picard/www/pldl-lp/database/database.sqlite
+
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+SESSION_PATH=/
+SESSION_DOMAIN=null
+
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=database
+
+CACHE_STORE=database
+CACHE_PREFIX=
+
+# ----- メール (さくらのメールボックス使用) -----
+# 「メール」→「メール一覧」で送信用アカウントを作ったあと、その値を入れる
+MAIL_MAILER=smtp
+MAIL_HOST=top-ace-picard.sakura.ne.jp
+MAIL_PORT=587
+MAIL_USERNAME=no-reply@pldl.or.jp
+MAIL_PASSWORD=ここにSMTPパスワード
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="no-reply@pldl.or.jp"
+MAIL_FROM_NAME="${APP_NAME}"
+
+# 管理者宛通知（問い合わせフォーム）
+GAKUDO_LP_NOTIFY_TO=info@pldl.or.jp
+
+VITE_APP_NAME="${APP_NAME}"

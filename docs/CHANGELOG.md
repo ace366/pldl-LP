@@ -11,6 +11,21 @@
 
 ---
 
+## 2026-04-30  さくらレンタルサーバー向けデプロイスクリプト追加
+
+manaloom の deploy 方式を踏襲し、ローカルから一発で `/home/top-ace-picard/www/pldl-lp` へアップロードできる構成を追加。
+
+### 追加ファイル
+- `deploy_pldl_lp_to_sakura.bat` — Windows 側エントリ。`npm run build` → robocopy staging → zip → SCP → リモートで .sh 実行
+- `remote_deploy_pldl_lp.sh` — サーバー側で展開・差し替え。`vendor/`・`storage/`・`.env`・`*.sqlite` は維持
+- `docs/sakura-env.production.txt` — 本番 `.env` のテンプレ
+
+### 運用
+- 「サーバーにあげて」のフレーズで起動（auto-memory に登録）
+- 初回は SSH で `composer install` / `.env` 配置 / `key:generate` / `migrate` の手作業が必要
+
+---
+
 ## 2026-04-30  パンフレットを8ページ→11ページに拡張（LPと同期）
 
 LP側で行った機能拡張・モックアップ追加・比較強化を、パンフレット（`docs/pamphlet.html`）にも反映。
