@@ -110,6 +110,244 @@
         dl.innerHTML = cities.map((c) => `<option value="${escape(c)}"></option>`).join('');
     }
 
+    // --------------------------------------------------------------
+    // Website analyzer
+    //
+    // Fetch the site through allorigins.win (free CORS proxy), parse
+    // the HTML, and pull out:
+    //   - concept   : meta description / og:description / first <h1>
+    //   - lastUpdate: any modified_time meta or visible date pattern
+    //   - platform  : WordPress / Wix / Jimdo / BASE / Squarespace /
+    //                 Shopify / Movable Type / custom
+    //   - skillScore: 0..10 based on tech-quality signals
+    //   - skillLevel: high / mid / low
+    // --------------------------------------------------------------
+    const PROXY_URL = 'https://api.allorigins.win/get?url=';
+
+    function detectPlatform(html, doc) {
+        const generator = (doc.querySelector('meta[name="generator"]')?.content || '').toLowerCase();
+        const lower = html.toLowerCase();
+        if (/wp-content|wp-includes/.test(lower) || generator.includes('wordpress')) return 'WordPress';
+        if (lower.includes('static.parastorage.com') || generator.includes('wix')) return 'Wix';
+        if (generator.includes('jimdo') || lower.includes('jimdo.com')) return 'Jimdo';
+        if (lower.includes('cdn.shopify.com')) return 'Shopify';
+        if (lower.includes('squarespace')) return 'Squarespace';
+        if (generator.includes('movable type')) return 'Movable Type';
+        if (lower.includes('thebase.in') || lower.includes('static-base.in')) return 'BASE';
+        if (lower.includes('peraichi')) return 'ペライチ';
+        if (lower.includes('studio.design') || lower.includes('cdn.studio.design')) return 'STUDIO';
+        if (generator) return generator.split(' ')[0];
+        return 'カスタム / 不明';
+    }
+
+    function computeSkillScore(html, doc, finalUrl) {
+        let score = 0;
+        const lower = html.toLowerCase();
+
+        // HTTPS
+        if (/^https:\/\//i.test(finalUrl || '')) score += 2;
+
+        // Doctype html5
+        if (/<!doctype html>/i.test(html.slice(0, 200))) score += 1;
+
+        // viewport meta (responsive)
+        if (doc.querySelector('meta[name="viewport"]')) score += 1;
+
+        // og: tags
+        if (doc.querySelector('meta[property^="og:"]')) score += 1;
+
+        // semantic tags
+        const semantic = ['header', 'main', 'article', 'section', 'nav', 'footer']
+            .filter((t) => doc.querySelector(t)).length;
+        if (semantic >= 3) score += 1;
+
+        // structured data
+        if (doc.querySelector('script[type="application/ld+json"]')) score += 1;
+
+        // favicon
+        if (doc.querySelector('link[rel*="icon"]')) score += 0.5;
+
+        // hreflang / multilang
+        if (doc.querySelector('link[rel="alternate"][hreflang]')) score += 0.5;
+
+        // modern framework markers
+        if (/react|next\.js|vue|nuxt|svelte|astro/.test(lower)) score += 1;
+
+        // CDN markers
+        if (/cdn\.|cloudfront|akamai|fastly|jsdelivr/.test(lower)) score += 0.5;
+
+        // CSS framework
+        if (/bootstrap|tailwind|bulma|foundation/.test(lower)) score += 0.5;
+
+        return Math.min(10, Math.round(score * 10) / 10);
+    }
+
+    function platformSkillHint(platform) {
+        // Map platform → expected build origin (業者 vs 自作 vs ノーコード)
+        if (platform === 'Wix' || platform === 'Jimdo' || platform === 'ペライチ' ||
+            platform === 'BASE' || platform === 'STUDIO' || platform === 'Squarespace') {
+            return { origin: 'ノーコード（自作）', selfBuilt: true };
+        }
+        if (platform === 'WordPress' || platform === 'Movable Type' || platform === 'Shopify') {
+            return { origin: '業者または自作（CMS）', selfBuilt: null };
+        }
+        if (platform === 'カスタム / 不明') {
+            return { origin: '業者制作の可能性が高い', selfBuilt: false };
+        }
+        return { origin: '不明', selfBuilt: null };
+    }
+
+    function scoreToLevel(score) {
+        if (score >= 7) return 'high';
+        if (score >= 4) return 'mid';
+        return 'low';
+    }
+
+    function levelLabel(level) {
+        return { high: '高（しっかり制作）', mid: '中（標準）', low: '低（簡易）' }[level] || level;
+    }
+
+    function extractConcept(doc) {
+        const desc = (doc.querySelector('meta[name="description"]')?.content
+                  || doc.querySelector('meta[property="og:description"]')?.content
+                  || '').trim();
+        const h1 = (doc.querySelector('h1')?.textContent || '').trim().replace(/\s+/g, ' ');
+        const title = (doc.querySelector('title')?.textContent || '').trim().replace(/\s+/g, ' ');
+        return {
+            description: desc.slice(0, 240),
+            h1: h1.slice(0, 120),
+            title: title.slice(0, 120),
+        };
+    }
+
+    function extractLastUpdate(html, doc) {
+        // 1. meta tags
+        const metaCandidates = [
+            'meta[property="article:modified_time"]',
+            'meta[name="last-modified"]',
+            'meta[itemprop="dateModified"]',
+            'meta[name="date"]',
+            'meta[property="og:updated_time"]',
+        ];
+        for (const sel of metaCandidates) {
+            const v = doc.querySelector(sel)?.content;
+            if (v) return { source: sel.split('[')[1].split('=')[0], value: v.slice(0, 60) };
+        }
+
+        // 2. visible date patterns (find newest)
+        const patterns = [
+            /(\d{4})[年\-\/.](\d{1,2})[月\-\/.](\d{1,2})日?/g,
+        ];
+        const text = doc.body ? doc.body.textContent : '';
+        const dates = [];
+        for (const re of patterns) {
+            let m;
+            while ((m = re.exec(text)) !== null) {
+                const y = parseInt(m[1], 10);
+                const mm = parseInt(m[2], 10);
+                const d = parseInt(m[3], 10);
+                if (y >= 2000 && y <= 2099 && mm >= 1 && mm <= 12 && d >= 1 && d <= 31) {
+                    dates.push({ y, m: mm, d });
+                }
+            }
+        }
+        if (dates.length === 0) return null;
+        dates.sort((a, b) => (b.y - a.y) || (b.m - a.m) || (b.d - a.d));
+        const latest = dates[0];
+        return {
+            source: 'page text',
+            value: `${latest.y}-${String(latest.m).padStart(2,'0')}-${String(latest.d).padStart(2,'0')}`,
+        };
+    }
+
+    async function analyzeWebsite(url) {
+        if (!isUrl(url)) throw new Error('有効な URL ではありません。');
+
+        const proxyRes = await fetch(PROXY_URL + encodeURIComponent(url), { cache: 'no-store' });
+        if (!proxyRes.ok) throw new Error('プロキシの取得に失敗しました（' + proxyRes.status + '）');
+        const data = await proxyRes.json();
+        const html = data && data.contents;
+        const finalUrl = (data && data.status && data.status.url) || url;
+        if (!html || typeof html !== 'string') throw new Error('HTML を取得できませんでした。');
+
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+
+        const platform = detectPlatform(html, doc);
+        const skillScore = computeSkillScore(html, doc, finalUrl);
+        const skillLevel = scoreToLevel(skillScore);
+        const concept = extractConcept(doc);
+        const lastUpdate = extractLastUpdate(html, doc);
+        const origin = platformSkillHint(platform);
+
+        return {
+            fetchedAt: nowIso(),
+            url: finalUrl,
+            platform,
+            skillScore,
+            skillLevel,
+            origin: origin.origin,
+            selfBuilt: origin.selfBuilt,
+            concept,
+            lastUpdate,
+        };
+    }
+
+    function renderAnalysis(analysis, container) {
+        if (!container) return;
+        if (!analysis) {
+            container.dataset.empty = '1';
+            container.removeAttribute('data-loading');
+            container.removeAttribute('data-error');
+            container.innerHTML = 'WebサイトURL を入れて「解析する」を押すと、コンセプト・最新更新・制作レベルを推定します。';
+            return;
+        }
+        const stars = '★'.repeat(Math.round(analysis.skillScore / 2)) + '☆'.repeat(5 - Math.round(analysis.skillScore / 2));
+        const fetchedDate = new Date(analysis.fetchedAt);
+        const fetchedStr = `${fetchedDate.getFullYear()}-${String(fetchedDate.getMonth()+1).padStart(2,'0')}-${String(fetchedDate.getDate()).padStart(2,'0')} ${String(fetchedDate.getHours()).padStart(2,'0')}:${String(fetchedDate.getMinutes()).padStart(2,'0')}`;
+
+        container.removeAttribute('data-empty');
+        container.removeAttribute('data-loading');
+        container.removeAttribute('data-error');
+        container.innerHTML = `
+            <div class="analysis-row">
+                <div class="analysis-row__label">制作プラットフォーム</div>
+                <div class="analysis-row__value">
+                    <span class="analysis-tag">${escape(analysis.platform)}</span>
+                    <span style="color:var(--c-soft); margin-left:8px; font-size:11px;">${escape(analysis.origin)}</span>
+                </div>
+            </div>
+            <div class="analysis-row">
+                <div class="analysis-row__label">スキル評価</div>
+                <div class="analysis-row__value">
+                    <span class="analysis-tag analysis-tag--${analysis.skillLevel}">${escape(levelLabel(analysis.skillLevel))}</span>
+                    <span class="analysis-stars">${stars}</span>
+                    <span style="color:var(--c-soft);font-size:11px; margin-left:6px;">${analysis.skillScore} / 10</span>
+                </div>
+            </div>
+            <div class="analysis-row">
+                <div class="analysis-row__label">コンセプト</div>
+                <div class="analysis-row__value">
+                    ${analysis.concept.title ? `<div><strong>${escape(analysis.concept.title)}</strong></div>` : ''}
+                    ${analysis.concept.description ? `<div style="margin-top:4px;">${escape(analysis.concept.description)}</div>` : ''}
+                    ${analysis.concept.h1 && analysis.concept.h1 !== analysis.concept.title ? `<div style="margin-top:4px; color:var(--c-muted); font-size:12px;">H1: ${escape(analysis.concept.h1)}</div>` : ''}
+                    ${!analysis.concept.title && !analysis.concept.description && !analysis.concept.h1 ? '<em style="color:var(--c-soft);">（取得できませんでした）</em>' : ''}
+                </div>
+            </div>
+            <div class="analysis-row">
+                <div class="analysis-row__label">最新更新</div>
+                <div class="analysis-row__value">
+                    ${analysis.lastUpdate
+                        ? `${escape(analysis.lastUpdate.value)} <span style="color:var(--c-soft); font-size:11px;">(${escape(analysis.lastUpdate.source)})</span>`
+                        : '<em style="color:var(--c-soft);">不明</em>'}
+                </div>
+            </div>
+            <div class="analysis-meta">
+                <span>解析日時: ${escape(fetchedStr)}</span>
+                <span>取得元: <a href="${escape(analysis.url)}" target="_blank" rel="noopener">${escape(analysis.url)}</a></span>
+            </div>
+        `;
+    }
+
     let cityFetchToken = 0;
     function refreshCityDatalist(prefecture) {
         const hint = el('city-hint');
@@ -232,6 +470,21 @@
 
     /**
      * Auto priority suggestion.
+     *
+     * Base rule (種別 + URL の有無):
+     *   - 民間学童 + Web + フォーム → S
+     *   - 民間学童 + Web のみ      → A
+     *   - NPO / 法人運営 + Web     → A
+     *   - 公立/自治体系             → C
+     *   - 電話のみ                  → B
+     *   - その他                    → C
+     *
+     * Skill 補正 (analysis があれば):
+     *   - level=high (業者の立派なサイト)  → 1段階下げる（決裁が重そう）
+     *   - level=low  (簡易自作)            → 1段階上げる（小規模・直接決裁）
+     *   - level=mid                        → そのまま
+     *   ただし最終結果は S..C の範囲に丸める
+     *
      * @param {Item} item
      * @returns {'S'|'A'|'B'|'C'|''}
      */
@@ -240,13 +493,23 @@
         const hasSite = isUrl(item.websiteUrl);
         const hasForm = isUrl(item.contactFormUrl);
 
-        if (t === '民間学童' && hasSite && hasForm) return 'S';
-        if (t === '民間学童' && hasSite) return 'A';
-        if ((t === 'NPO' || t === '法人運営') && hasSite) return 'A';
-        if (t === '公立/自治体系') return 'C';
-        if (!hasSite && !hasForm && item.phone) return 'B';
-        if (hasSite || hasForm) return 'B';
-        return 'C';
+        let base;
+        if (t === '民間学童' && hasSite && hasForm) base = 'S';
+        else if (t === '民間学童' && hasSite) base = 'A';
+        else if ((t === 'NPO' || t === '法人運営') && hasSite) base = 'A';
+        else if (t === '公立/自治体系') base = 'C';
+        else if (!hasSite && !hasForm && item.phone) base = 'B';
+        else if (hasSite || hasForm) base = 'B';
+        else base = 'C';
+
+        const level = item.analysis?.skillLevel;
+        if (!level) return base;
+
+        const order = ['S', 'A', 'B', 'C'];
+        let idx = order.indexOf(base);
+        if (level === 'high') idx = Math.min(order.length - 1, idx + 1); // demote
+        else if (level === 'low') idx = Math.max(0, idx - 1);            // promote
+        return order[idx];
     }
 
     // --------------------------------------------------------------
@@ -327,7 +590,10 @@
                 <td>${priorityPill(it.priority)}</td>
                 <td>${statusPill(it.status)}</td>
                 <td>
-                    <div class="facility-name">${escape(it.facility || '(無題)')}</div>
+                    <div class="facility-name">
+                        ${escape(it.facility || '(無題)')}
+                        ${it.analysis ? `<span class="analyzed-badge" title="解析済 (${escape(it.analysis.platform)} / ${it.analysis.skillScore}/10)">解析★${it.analysis.skillScore}</span>` : ''}
+                    </div>
                     ${it.address ? `<div class="address-line">${escape(it.address)}</div>` : ''}
                 </td>
                 <td>${escape([it.prefecture, it.city].filter(Boolean).join(' '))}</td>
@@ -351,7 +617,10 @@
         list.innerHTML = rows.map((it) => `
             <article class="card">
                 <header class="card__head">
-                    <h3 class="card__title">${escape(it.facility || '(無題)')}</h3>
+                    <h3 class="card__title">
+                        ${escape(it.facility || '(無題)')}
+                        ${it.analysis ? `<span class="analyzed-badge" title="${escape(it.analysis.platform)} / ${it.analysis.skillScore}/10">解析★${it.analysis.skillScore}</span>` : ''}
+                    </h3>
                     <div class="card__pills">
                         ${priorityPill(it.priority)}
                         ${statusPill(it.status)}
@@ -432,6 +701,8 @@
     // --------------------------------------------------------------
     const modal = el('modal');
     const form = el('form');
+    /** Holds the analysis being edited / displayed in the modal. */
+    let modalAnalysis = null;
 
     function openModal(item) {
         form.reset();
@@ -451,6 +722,10 @@
 
         // Pre-load city candidates for the existing prefecture (edit case)
         refreshCityDatalist(data.prefecture || '');
+
+        // Render existing analysis (or empty placeholder) into the modal
+        modalAnalysis = data.analysis ? Object.assign({}, data.analysis) : null;
+        renderAnalysis(modalAnalysis, el('analysis-result'));
 
         modal.hidden = false;
         document.body.style.overflow = 'hidden';
@@ -474,6 +749,7 @@
             data[k] = elField ? elField.value.trim() : '';
         });
         if (!data.status) data.status = '未送信';
+        if (modalAnalysis) data.analysis = modalAnalysis;
         return data;
     }
 
@@ -683,6 +959,37 @@
     });
     form.elements['prefecture'].addEventListener('change', (e) => {
         refreshCityDatalist(e.target.value.trim());
+    });
+
+    // Site analyze
+    el('btn-analyze').addEventListener('click', async () => {
+        const url = (form.elements['websiteUrl'].value || '').trim();
+        const result = el('analysis-result');
+        const hint = el('analysis-hint');
+        if (!isUrl(url)) {
+            alert('まず WebサイトURL を入力してください（http:// または https:// で始まる形式）');
+            return;
+        }
+        result.removeAttribute('data-empty');
+        result.removeAttribute('data-error');
+        result.dataset.loading = '1';
+        result.innerHTML = '解析中… サイトを読み込んでいます';
+        if (hint) { hint.hidden = false; hint.textContent = '取得中…'; }
+
+        try {
+            const analysis = await analyzeWebsite(url);
+            modalAnalysis = analysis;
+            renderAnalysis(analysis, result);
+            if (hint) hint.hidden = true;
+            showToast(`解析完了: ${analysis.platform} / スキル ${analysis.skillScore}`);
+        } catch (err) {
+            console.error(err);
+            result.removeAttribute('data-empty');
+            result.removeAttribute('data-loading');
+            result.dataset.error = '1';
+            result.textContent = '解析に失敗しました: ' + err.message;
+            if (hint) hint.hidden = true;
+        }
     });
 
     // Suggest priority

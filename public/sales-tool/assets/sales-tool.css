@@ -516,6 +516,75 @@ textarea.input { min-height: 70px; resize: vertical; }
     font-weight: 500;
 }
 
+/* ---------- Analysis report ---------- */
+.analysis-result {
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    background: var(--c-bg);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--c-text);
+    min-height: 64px;
+}
+.analysis-result[data-empty="1"] {
+    color: var(--c-soft);
+    font-size: 12px;
+    background: var(--c-bg);
+    border-style: dashed;
+}
+.analysis-result[data-loading="1"] {
+    color: var(--c-blue);
+    font-weight: 700;
+}
+.analysis-result[data-error="1"] {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: var(--c-error);
+}
+.analysis-row {
+    display: grid;
+    grid-template-columns: 84px 1fr;
+    gap: 6px 12px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--c-border);
+}
+.analysis-row:last-child { border-bottom: 0; }
+.analysis-row__label { font-size: 11px; color: var(--c-soft); font-weight: 700; padding-top: 2px; }
+.analysis-row__value { word-break: break-word; }
+.analysis-stars { color: var(--c-orange); letter-spacing: 1px; }
+.analysis-meta {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--c-soft);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.analysis-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--c-blue-soft);
+    color: var(--c-blue);
+}
+.analysis-tag--high  { background: var(--c-orange);     color: #fff; }
+.analysis-tag--mid   { background: var(--c-orange-soft);color: var(--c-orange); }
+.analysis-tag--low   { background: #f1f5f9;             color: var(--c-soft); }
+.analyzed-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--c-blue-soft);
+    color: var(--c-blue);
+    margin-left: 4px;
+}
+
 /* ---------- Toast ---------- */
 .toast {
     position: fixed;

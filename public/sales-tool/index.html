@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=noto-sans-jp:400,500,700,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/sales-tool.css?v=7">
+<link rel="stylesheet" href="assets/sales-tool.css?v=8">
 </head>
 <body>
 
@@ -222,6 +222,17 @@
                     <span class="field__label">メモ</span>
                     <textarea class="input" name="memo" rows="3" maxlength="2000"></textarea>
                 </label>
+
+                <div class="field field--span-2 analysis-block">
+                    <div class="field__label">
+                        サイト解析
+                        <button type="button" class="link-btn" id="btn-analyze">解析する</button>
+                        <span class="field__hint" id="analysis-hint" hidden></span>
+                    </div>
+                    <div class="analysis-result" id="analysis-result" data-empty="1">
+                        WebサイトURL を入れて「解析する」を押すと、コンセプト・最新更新・制作レベルを推定します。
+                    </div>
+                </div>
             </div>
 
             <footer class="modal__foot">
@@ -252,6 +263,6 @@
 <!-- ========== Toast ========== -->
 <div class="toast" id="toast" hidden></div>
 
-<script src="assets/sales-tool.js?v=7"></script>
+<script src="assets/sales-tool.js?v=8"></script>
 </body>
 </html>
