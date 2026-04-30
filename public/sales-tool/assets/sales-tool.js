@@ -1346,6 +1346,221 @@
         }
     })();
 
+    // --------------------------------------------------------------
+    // Search & Import (Google Places via places.php)
+    // --------------------------------------------------------------
+    const searchModal = el('search-modal');
+    /** @type {Array<{name:string,address:string,phone:string,websiteUrl:string,gmapUrl:string,types:string[]}>|null} */
+    let searchResults = null;
+
+    function openSearchModal() {
+        searchResults = null;
+        el('search-q').value = '';
+        el('search-count').value = '20';
+        el('search-fetch-mail').value = '1';
+        const status = el('search-status');
+        status.removeAttribute('data-state');
+        status.textContent = 'キーワードを入れて「検索」を押すと、Google Places から該当する施設を取得します。';
+        el('search-results').hidden = true;
+        el('search-results-list').innerHTML = '';
+        el('btn-do-import').disabled = true;
+        searchModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => el('search-q').focus(), 50);
+    }
+    function closeSearchModal() {
+        searchModal.hidden = true;
+        document.body.style.overflow = '';
+    }
+
+    function setSearchStatus(text, state) {
+        const node = el('search-status');
+        node.textContent = text;
+        if (state) node.dataset.state = state;
+        else node.removeAttribute('data-state');
+    }
+
+    /**
+     * Spot duplicates: same facility (case-insensitive) or websiteUrl.
+     * Returns true if a matching item already exists in `items`.
+     */
+    function isDuplicate(candidate) {
+        const name = (candidate.name || '').toLowerCase().trim();
+        const url  = (candidate.websiteUrl || '').toLowerCase().trim();
+        return items.some((it) => {
+            const itName = (it.facility || '').toLowerCase().trim();
+            const itUrl  = (it.websiteUrl || '').toLowerCase().trim();
+            return (name && itName && name === itName)
+                || (url && itUrl && url === itUrl);
+        });
+    }
+
+    function renderSearchResults() {
+        const list = el('search-results-list');
+        const counter = el('search-results-count');
+        if (!searchResults || searchResults.length === 0) {
+            counter.textContent = '0件';
+            list.innerHTML = '<div style="padding:20px; color:var(--c-soft); text-align:center;">該当なし</div>';
+            el('btn-do-import').disabled = true;
+            return;
+        }
+        counter.textContent = `${searchResults.length}件`;
+        list.innerHTML = searchResults.map((p, i) => {
+            const dup = isDuplicate(p);
+            return `
+                <div class="search-row">
+                    <div class="search-row__check">
+                        <input type="checkbox" data-search-row="${i}" ${dup ? '' : 'checked'} ${dup ? 'disabled' : ''}>
+                    </div>
+                    <div>
+                        <div class="search-row__name">
+                            ${escape(p.name || '(無題)')}
+                            ${dup ? '<span class="search-row__dup">既に登録済</span>' : ''}
+                        </div>
+                        <div class="search-row__addr">${escape(p.address || '')}</div>
+                        <div class="search-row__meta">
+                            ${p.phone ? `<span>📞 ${escape(p.phone)}</span>` : ''}
+                            ${p.websiteUrl ? `<a href="${escape(p.websiteUrl)}" target="_blank" rel="noopener">🌐 ${escape(p.websiteUrl)}</a>` : ''}
+                            ${p.gmapUrl ? `<a href="${escape(p.gmapUrl)}" target="_blank" rel="noopener">📍 GoogleMap</a>` : ''}
+                            ${(p.types || []).slice(0, 3).map((t) => `<span style="background:var(--c-bg); padding:1px 6px; border-radius:6px;">${escape(t)}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        el('btn-do-import').disabled = false;
+    }
+
+    async function doSearch() {
+        const q = el('search-q').value.trim();
+        const count = Math.max(1, Math.min(60, parseInt(el('search-count').value || '20', 10) || 20));
+        if (!q) {
+            alert('キーワードを入力してください');
+            return;
+        }
+        searchResults = null;
+        el('search-results').hidden = true;
+        el('btn-do-import').disabled = true;
+        setSearchStatus('検索中…', 'loading');
+
+        try {
+            const res = await fetch('places.php?query=' + encodeURIComponent(q) + '&total=' + count, { cache: 'no-store' });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data?.error || ('HTTP ' + res.status));
+            }
+            searchResults = (data.places || []);
+            renderSearchResults();
+            el('search-results').hidden = false;
+            setSearchStatus(`${searchResults.length}件 取得しました。チェックを外して取捨選択 → 「取り込み開始」`, 'ok');
+        } catch (err) {
+            console.error(err);
+            setSearchStatus('検索に失敗しました: ' + err.message, 'error');
+        }
+    }
+
+    function selectedSearchRows() {
+        if (!searchResults) return [];
+        const out = [];
+        $$('input[data-search-row]', el('search-results-list')).forEach((cb) => {
+            if (cb.checked && !cb.disabled) {
+                const idx = parseInt(cb.dataset.searchRow, 10);
+                if (!isNaN(idx) && searchResults[idx]) out.push(searchResults[idx]);
+            }
+        });
+        return out;
+    }
+
+    async function doImport() {
+        const picked = selectedSearchRows();
+        if (picked.length === 0) {
+            alert('取り込む施設を選択してください');
+            return;
+        }
+        const fetchMail = el('search-fetch-mail').value === '1';
+        const btn = el('btn-do-import');
+        btn.disabled = true;
+        let added = 0, skipped = 0, mailFound = 0;
+
+        for (let i = 0; i < picked.length; i++) {
+            const p = picked[i];
+            setSearchStatus(`取り込み中… (${i + 1}/${picked.length}) ${p.name}`, 'working');
+
+            if (isDuplicate(p)) { skipped++; continue; }
+
+            // Convert to Item shape
+            const prefecture = pickPrefectureFromAddress(p.address);
+            const city       = pickCityFromAddress(p.address, prefecture);
+            const item = {
+                facility       : p.name || '',
+                prefecture     : prefecture || '',
+                city           : city || '',
+                address        : p.address || '',
+                phone          : p.phone || '',
+                email          : '',
+                websiteUrl     : p.websiteUrl || '',
+                contactFormUrl : '',
+                gmapUrl        : p.gmapUrl || '',
+                type           : '',
+                status         : '未送信',
+                priority       : '',
+                memo           : '',
+                firstSentAt    : '',
+                nextActionAt   : '',
+            };
+
+            // Optional: hit the official website to grab email + analysis + type guess
+            if (fetchMail && isUrl(item.websiteUrl)) {
+                try {
+                    const { fields, analysis } = await importFromUrl(item.websiteUrl);
+                    if (!item.email          && fields.email)          { item.email = fields.email; mailFound++; }
+                    if (!item.contactFormUrl && fields.contactFormUrl) item.contactFormUrl = fields.contactFormUrl;
+                    if (!item.type           && fields.type)           item.type = fields.type;
+                    if (!item.address        && fields.address)        item.address = fields.address;
+                    if (!item.prefecture     && fields.prefecture)     item.prefecture = fields.prefecture;
+                    if (!item.city           && fields.city)           item.city = fields.city;
+                    if (!item.phone          && fields.phone)          item.phone = fields.phone;
+                    item.analysis = analysis;
+                } catch (err) {
+                    // Per-item failures are non-fatal — keep the basic record
+                    console.warn('site import failed for', item.websiteUrl, err);
+                }
+            }
+
+            // Auto priority
+            const sug = suggestPriority(item);
+            if (sug) item.priority = sug;
+
+            addItem(item);
+            added++;
+        }
+
+        setSearchStatus(`完了: ${added}件追加 / ${skipped}件スキップ${fetchMail ? ` / ${mailFound}件メール取得` : ''}`, 'ok');
+        showToast(`${added}件 取り込み完了`);
+        // Refresh the duplicate flags for any remaining results
+        renderSearchResults();
+        btn.disabled = false;
+    }
+
+    el('btn-search-import').addEventListener('click', openSearchModal);
+    searchModal.addEventListener('click', (e) => {
+        if (e.target.closest('[data-close-search]')) closeSearchModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !searchModal.hidden) closeSearchModal();
+    });
+    el('btn-do-search').addEventListener('click', doSearch);
+    el('search-q').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
+    });
+    el('btn-do-import').addEventListener('click', doImport);
+    el('search-check-all').addEventListener('change', (e) => {
+        const on = e.target.checked;
+        $$('input[data-search-row]', el('search-results-list')).forEach((cb) => {
+            if (!cb.disabled) cb.checked = on;
+        });
+    });
+
     // Initial render
     render();
 })();

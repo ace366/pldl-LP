@@ -587,6 +587,68 @@ textarea.input { min-height: 70px; resize: vertical; }
     margin-left: 4px;
 }
 
+/* ---------- Search & Import modal ---------- */
+.modal__panel--lg { max-width: 920px; }
+.search-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: stretch;
+    margin-bottom: 12px;
+}
+.search-status {
+    font-size: 12px;
+    color: var(--c-soft);
+    margin: 8px 0 12px;
+    padding: 10px 12px;
+    border: 1px dashed var(--c-border);
+    border-radius: var(--radius-sm);
+    background: var(--c-bg);
+}
+.search-status[data-state="loading"] { color: var(--c-blue); border-color: var(--c-blue-line); background: var(--c-blue-soft); font-weight: 700; }
+.search-status[data-state="error"]   { color: var(--c-error); border-color: #fca5a5; background: #fee2e2; font-weight: 700; }
+.search-status[data-state="ok"]      { color: var(--c-success); border-color: #86efac; background: #dcfce7; }
+.search-status[data-state="working"] { color: var(--c-warning); border-color: var(--c-orange-line); background: var(--c-orange-soft); font-weight: 700; }
+
+.search-results {
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+}
+.search-results__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-bg);
+    font-size: 12px;
+}
+.search-check-all { display: inline-flex; align-items: center; gap: 6px; }
+.search-results__count { color: var(--c-muted); }
+.search-results__list { max-height: 50vh; overflow-y: auto; }
+.search-row {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--c-border);
+    font-size: 13px;
+}
+.search-row:last-child { border-bottom: 0; }
+.search-row__check { padding-top: 4px; }
+.search-row__check input { width: 18px; height: 18px; }
+.search-row__name { font-weight: 700; color: var(--c-navy); margin-bottom: 2px; }
+.search-row__addr { color: var(--c-muted); font-size: 12px; }
+.search-row__meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; font-size: 11px; color: var(--c-soft); }
+.search-row__meta a { color: var(--c-blue); }
+.search-row__dup {
+    margin-left: 8px;
+    font-size: 11px;
+    color: var(--c-error);
+    font-weight: 700;
+}
+
 /* ---------- Toast ---------- */
 .toast {
     position: fixed;

@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=noto-sans-jp:400,500,700,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/sales-tool.css?v=11">
+<link rel="stylesheet" href="assets/sales-tool.css?v=12">
 </head>
 <body>
 
@@ -89,6 +89,7 @@
             </select>
         </div>
         <div class="toolbar__actions">
+            <button type="button" class="btn btn--secondary btn--lg" id="btn-search-import">🔍 検索取り込み</button>
             <button type="button" class="btn btn--primary btn--lg" id="btn-add">+ 新規追加</button>
         </div>
     </section>
@@ -254,6 +255,55 @@
     </div>
 </div>
 
+<!-- ========== Modal: Search & Import ========== -->
+<div class="modal" id="search-modal" hidden>
+    <div class="modal__backdrop" data-close-search></div>
+    <div class="modal__panel modal__panel--lg" role="dialog" aria-modal="true" aria-labelledby="search-modal-title">
+        <header class="modal__head">
+            <h2 class="modal__title" id="search-modal-title">検索取り込み</h2>
+            <button type="button" class="modal__close" aria-label="閉じる" data-close-search>×</button>
+        </header>
+        <div class="modal__body">
+            <div class="search-bar">
+                <label class="field" style="flex: 1;">
+                    <span class="field__label">検索キーワード <span class="field__hint">例: 群馬 民間学童 / 埼玉 放課後児童クラブ</span></span>
+                    <input class="input" type="text" id="search-q" placeholder="例: 群馬 民間学童" maxlength="200">
+                </label>
+                <label class="field" style="width: 110px; flex: 0 0 auto;">
+                    <span class="field__label">件数</span>
+                    <input class="input" type="number" id="search-count" value="20" min="1" max="60">
+                </label>
+                <label class="field" style="width: 160px; flex: 0 0 auto;">
+                    <span class="field__label">メール自動取得</span>
+                    <select class="input" id="search-fetch-mail">
+                        <option value="1" selected>ON（時間かかる）</option>
+                        <option value="0">OFF</option>
+                    </select>
+                </label>
+                <button type="button" class="btn btn--secondary btn--lg" id="btn-do-search" style="align-self: end;">検索</button>
+            </div>
+
+            <p class="search-status" id="search-status">キーワードを入れて「検索」を押すと、Google Places から該当する施設を取得します。</p>
+
+            <div class="search-results" id="search-results" hidden>
+                <div class="search-results__head">
+                    <label class="search-check-all">
+                        <input type="checkbox" id="search-check-all" checked>
+                        <span>全選択</span>
+                    </label>
+                    <span class="search-results__count" id="search-results-count"></span>
+                </div>
+                <div class="search-results__list" id="search-results-list"></div>
+            </div>
+        </div>
+        <footer class="modal__foot">
+            <span style="flex: 1;"></span>
+            <button type="button" class="btn btn--ghost-light" data-close-search>キャンセル</button>
+            <button type="button" class="btn btn--primary" id="btn-do-import" disabled>取り込み開始</button>
+        </footer>
+    </div>
+</div>
+
 <datalist id="prefectures">
     <option value="北海道"><option value="青森県"><option value="岩手県"><option value="宮城県"><option value="秋田県">
     <option value="山形県"><option value="福島県"><option value="茨城県"><option value="栃木県"><option value="群馬県">
@@ -272,6 +322,6 @@
 <!-- ========== Toast ========== -->
 <div class="toast" id="toast" hidden></div>
 
-<script src="assets/sales-tool.js?v=11"></script>
+<script src="assets/sales-tool.js?v=12"></script>
 </body>
 </html>
