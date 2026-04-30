@@ -35,6 +35,7 @@
 </head>
 <body>
     <div id="gakudo-lp-root"
-         data-settings='@json($lpSettings)'></div>
+         data-settings='@json($lpSettings)'
+         data-app-url="{{ rtrim(config('app.url'), '/') }}"></div>
 </body>
 </html>

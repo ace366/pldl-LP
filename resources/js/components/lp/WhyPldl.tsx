@@ -1,4 +1,5 @@
 import React from 'react';
+import { asset } from '../../lib/asset';
 
 const points = [
     {
@@ -42,7 +43,7 @@ const WhyPldl: React.FC = () => {
                 <div className="lp-grid lp-grid--2">
                     {points.map((p) => (
                         <article key={p.title} className="lp-card lp-card--with-icon">
-                            <img className="lp-card__icon" src={p.icon} alt="" width="64" height="64" />
+                            <img className="lp-card__icon" src={asset(p.icon)} alt="" width="64" height="64" />
                             <div>
                                 <h3 className="lp-card__title">{p.title}</h3>
                                 <p className="lp-card__body">{p.body}</p>

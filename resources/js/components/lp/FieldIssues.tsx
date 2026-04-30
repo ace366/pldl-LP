@@ -1,4 +1,5 @@
 import React from 'react';
+import { asset } from '../../lib/asset';
 
 const issues = [
     {
@@ -45,7 +46,7 @@ const FieldIssues: React.FC = () => {
                     {issues.map((i) => (
                         <li key={i.title} className="lp-issue">
                             <span className="lp-issue__icon" aria-hidden="true">
-                                <img src={i.icon} alt="" width="36" height="36" />
+                                <img src={asset(i.icon)} alt="" width="36" height="36" />
                             </span>
                             <div>
                                 <h3 className="lp-issue__title">{i.title}</h3>

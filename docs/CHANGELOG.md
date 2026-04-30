@@ -11,6 +11,20 @@
 
 ---
 
+## 2026-04-30  サブパス公開で画像/エンドポイントが壊れていたのを修正
+
+`/pldl-lp` サブパス公開時、React 内のハードコード絶対パス（`/images/...`、`/gakudo/contact`）がドメイン直下を見に行って 404 になっていた。
+
+### 修正
+- `resources/js/lib/asset.ts` に `asset(path)` ヘルパー追加。`window.__APP_URL__` を読んで base URL を前置する
+- Blade で `<div data-app-url="{{ rtrim(config('app.url'), '/') }}">` を出力 → `gakudo-lp.tsx` で `window.__APP_URL__` に設定
+- `Hero.tsx` / `Solutions.tsx` / `WhyPldl.tsx` / `FieldIssues.tsx` の 21 個の `<img src>` を `asset(...)` で包む
+- `contactEndpoint` のデフォルト値も `asset('/gakudo/contact')` に
+
+ローカル開発（`APP_URL=http://127.0.0.1:8000`）では `asset('/images/foo')` → `http://127.0.0.1:8000/images/foo` で従来通り動く。
+
+---
+
 ## 2026-04-30  さくらサブパス公開向けに public/index.php を補正
 
 `https://top-ace-picard.sakura.ne.jp/pldl-lp` のような **サブパス公開**で Laravel が 404 を返していた問題を修正。

@@ -1,4 +1,5 @@
 import React from 'react';
+import { asset } from '../../lib/asset';
 
 const features = [
     {
@@ -65,7 +66,7 @@ const Solutions: React.FC = () => {
                 <div className="lp-grid lp-grid--3">
                     {features.map((f) => (
                         <article key={f.title} className="lp-feature">
-                            <img className="lp-feature__icon" src={f.icon} alt="" width="56" height="56" />
+                            <img className="lp-feature__icon" src={asset(f.icon)} alt="" width="56" height="56" />
                             <h3 className="lp-feature__title">{f.title}</h3>
                             <p className="lp-feature__body">{f.body}</p>
                         </article>

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { LpSettings } from './types';
+import { asset } from '../../lib/asset';
 
 type Props = { settings: LpSettings };
 
@@ -57,27 +58,27 @@ const Hero: React.FC<Props> = ({ settings }) => {
                     <div className="lp-hero__phone" aria-hidden="true">
                         <div className="lp-hero__phone-screen">
                             <div className="lp-hero__phone-row lp-hero__phone-row--head">
-                                <img src="/images/attendance.png" alt="" width="20" height="20" />
+                                <img src={asset('/images/attendance.png')} alt="" width="20" height="20" />
                                 <span>本日の出席</span>
                                 <span className="lp-hero__phone-pill">38 / 42</span>
                             </div>
                             <div className="lp-hero__phone-row">
-                                <img src="/images/press.png" alt="" width="20" height="20" />
+                                <img src={asset('/images/press.png')} alt="" width="20" height="20" />
                                 <span>欠席連絡</span>
                                 <span>4件 受信</span>
                             </div>
                             <div className="lp-hero__phone-row">
-                                <img src="/images/car.png" alt="" width="20" height="20" />
+                                <img src={asset('/images/car.png')} alt="" width="20" height="20" />
                                 <span>お迎え変更</span>
                                 <span>2件</span>
                             </div>
                             <div className="lp-hero__phone-row lp-hero__phone-row--ok">
-                                <img src="/images/send.png" alt="" width="20" height="20" />
+                                <img src={asset('/images/send.png')} alt="" width="20" height="20" />
                                 <span>保護者通知</span>
                                 <span>送信済み</span>
                             </div>
                             <div className="lp-hero__phone-row lp-hero__phone-row--soft">
-                                <img src="/images/QR.png" alt="" width="20" height="20" />
+                                <img src={asset('/images/QR.png')} alt="" width="20" height="20" />
                                 <span>QR出席</span>
                                 <span>稼働中</span>
                             </div>

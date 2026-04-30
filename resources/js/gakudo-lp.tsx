@@ -1,10 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import GakudoLp, { type LpSettings } from './pages/GakudoLp';
+import { asset } from './lib/asset';
 
 const mount = document.getElementById('gakudo-lp-root');
 
 if (mount) {
+    window.__APP_URL__ = mount.getAttribute('data-app-url') ?? '';
+
     let settings: LpSettings = {
         lineConsultUrl: '',
         introVideoUrl: '',
@@ -17,7 +20,7 @@ if (mount) {
         receptionClosedMsg: '',
         gaMeasurementId: '',
         gscVerification: '',
-        contactEndpoint: '/gakudo/contact',
+        contactEndpoint: asset('/gakudo/contact'),
     };
 
     const raw = mount.getAttribute('data-settings');
