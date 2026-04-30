@@ -509,9 +509,10 @@
         render();
     });
 
-    // Modal close handlers
+    // Modal close handlers — use closest() so a click on the inner content
+    // of a [data-close] element (the × glyph, etc.) still triggers close.
     modal.addEventListener('click', (e) => {
-        if (e.target.dataset && e.target.dataset.close !== undefined) {
+        if (e.target.closest('[data-close]')) {
             closeModal();
         }
     });
