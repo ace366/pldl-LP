@@ -24,12 +24,17 @@ class AppServiceProvider extends ServiceProvider
         Vite::prefetch(concurrency: 3);
 
         // Sub-path deploy support (e.g. https://example.com/pldl-lp).
-        // Without this, redirect('/dashboard') drops the /pldl-lp prefix
-        // because Laravel uses the request host instead of APP_URL.
+        // Only force the root URL when APP_URL has a path component, otherwise
+        // local dev (APP_URL=http://127.0.0.1:8000 accessed via localhost) gets
+        // its asset URLs rewritten to a different origin and breaks with CORS.
         $appUrl = config('app.url');
         if ($appUrl) {
-            URL::forceRootUrl($appUrl);
-            if (str_starts_with($appUrl, 'https://')) {
+            $parsed = parse_url($appUrl);
+            $path = $parsed['path'] ?? '';
+            if ($path !== '' && $path !== '/') {
+                URL::forceRootUrl($appUrl);
+            }
+            if (($parsed['scheme'] ?? '') === 'https') {
                 URL::forceScheme('https');
             }
         }

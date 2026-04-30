@@ -11,6 +11,14 @@
 
 ---
 
+## 2026-04-30  ローカル `/register` が真っ白になる問題を修正
+
+`AppServiceProvider::boot()` の `URL::forceRootUrl(config('app.url'))` をローカル (APP_URL=`http://127.0.0.1:8000`) でも無条件で効かせていたため、ブラウザを `http://localhost:8000` で開くと JS/CSS の `<script src>`/`<link href>` が `127.0.0.1:8000` を指してしまい **CORS で React がマウントされず blank** だった。
+
+`APP_URL` にパス成分（サブパス）があるときだけ `forceRootUrl` を呼ぶよう変更。`https` スキームの強制も同じガードに統合。
+
+---
+
 ## 2026-04-30  /register で 419 が出る問題を修正
 
 ### 真因
