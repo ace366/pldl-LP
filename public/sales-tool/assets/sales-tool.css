@@ -431,6 +431,9 @@ textarea.input { min-height: 70px; resize: vertical; }
     justify-content: center;
     padding: 20px;
 }
+.modal[hidden] {
+    display: none !important;
+}
 .modal__backdrop {
     position: absolute;
     inset: 0;

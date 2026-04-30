@@ -509,12 +509,18 @@
         render();
     });
 
-    // Modal close handlers — use closest() so a click on the inner content
-    // of a [data-close] element (the × glyph, etc.) still triggers close.
+    // Modal close handlers — combine event delegation (closest) and direct
+    // listeners on each [data-close] element. Belt-and-suspenders.
     modal.addEventListener('click', (e) => {
         if (e.target.closest('[data-close]')) {
             closeModal();
         }
+    });
+    $$('[data-close]', modal).forEach((node) => {
+        node.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeModal();
+        });
     });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !modal.hidden) closeModal();
