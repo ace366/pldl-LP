@@ -291,16 +291,17 @@
         throw new Error('すべてのプロキシで取得失敗\n' + errors.map(s => '  - ' + s).join('\n'));
     }
 
-    async function analyzeWebsite(url) {
+    async function fetchAndParse(url) {
         if (!isUrl(url)) throw new Error('有効な URL ではありません。');
-
         const fetched = await fetchViaProxies(url);
         const html = fetched.html;
         const finalUrl = fetched.finalUrl;
         if (!html || typeof html !== 'string') throw new Error('HTML を取得できませんでした。');
-
         const doc = new DOMParser().parseFromString(html, 'text/html');
+        return { html, doc, finalUrl };
+    }
 
+    function computeAnalysisFromDoc(html, doc, finalUrl) {
         const platform = detectPlatform(html, doc);
         const skillScore = computeSkillScore(html, doc, finalUrl);
         const skillLevel = scoreToLevel(skillScore);
@@ -319,6 +320,198 @@
             concept,
             lastUpdate,
         };
+    }
+
+    async function analyzeWebsite(url) {
+        const { html, doc, finalUrl } = await fetchAndParse(url);
+        return computeAnalysisFromDoc(html, doc, finalUrl);
+    }
+
+    /**
+     * Fetch URL once, return both the field extraction and the analysis.
+     */
+    async function importFromUrl(url) {
+        const { html, doc, finalUrl } = await fetchAndParse(url);
+        const fields = extractFieldsFromDoc(html, doc, finalUrl);
+        const analysis = computeAnalysisFromDoc(html, doc, finalUrl);
+        return { fields, analysis };
+    }
+
+    // --------------------------------------------------------------
+    // Field extraction from a fetched HTML document
+    // --------------------------------------------------------------
+    const PREFECTURE_LIST = [
+        '北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県',
+        '茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県',
+        '新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県',
+        '静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県',
+        '奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県',
+        '徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県',
+        '熊本県','大分県','宮崎県','鹿児島県','沖縄県',
+    ];
+
+    function extractJsonLd(doc) {
+        const out = [];
+        doc.querySelectorAll('script[type="application/ld+json"]').forEach((s) => {
+            try {
+                const parsed = JSON.parse(s.textContent);
+                const arr = Array.isArray(parsed) ? parsed
+                          : (parsed && parsed['@graph']) ? parsed['@graph']
+                          : [parsed];
+                arr.forEach((it) => { if (it && typeof it === 'object') out.push(it); });
+            } catch {}
+        });
+        return out;
+    }
+
+    function findOrgInJsonLd(items) {
+        const wanted = ['Organization','LocalBusiness','EducationalOrganization','School',
+                        'NGO','Place','ChildCare'];
+        return items.find((it) => {
+            const t = it['@type'];
+            const types = Array.isArray(t) ? t : [t];
+            return types.some((x) => wanted.includes(x));
+        });
+    }
+
+    function pickFacility(doc, jsonLd) {
+        const org = findOrgInJsonLd(jsonLd);
+        if (org?.name) return String(org.name).trim();
+
+        const ogSiteName = doc.querySelector('meta[property="og:site_name"]')?.content;
+        if (ogSiteName) return ogSiteName.trim();
+
+        const ogTitle = doc.querySelector('meta[property="og:title"]')?.content;
+        const title = doc.querySelector('title')?.textContent?.trim();
+        const candidate = (ogTitle || title || '').trim();
+        if (candidate) {
+            // Often "施設名 ｜ キャッチ" — take the first segment if reasonable
+            const parts = candidate.split(/[|｜｜\-—–]/).map((s) => s.trim()).filter(Boolean);
+            if (parts.length > 1 && parts[0].length <= 60) return parts[0];
+            return candidate;
+        }
+
+        const h1 = doc.querySelector('h1')?.textContent?.trim().replace(/\s+/g, ' ');
+        return h1 ? h1.slice(0, 100) : '';
+    }
+
+    function pickAddress(doc, jsonLd) {
+        const org = findOrgInJsonLd(jsonLd);
+        if (org?.address) {
+            const a = org.address;
+            if (typeof a === 'string') return a.trim();
+            if (a && typeof a === 'object') {
+                const parts = [
+                    a.postalCode ? '〒' + String(a.postalCode).replace(/-?(\d{3})(\d{4})/, '$1-$2') : '',
+                    a.addressRegion,
+                    a.addressLocality,
+                    a.streetAddress,
+                ].filter(Boolean).map(String);
+                if (parts.length > 0) return parts.join(' ').trim();
+            }
+        }
+
+        // Try <address> element
+        const addrEl = doc.querySelector('address');
+        if (addrEl) {
+            const t = addrEl.textContent.replace(/\s+/g, ' ').trim();
+            if (t.length >= 6 && t.length <= 200) return t;
+        }
+
+        // Body text scan: 〒XXX-XXXX 都道府県... 市区町村...
+        const text = (doc.body?.textContent || '').replace(/\s+/g, ' ');
+        const re = /〒\s*\d{3}\s*[-‐ー－]\s*\d{4}[\s　]*([^\s　]{1,100})/;
+        const m = text.match(re);
+        if (m) return m[0].replace(/\s+/g, ' ').trim().slice(0, 200);
+        return '';
+    }
+
+    function pickPhone(doc, jsonLd) {
+        const org = findOrgInJsonLd(jsonLd);
+        if (org?.telephone) return String(org.telephone).trim();
+
+        const tel = doc.querySelector('a[href^="tel:"]')?.getAttribute('href');
+        if (tel) return tel.replace(/^tel:/, '').replace(/\s+/g, '').trim();
+
+        const text = (doc.body?.textContent || '').replace(/\s+/g, ' ');
+        const m = text.match(/(?:0\d{1,4}[-‐ー－(]?\d{1,4}[)\-‐ー－]?\d{4}|\(0\d{1,4}\)\s*\d{1,4}[-\s]?\d{4})/);
+        return m ? m[0].replace(/\s/g, '') : '';
+    }
+
+    function pickEmail(doc, jsonLd) {
+        const org = findOrgInJsonLd(jsonLd);
+        if (org?.email) return String(org.email).trim();
+
+        const mailto = doc.querySelector('a[href^="mailto:"]')?.getAttribute('href');
+        if (mailto) return mailto.replace(/^mailto:/, '').split('?')[0].trim();
+
+        const text = doc.body?.textContent || '';
+        // skip noreply / @example.com style placeholders later if desired
+        const m = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+        return m ? m[0] : '';
+    }
+
+    function pickPrefecture(addr) {
+        if (!addr) return '';
+        return PREFECTURES.includes ? '' : '';
+    }
+
+    function pickPrefectureFromAddress(addr) {
+        if (!addr) return '';
+        return PREFECTURE_LIST.find((p) => addr.includes(p)) || '';
+    }
+
+    function pickCityFromAddress(addr, prefecture) {
+        if (!addr || !prefecture) return '';
+        const idx = addr.indexOf(prefecture);
+        if (idx < 0) return '';
+        const rest = addr.slice(idx + prefecture.length);
+        const m = rest.match(/^[\s　]*([^\s　0-9０-９]{1,15}?[市区町村郡])/);
+        return m ? m[1] : '';
+    }
+
+    function pickType(doc) {
+        const head = (doc.querySelector('title')?.textContent || '') + ' ' +
+                     (doc.querySelector('meta[name="description"]')?.content || '') + ' ' +
+                     (doc.querySelector('h1')?.textContent || '');
+        if (/NPO|特定非営利|社団法人|社会福祉法人/.test(head)) return 'NPO';
+        if (/放課後児童クラブ/.test(head)) return '放課後児童クラブ';
+        if (/学童|アフタースクール|after\s*school/i.test(head)) return '民間学童';
+        return '';
+    }
+
+    function pickContactFormUrl(doc, finalUrl) {
+        // First, look for anchor tags whose text suggests a contact form
+        const anchors = Array.from(doc.querySelectorAll('a[href]'));
+        const re = /(お?問い?合わせ|お問合せ|問合せ|コンタクト|^Contact$|^contact us$|inquiry)/i;
+        for (const a of anchors) {
+            const text = (a.textContent || '').trim();
+            if (re.test(text)) {
+                const href = a.getAttribute('href');
+                if (!href || href.startsWith('mailto:') || href.startsWith('tel:')) continue;
+                try { return new URL(href, finalUrl).href; } catch {}
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Pull as many fields as we can from a fetched HTML document.
+     * Returns { facility, prefecture, city, address, phone, email,
+     *           contactFormUrl, type, found:[] }
+     */
+    function extractFieldsFromDoc(html, doc, finalUrl) {
+        const jsonLd = extractJsonLd(doc);
+        const facility = pickFacility(doc, jsonLd);
+        const address  = pickAddress(doc, jsonLd);
+        const phone    = pickPhone(doc, jsonLd);
+        const email    = pickEmail(doc, jsonLd);
+        const prefecture = pickPrefectureFromAddress(address);
+        const city = pickCityFromAddress(address, prefecture);
+        const type = pickType(doc);
+        const contactFormUrl = pickContactFormUrl(doc, finalUrl);
+
+        return { facility, prefecture, city, address, phone, email, contactFormUrl, type };
     }
 
     function renderAnalysis(analysis, container) {
@@ -758,6 +951,10 @@
         // Render existing analysis (or empty placeholder) into the modal
         modalAnalysis = data.analysis ? Object.assign({}, data.analysis) : null;
         renderAnalysis(modalAnalysis, el('analysis-result'));
+        const importHint = el('import-hint');
+        if (importHint) { importHint.hidden = true; importHint.textContent = ''; }
+        const analysisHint = el('analysis-hint');
+        if (analysisHint) { analysisHint.hidden = true; analysisHint.textContent = ''; }
 
         modal.hidden = false;
         document.body.style.overflow = 'hidden';
@@ -992,6 +1189,71 @@
     });
     form.elements['prefecture'].addEventListener('change', (e) => {
         refreshCityDatalist(e.target.value.trim());
+    });
+
+    // Import facility data from website
+    el('btn-import').addEventListener('click', async () => {
+        const url = (form.elements['websiteUrl'].value || '').trim();
+        const hint = el('import-hint');
+        const analysisResult = el('analysis-result');
+        if (!isUrl(url)) {
+            alert('まず WebサイトURL を入力してください（http:// または https:// で始まる形式）');
+            return;
+        }
+
+        // Show loading on both the import hint and the analysis card
+        if (hint) { hint.hidden = false; hint.textContent = '取り込み中…'; }
+        analysisResult.removeAttribute('data-empty');
+        analysisResult.removeAttribute('data-error');
+        analysisResult.dataset.loading = '1';
+        analysisResult.innerHTML = 'サイトを取得しています…';
+
+        try {
+            const { fields, analysis } = await importFromUrl(url);
+
+            // Smart-fill: only populate empty fields, never clobber user input
+            const filledKeys = [];
+            const order = ['facility','prefecture','city','address','phone','email',
+                           'contactFormUrl','type'];
+            order.forEach((k) => {
+                const elField = form.elements[k];
+                if (!elField) return;
+                const current = (elField.value || '').trim();
+                const found = (fields[k] || '').trim();
+                if (current === '' && found !== '') {
+                    elField.value = found;
+                    filledKeys.push(k);
+                    if (k === 'prefecture') refreshCityDatalist(found);
+                }
+            });
+
+            // Save analysis to the record's draft and render it
+            modalAnalysis = analysis;
+            renderAnalysis(analysis, analysisResult);
+
+            // Auto-suggest priority if currently empty
+            if (!form.elements['priority'].value) {
+                const draft = readForm();
+                const sug = suggestPriority(draft);
+                if (sug) form.elements['priority'].value = sug;
+            }
+
+            if (hint) {
+                if (filledKeys.length === 0) {
+                    hint.textContent = '埋まる項目は見つかりませんでした（解析のみ完了）';
+                } else {
+                    hint.textContent = `${filledKeys.length}項目埋めました: ${filledKeys.join(', ')}`;
+                }
+            }
+            showToast(`取り込み完了 (${filledKeys.length}項目 + 解析)`);
+        } catch (err) {
+            console.error(err);
+            analysisResult.removeAttribute('data-empty');
+            analysisResult.removeAttribute('data-loading');
+            analysisResult.dataset.error = '1';
+            analysisResult.textContent = '取り込みに失敗しました: ' + err.message;
+            if (hint) { hint.hidden = false; hint.textContent = '失敗'; }
+        }
     });
 
     // Site analyze
