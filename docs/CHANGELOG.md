@@ -11,6 +11,23 @@
 
 ---
 
+## 2026-04-30  さくらサブパス公開向けに public/index.php を補正
+
+`https://top-ace-picard.sakura.ne.jp/pldl-lp` のような **サブパス公開**で Laravel が 404 を返していた問題を修正。
+
+### 症状
+さくらの自動リライト（`/pldl-lp/foo` → `/pldl-lp/public/foo`）後、PHP に渡る `SCRIPT_NAME` が `/pldl-lp/public/index.php` になるが `REQUEST_URI` は `/pldl-lp/foo` のまま。Symfony の baseUrl 検出が `/pldl-lp` を剥がせず、Laravel ルーターには `/pldl-lp/foo` が渡って 404。
+
+### 修正
+`public/index.php` の冒頭で `SCRIPT_NAME` / `PHP_SELF` の `/public/index.php` を `/index.php` に置換。これで Symfony が dirname(`/pldl-lp/index.php`) = `/pldl-lp` を baseUrl として認識し、pathInfo が `/foo` に正規化される。
+
+ローカル開発（`/public` がパスに含まれない）では no-op。
+
+### 関連
+- 影響パス例: `/pldl-lp/gakudo` ✓ 200、`/pldl-lp/admin/lp-settings` 等
+
+---
+
 ## 2026-04-30  デプロイスクリプトを zip → tar.gz に切替
 
 PowerShell `Compress-Archive` 経由のZIPだとさくら側 `unzip` で失敗するケースがあったため、Windows 同梱の BSD tar (`%SystemRoot%\System32\tar.exe`) で `tar.gz` を作成する方式に変更。
