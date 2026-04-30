@@ -11,6 +11,12 @@
 
 ---
 
+## 2026-04-30  /register で 419 が出る問題を修正 (trustProxies)
+
+さくらは nginx → Apache のリバースプロキシ構成。`trustProxies` を設定しないと `request()->isSecure()` が HTTPS でも false を返し、セッションクッキーの Secure フラグが正しく付かない／URL scheme 判定が狂う等で **POST /register が 419 (Page Expired = CSRF mismatch)** で落ちていた。
+
+`bootstrap/app.php` で `$middleware->trustProxies(at: '*', headers: X_FORWARDED_FOR | HOST | PORT | PROTO)` を設定。
+
 ## 2026-04-30  /register などサブパス公開対応 + Laravel ロゴ撤去
 
 ### サブパスリダイレクト対応
