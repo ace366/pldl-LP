@@ -122,7 +122,13 @@
     //   - skillScore: 0..10 based on tech-quality signals
     //   - skillLevel: high / mid / low
     // --------------------------------------------------------------
-    const PROXY_URL = 'https://api.allorigins.win/get?url=';
+    // First entry is same-origin (Laravel-side proxy.php). When the tool
+    // is opened via file:// or another origin, that endpoint is missing,
+    // so allorigins.win is kept as a public fallback.
+    const PROXY_ENDPOINTS = [
+        'proxy.php?url=',
+        'https://api.allorigins.win/get?url=',
+    ];
 
     function detectPlatform(html, doc) {
         const generator = (doc.querySelector('meta[name="generator"]')?.content || '').toLowerCase();
@@ -260,14 +266,37 @@
         };
     }
 
+    async function fetchViaProxies(url) {
+        const errors = [];
+        for (const ep of PROXY_ENDPOINTS) {
+            try {
+                const res = await fetch(ep + encodeURIComponent(url), { cache: 'no-store' });
+                if (!res.ok) {
+                    errors.push(`${ep.split('?')[0]} → HTTP ${res.status}`);
+                    continue;
+                }
+                const data = await res.json();
+                if (data && typeof data.contents === 'string' && data.contents.length > 0) {
+                    return {
+                        html: data.contents,
+                        finalUrl: (data.status && data.status.url) || url,
+                        via: ep.split('?')[0],
+                    };
+                }
+                errors.push(`${ep.split('?')[0]} → 空レスポンス`);
+            } catch (e) {
+                errors.push(`${ep.split('?')[0]} → ${e.message}`);
+            }
+        }
+        throw new Error('すべてのプロキシで取得失敗\n' + errors.map(s => '  - ' + s).join('\n'));
+    }
+
     async function analyzeWebsite(url) {
         if (!isUrl(url)) throw new Error('有効な URL ではありません。');
 
-        const proxyRes = await fetch(PROXY_URL + encodeURIComponent(url), { cache: 'no-store' });
-        if (!proxyRes.ok) throw new Error('プロキシの取得に失敗しました（' + proxyRes.status + '）');
-        const data = await proxyRes.json();
-        const html = data && data.contents;
-        const finalUrl = (data && data.status && data.status.url) || url;
+        const fetched = await fetchViaProxies(url);
+        const html = fetched.html;
+        const finalUrl = fetched.finalUrl;
         if (!html || typeof html !== 'string') throw new Error('HTML を取得できませんでした。');
 
         const doc = new DOMParser().parseFromString(html, 'text/html');
