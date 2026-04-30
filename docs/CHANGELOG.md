@@ -11,11 +11,19 @@
 
 ---
 
-## 2026-04-30  /register で 419 が出る問題を修正 (trustProxies)
+## 2026-04-30  /register で 419 が出る問題を修正
 
-さくらは nginx → Apache のリバースプロキシ構成。`trustProxies` を設定しないと `request()->isSecure()` が HTTPS でも false を返し、セッションクッキーの Secure フラグが正しく付かない／URL scheme 判定が狂う等で **POST /register が 419 (Page Expired = CSRF mismatch)** で落ちていた。
+### 真因
+さくらレンタルサーバーは `Set-Cookie` ヘッダの cookie 名に `ENC_` プレフィックスを付け、値も独自暗号化する**透過プロキシ**を挟んでいる。
+- レスポンス: `Set-Cookie: pldl_gakudo_lp_session=<laravel encrypted>` → ブラウザに届くのは `Set-Cookie: ENC_pldl_gakudo_lp_session=<sakura encrypted>`
+- リクエスト: ブラウザが `Cookie: ENC_pldl_gakudo_lp_session=<sakura encrypted>` 送信 → さくらが復号して PHP の `$_COOKIE['pldl_gakudo_lp_session']` には Laravel の元の暗号化値が入る
 
-`bootstrap/app.php` で `$middleware->trustProxies(at: '*', headers: X_FORWARDED_FOR | HOST | PORT | PROTO)` を設定。
+サーバー側は透過なので影響なし。**問題は JS 側**で、`document.cookie` で見えるのは `ENC_XSRF-TOKEN=<sakura encrypted>` のみ。Inertia/Axios はデフォルトで `XSRF-TOKEN` cookie を読んで `X-XSRF-TOKEN` ヘッダで送るが、さくら暗号化された値は Laravel が復号できず CSRF 不一致 → **419**。
+
+### 修正
+1. `resources/views/app.blade.php` に `<meta name="csrf-token" content="{{ csrf_token() }}">` を追加
+2. `resources/js/bootstrap.ts` で meta タグから生トークンを読み、`axios.defaults.headers.common['X-CSRF-TOKEN']` に設定。Cookie ベースの CSRF を完全に迂回。
+3. `bootstrap/app.php` で `trustProxies(at: '*')` も併せて設定（scheme 判定の信頼性確保）。
 
 ## 2026-04-30  /register などサブパス公開対応 + Laravel ロゴ撤去
 
