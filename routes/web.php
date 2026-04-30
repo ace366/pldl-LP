@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\GakudoLpContactsAdminController;
 use App\Http\Controllers\Admin\LpSettingsController;
 use App\Http\Controllers\GakudoLpContactController;
 use App\Http\Controllers\ProfileController;
@@ -19,6 +20,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         ->name('lp-settings.index');
     Route::put('/lp-settings', [LpSettingsController::class, 'update'])
         ->name('lp-settings.update');
+
+    Route::get('/contacts', [GakudoLpContactsAdminController::class, 'index'])
+        ->name('contacts.index');
+    Route::get('/contacts/{contact}', [GakudoLpContactsAdminController::class, 'show'])
+        ->name('contacts.show');
+    Route::put('/contacts/{contact}', [GakudoLpContactsAdminController::class, 'update'])
+        ->name('contacts.update');
 });
 
 Route::get('/dashboard', function () {
