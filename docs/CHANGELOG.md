@@ -11,6 +11,21 @@
 
 ---
 
+## 2026-04-30  本番 SMTP（さくら）動作確認 + テンプレ修正
+
+`MAIL_USERNAME=no-reply@pldl.or.jp / pass=t366bbmh` で 535 認証失敗していた件、ユーザー確認の結果 **`t366bbmh` は `support@top-ace-picard.sakura.ne.jp` のパスワード**だった。
+
+### 修正
+- 本番 `.env`: `MAIL_USERNAME` と `MAIL_FROM_ADDRESS` を `support@top-ace-picard.sakura.ne.jp` に変更
+- `docs/sakura-env.production.txt`: 同じく修正、Laravel 11 では `MAIL_ENCRYPTION` 不要 (`MAIL_SCHEME` を使う) コメントも追加
+- 管理者通知先 `admin_notify_email` は env ではなく **DB (`lp_settings`) 管理**である旨をテンプレに明記
+
+### 検証
+- CLI: `Mail::raw(...)` で `support@top-ace-picard.sakura.ne.jp` 宛にテスト送信 → 例外なし
+- HTTP: `POST /pldl-lp/gakudo/contact` を curl で実行 → `200 / {ok:true}`、DB に保存され通知メールが投げられる
+
+---
+
 ## 2026-04-30  ローカル/本番の切り分けを自動化（再発防止）
 
 ローカル ↔ 本番でハマる事故を減らすため、3 段で防御を入れた。

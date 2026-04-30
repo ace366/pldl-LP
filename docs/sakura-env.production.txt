@@ -47,13 +47,14 @@ CACHE_PREFIX=
 MAIL_MAILER=smtp
 MAIL_HOST=top-ace-picard.sakura.ne.jp
 MAIL_PORT=587
-MAIL_USERNAME=no-reply@pldl.or.jp
-MAIL_PASSWORD=ここにSMTPパスワード
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="no-reply@pldl.or.jp"
+MAIL_USERNAME=support@top-ace-picard.sakura.ne.jp
+MAIL_PASSWORD=【さくらコントロールパネルのメール一覧で発行したパスワード】
+# Laravel 11 は MAIL_ENCRYPTION ではなく MAIL_SCHEME を使う（587/STARTTLSなら未指定でOK）
+MAIL_FROM_ADDRESS="support@top-ace-picard.sakura.ne.jp"
 MAIL_FROM_NAME="${APP_NAME}"
 
-# 管理者宛通知（問い合わせフォーム）
-GAKUDO_LP_NOTIFY_TO=info@pldl.or.jp
+# 管理者宛通知（問い合わせフォーム）の宛先は DB の `lp_settings.admin_notify_email` で管理。
+# admin 画面 (/pldl-lp/admin/lp-settings) で変更するか、SQLite で直接更新:
+#   sqlite3 database/database.sqlite "UPDATE lp_settings SET value='宛先@example' WHERE key='admin_notify_email';"
 
 VITE_APP_NAME="${APP_NAME}"
