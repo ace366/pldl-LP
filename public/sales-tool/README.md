@@ -2,19 +2,31 @@
 
 学童施設の営業候補リスト100件を作成・管理する**軽量フロントエンドツール**。
 
-Laravel 本体には一切依存していません。`sales-tool/` 配下のみで完結します。
+Laravel のルート / Controller / migration / vite には一切依存していません。`public/sales-tool/` 配下の静的ファイルのみで完結します（Web サーバの静的配信に乗っているだけ）。
 
 ## 起動方法
 
-ブラウザで `index.html` を直接開くだけ。
+### 本番環境
 
 ```
-C:\work\PLDL-LP\sales-tool\index.html
+https://top-ace-picard.sakura.ne.jp/pldl-lp/sales-tool/
 ```
 
-ダブルクリックで Chrome / Edge が立ち上がります。
+Laravel のルーティングを通らず、さくらの静的配信で直接届きます。
 
-> サーバ不要。インストール不要。Laravel が動いていなくても使えます。
+### ローカル開発
+
+`php artisan serve` を立ち上げてあれば:
+
+```
+http://localhost:8000/sales-tool/
+```
+
+または `file://` でも動きます:
+
+```
+file:///C:/work/PLDL-LP/public/sales-tool/index.html
+```
 
 ## データの保存先
 
@@ -72,7 +84,7 @@ C:\work\PLDL-LP\sales-tool\index.html
 ## ディレクトリ構成
 
 ```
-sales-tool/
+public/sales-tool/
 ├ index.html
 ├ assets/
 │  ├ sales-tool.css
@@ -82,6 +94,10 @@ sales-tool/
 
 ## Laravel 本体への影響
 
-なし。`sales-tool/` を削除しても LP やパンフレットは動作します。
+なし。`public/sales-tool/` を丸ごと削除しても LP / 管理画面 / パンフレットは動作します。`public/` 配下の静的ファイルとして Web サーバが返しているだけで、Laravel のルート (`routes/web.php`) や Controller には何も追加していません。
 
-デプロイ対象にも含めていません（さくらレンタルサーバーには上がりません）。営業担当者のローカル PC でのみ使用する想定。
+## 公開範囲の注意
+
+`public/sales-tool/` は **誰でも URL を知っていれば開けます**（認証なし）。データはブラウザの localStorage に閉じているので他人のリストは見えませんが、ツール自体は公開状態です。検索エンジン避けは `<meta name="robots" content="noindex,nofollow">` で対応済み。
+
+社外公開したくなければ `.htaccess` で IP / Basic 認証を追加するか、最初の構成（`file://` でローカル開く）に戻してください。

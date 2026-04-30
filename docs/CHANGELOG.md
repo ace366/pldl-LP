@@ -11,6 +11,17 @@
 
 ---
 
+## 2026-04-30  営業リストツールを public/ 配下に移して本番公開
+
+`sales-tool/` ディレクトリを `public/sales-tool/` に移動。本番からも `https://top-ace-picard.sakura.ne.jp/pldl-lp/sales-tool/` で開けるようにした。
+
+- `git mv sales-tool public/sales-tool` で履歴保持しつつ移動
+- `deploy_pldl_lp_to_sakura.bat` の robocopy 除外から `sales-tool` を削除（`public/` ごと送られるので自然にデプロイ対象に入る）
+- README を新パス・新URLに更新。「URL を知っていれば誰でも開ける」「データは localStorage 端末ローカル」などの注意事項を追記
+- Laravel ルーティングや Controller は一切追加していない。`public/` 配下の静的ファイル配信としてのみ動く
+
+---
+
 ## 2026-04-30  デプロイ bat に migrate / cache:clear を統合
 
 新規マイグレーションを含むデプロイで「LP に新しい設定値が反映されない」事故が起きた。原因:

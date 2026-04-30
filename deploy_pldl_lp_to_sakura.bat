@@ -100,7 +100,7 @@ if exist "%STAGING_DIR%" rmdir /s /q "%STAGING_DIR%"
 mkdir "%STAGING_DIR%"
 
 robocopy "%LOCAL_PROJECT%" "%STAGING_DIR%" /MIR /R:1 /W:1 ^
-  /XD ".git" "node_modules" "vendor" "storage" ".idea" ".vscode" ".claude" "tests" "sales-tool" "tools" ^
+  /XD ".git" "node_modules" "vendor" "storage" ".idea" ".vscode" ".claude" "tests" "tools" ^
   /XF ".env" ".env.*" "*.sqlite" "*.sqlite-journal" "deploy_pldl_lp_to_sakura.bat" "remote_deploy_pldl_lp.sh"
 set RC=%ERRORLEVEL%
 if %RC% GEQ 8 (
