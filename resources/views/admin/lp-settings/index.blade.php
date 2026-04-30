@@ -191,6 +191,7 @@
             'fv'           => 'ファーストビュー',
             'campaign'     => 'キャンペーン表示',
             'reception'    => '受付状況',
+            'seo'          => 'SEO / 検索エンジン',
         ];
         $groups = $settings->groupBy(fn ($s) => $s->group ?: 'other');
     @endphp

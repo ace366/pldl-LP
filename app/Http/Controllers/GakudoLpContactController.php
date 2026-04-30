@@ -31,6 +31,7 @@ class GakudoLpContactController extends Controller
             'receptionClosedMsg'  => $val('reception_closed_message'),
             'gaMeasurementId'     => $val('ga_measurement_id'),
             'gscVerification'     => $val('gsc_verification'),
+            'noindex'             => $bool('noindex'),
             'contactEndpoint'     => route('gakudo-lp.contact'),
         ];
 
@@ -41,6 +42,19 @@ class GakudoLpContactController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        // Honeypot — 人間に見えない hidden field "website" を bot は埋めてくる。
+        // 値が入っていたら受付成功を装って静かに無視する（200 を返してログだけ残す）。
+        if ($request->filled('website')) {
+            Log::info('LP contact honeypot triggered', [
+                'ip' => $request->ip(),
+                'website' => substr((string) $request->input('website'), 0, 200),
+            ]);
+            return response()->json([
+                'ok' => true,
+                'message' => 'お問い合わせありがとうございます。内容を確認のうえ、ご連絡いたします。',
+            ]);
+        }
+
         if (LpSetting::getValue('reception_closed') === '1') {
             return response()->json([
                 'ok' => false,

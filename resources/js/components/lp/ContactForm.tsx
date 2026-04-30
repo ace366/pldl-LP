@@ -38,6 +38,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
     const [purpose, setPurpose] = useState('');
     const [message, setMessage] = useState('');
     const [agree, setAgree] = useState(false);
+    const [website, setWebsite] = useState(''); // honeypot — keep hidden, must stay empty
 
     const [status, setStatus] = useState<Status>('idle');
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -100,6 +101,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                     children_count: childrenCount ? Number(childrenCount) : null,
                     purpose: purpose || null,
                     message: message || null,
+                    website, // honeypot
                     ...utm,
                 }),
             });
@@ -157,6 +159,24 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                 )}
 
                 <form className="lp-form" onSubmit={handleSubmit} noValidate>
+                    {/* Honeypot — visually hidden + tab-skippable. Bots fill it; humans never see it. */}
+                    <div
+                        aria-hidden="true"
+                        style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}
+                    >
+                        <label>
+                            Website (do not fill in)
+                            <input
+                                type="text"
+                                name="website"
+                                tabIndex={-1}
+                                autoComplete="off"
+                                value={website}
+                                onChange={(e) => setWebsite(e.target.value)}
+                            />
+                        </label>
+                    </div>
+
                     <div className="lp-form__row">
                         <label className="lp-field">
                             <span className="lp-field__label">

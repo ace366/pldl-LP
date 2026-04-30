@@ -11,6 +11,7 @@ Route::get('/gakudo', [GakudoLpContactController::class, 'show'])
     ->name('gakudo-lp.index');
 
 Route::post('/gakudo/contact', [GakudoLpContactController::class, 'store'])
+    ->middleware('throttle:5,1') // 1分あたり5回まで（IP単位）
     ->name('gakudo-lp.contact');
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {

@@ -11,6 +11,21 @@
 
 ---
 
+## 2026-04-30  LP問い合わせフォーム拡張: noindex / honeypot / rate limit
+
+### noindex 制御（管理画面から ON/OFF）
+- マイグレーション `2026_04_30_000003_add_seo_settings_to_lp_settings` で `lp_settings` に `noindex` (bool, group=seo) を追加
+- LP Blade で `$lpSettings['noindex']` を見て `<meta name="robots" content="noindex,nofollow">` を出し分け
+- 管理画面のグループラベル `seo` を追加して自動表示
+
+### スパム対策
+- **ハニーポット**: ContactForm.tsx に `position:absolute;left:-9999px` で隠した `name="website"` 入力を追加。`tabIndex={-1}` で tab 移動からも除外。bot が埋めたら `200 OK` を返しつつ DB 保存・通知を**スキップ**（ログに記録）
+- **レート制限**: `/gakudo/contact` に `throttle:5,1` を追加（IP 単位、1分あたり5回まで）
+
+ローカルでマイグレーション完了。
+
+---
+
 ## 2026-04-30  問い合わせ通知メールの改行が消える件 / .bat の LF 起因事故
 
 ### 通知メールの改行問題

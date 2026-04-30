@@ -14,6 +14,10 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
 
+    @if(!empty($lpSettings['noindex']))
+        <meta name="robots" content="noindex,nofollow">
+    @endif
+
     @if(!empty($lpSettings['gscVerification']))
         <meta name="google-site-verification" content="{{ $lpSettings['gscVerification'] }}">
     @endif
