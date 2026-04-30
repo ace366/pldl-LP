@@ -1,5 +1,4 @@
-﻿import ApplicationLogo from '@/components/ApplicationLogo';
-import Dropdown from '@/components/Dropdown';
+﻿import Dropdown from '@/components/Dropdown';
 import NavLink from '@/components/NavLink';
 import ResponsiveNavLink from '@/components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
@@ -21,8 +20,8 @@ export default function Authenticated({
                     <div className="flex h-16 justify-between">
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                                <Link href="/" className="text-lg font-bold tracking-wide text-gray-800 dark:text-gray-200">
+                                    PLDL
                                 </Link>
                             </div>
 

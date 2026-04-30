@@ -11,6 +11,19 @@
 
 ---
 
+## 2026-04-30  /register などサブパス公開対応 + Laravel ロゴ撤去
+
+### サブパスリダイレクト対応
+`AppServiceProvider::boot()` で `URL::forceRootUrl(config('app.url'))` を仕込み、`https` の場合は `URL::forceScheme('https')` も設定。これで `redirect('/dashboard')` 等が `https://top-ace-picard.sakura.ne.jp/pldl-lp/dashboard` を正しく組み立てる（従来は `/pldl-lp` プレフィックスを失っていた）。
+
+`/pldl-lp/register` 経由でユーザー登録 → ダッシュボード遷移が正しく動くようになる。
+
+### Laravel ロゴ撤去
+- `resources/js/layouts/GuestLayout.tsx` の `<ApplicationLogo>` を削除（login/register/forgot-password 画面）
+- `resources/js/layouts/AuthenticatedLayout.tsx` のロゴを SVG → "PLDL" テキストに置換（dashboard ナビゲーション）
+
+---
+
 ## 2026-04-30  「無料デモを予約」ボタンが hover まで見えない不具合を修正
 
 `.lp-root a { color: var(--lp-color-primary) }` のグローバル指定が `.lp-btn--primary` の dark テキスト指定より特異度が高く、黄色背景に黄色文字で透明同然になっていた。:hover 時のみ `.lp-btn--primary:hover`（特異度 0,2,0）が勝って白文字に切り替わるためポインター時のみ見える状態。
