@@ -249,6 +249,7 @@
                     <div class="row-actions">
                         <button class="btn btn--secondary btn--xs" data-action="copy" data-id="${it.id}">営業文</button>
                         <button class="btn btn--ghost-light btn--xs" data-action="edit" data-id="${it.id}">編集</button>
+                        <button class="btn btn--danger btn--xs" data-action="delete" data-id="${it.id}" title="削除">削除</button>
                     </div>
                 </td>
             </tr>
@@ -279,6 +280,7 @@
                 <div class="card__actions">
                     <button class="btn btn--secondary btn--sm" data-action="copy" data-id="${it.id}">営業文コピー</button>
                     <button class="btn btn--ghost-light btn--sm" data-action="edit" data-id="${it.id}">編集</button>
+                    <button class="btn btn--danger btn--sm" data-action="delete" data-id="${it.id}">削除</button>
                 </div>
             </article>
         `).join('');
@@ -592,7 +594,7 @@
         }
     });
 
-    // Edit / copy via delegation
+    // Edit / copy / delete via delegation
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-action]');
         if (!btn) return;
@@ -602,6 +604,13 @@
         if (!item) return;
         if (action === 'edit') openModal(item);
         else if (action === 'copy') copyTemplate(item);
+        else if (action === 'delete') {
+            const label = item.facility || '(無題)';
+            if (window.confirm(`「${label}」を削除します。よろしいですか？\n\n※ この操作は取り消せません。`)) {
+                deleteItem(id);
+                showToast('削除しました');
+            }
+        }
     });
 
     // Export / import buttons
