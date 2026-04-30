@@ -56,7 +56,7 @@
     display: block;
 }
 
-.lp-root a {
+.lp-root a:not(.lp-btn):not(.lp-header__brand) {
     color: var(--lp-color-primary);
     text-underline-offset: 3px;
 }
