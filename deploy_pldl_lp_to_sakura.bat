@@ -148,8 +148,8 @@ if errorlevel 1 (
 )
 
 echo.
-echo [6/7] Run remote deploy and rebuild caches...
-ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "bash %REMOTE_SCRIPT% %REMOTE_APP_DIR% %REMOTE_TMP_DIR%/pldl_lp_%TS%.tar.gz %TS% && cd %REMOTE_APP_DIR% && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache"
+echo [6/7] Run remote deploy, migrate, rebuild caches...
+ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "bash %REMOTE_SCRIPT% %REMOTE_APP_DIR% %REMOTE_TMP_DIR%/pldl_lp_%TS%.tar.gz %TS% && cd %REMOTE_APP_DIR% && php artisan migrate --force && php artisan optimize:clear && php artisan cache:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache"
 if errorlevel 1 (
   echo ERROR: remote deploy failed
   pause

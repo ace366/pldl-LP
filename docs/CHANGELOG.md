@@ -11,6 +11,17 @@
 
 ---
 
+## 2026-04-30  デプロイ bat に migrate / cache:clear を統合
+
+新規マイグレーションを含むデプロイで「LP に新しい設定値が反映されない」事故が起きた。原因:
+1. デプロイ → `optimize:clear` でキャッシュを一旦クリア
+2. アクセスが入って Controller が `lp_settings.allCached()` を実行 → **マイグレーション実行前**の DB 状態をキャッシュに固める
+3. その後 migrate → 新しい行が DB に入るが、cache 側は 10 分間旧値のまま
+
+対策: `deploy_pldl_lp_to_sakura.bat` の Step [6/7] に `php artisan migrate --force` と `php artisan cache:clear` を追加し、すべてを 1 つの SSH 呼び出しに連結。これでアクセスが介在せず順序が保証される。
+
+---
+
 ## 2026-04-30  パンフレット PDF + LP からダウンロード導線
 
 ### PDF
