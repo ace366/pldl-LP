@@ -1561,6 +1561,356 @@
         });
     });
 
+    // --------------------------------------------------------------
+    // CSV bulk import
+    // --------------------------------------------------------------
+    const csvModal = el('csv-modal');
+    /** @type {Array<Object>|null} */
+    let csvRows = null;
+    let csvCancel = false;
+    let csvRunning = false;
+
+    function openCsvModal() {
+        csvRows = null;
+        csvCancel = false;
+        el('csv-file').value = '';
+        el('csv-delay').value = '300';
+        el('csv-summary').hidden = true;
+        el('csv-progress-wrap').hidden = true;
+        el('csv-log').hidden = true;
+        el('csv-log').innerHTML = '';
+        el('btn-csv-start').disabled = true;
+        el('btn-csv-cancel').hidden = true;
+        el('csv-status').textContent = 'CSVを選んで「取り込み開始」を押してください。';
+        csvModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+    function closeCsvModal() {
+        if (csvRunning) {
+            if (!confirm('取り込み中です。中断して閉じますか？')) return;
+            csvCancel = true;
+        }
+        csvModal.hidden = true;
+        document.body.style.overflow = '';
+    }
+
+    /** Minimal RFC-4180 CSV parser (handles quoted fields, "" escapes, CRLF). */
+    function parseCsv(text) {
+        if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1); // strip BOM
+        const rows = [];
+        let row = [];
+        let cell = '';
+        let inQuotes = false;
+        for (let i = 0; i < text.length; i++) {
+            const c = text[i];
+            if (inQuotes) {
+                if (c === '"') {
+                    if (text[i + 1] === '"') { cell += '"'; i++; }
+                    else { inQuotes = false; }
+                } else {
+                    cell += c;
+                }
+            } else {
+                if (c === '"') { inQuotes = true; }
+                else if (c === ',') { row.push(cell); cell = ''; }
+                else if (c === '\r') { /* skip; handled at \n */ }
+                else if (c === '\n') {
+                    row.push(cell); cell = '';
+                    if (row.length > 1 || row[0] !== '') rows.push(row);
+                    row = [];
+                } else {
+                    cell += c;
+                }
+            }
+        }
+        if (cell !== '' || row.length > 0) {
+            row.push(cell);
+            if (row.length > 1 || row[0] !== '') rows.push(row);
+        }
+        return rows;
+    }
+
+    /** Strip leading numeric-prefix from "201前橋" style city codes. */
+    function stripCityCode(s) {
+        return String(s || '').replace(/^[0-9０-９]+/, '').trim();
+    }
+
+    /** Normalize phone for matching: digits only. */
+    function normalizePhone(s) {
+        return String(s || '').replace(/[^0-9]/g, '');
+    }
+
+    /** Turn 7-digit zip "3703573" into "〒370-3573". */
+    function formatZip(s) {
+        const z = String(s || '').replace(/[^0-9]/g, '');
+        if (z.length !== 7) return '';
+        return '〒' + z.slice(0, 3) + '-' + z.slice(3);
+    }
+
+    function csvLog(msg, kind) {
+        const log = el('csv-log');
+        const row = document.createElement('div');
+        row.className = 'csv-log__row csv-log__row--' + (kind || 'info');
+        row.textContent = msg;
+        log.appendChild(row);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function setCsvProgress(done, total) {
+        el('csv-st-done').textContent = String(done);
+        el('csv-st-total').textContent = String(total);
+        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        el('csv-progress').style.width = pct + '%';
+    }
+
+    /** Map CSV row → object using the header. */
+    function csvRowToObject(header, row) {
+        const get = (...names) => {
+            for (const n of names) {
+                const idx = header.findIndex((h) => h && h.includes(n));
+                if (idx >= 0 && row[idx] != null) return String(row[idx]).trim();
+            }
+            return '';
+        };
+        const facility = get('名称', '施設名', '事業所名');
+        const address  = get('所在地', '住所');
+        const phone    = get('電話番号', 'TEL', 'tel');
+        const zip      = get('郵便番号', '〒');
+        const cityCode = get('市町村', '市区町村');
+        const kind     = get('施設種別', '種別');
+        const oprator  = get('公立・私営', '運営');
+        return { facility, address, phone, zip, cityCode, kind, operator: oprator };
+    }
+
+    async function handleCsvFile(file) {
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const rows = parseCsv(text);
+            if (rows.length < 2) {
+                el('csv-status').textContent = 'CSVが空、またはヘッダ行のみです。';
+                el('btn-csv-start').disabled = true;
+                return;
+            }
+            const header = rows[0];
+            const data = rows.slice(1)
+                .map((r) => csvRowToObject(header, r))
+                .filter((o) => o.facility);
+            if (data.length === 0) {
+                el('csv-status').textContent = '「名称」列が見つかりません。CSVのヘッダを確認してください。';
+                el('btn-csv-start').disabled = true;
+                return;
+            }
+            csvRows = data;
+            el('csv-status').textContent = `${data.length}件 読み込みました。「取り込み開始」で処理します。`;
+            el('btn-csv-start').disabled = false;
+        } catch (err) {
+            el('csv-status').textContent = 'CSV読み込み失敗: ' + err.message;
+            el('btn-csv-start').disabled = true;
+        }
+    }
+
+    /**
+     * Find best Places result for a CSV row.
+     * Prefers a result whose phone matches the CSV phone exactly.
+     */
+    async function findPlaceForRow(row) {
+        const query = [row.facility, row.address].filter(Boolean).join(' ');
+        const res = await fetch('places.php?query=' + encodeURIComponent(query) + '&pageSize=5', { cache: 'no-store' });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data.places)) {
+            throw new Error(data?.error || ('Places HTTP ' + res.status));
+        }
+        if (data.places.length === 0) return null;
+        const csvPhone = normalizePhone(row.phone);
+        if (csvPhone) {
+            const phoneMatch = data.places.find((p) => normalizePhone(p.phone) === csvPhone);
+            if (phoneMatch) return phoneMatch;
+        }
+        // Fall back to first result whose name contains a token from the CSV facility name
+        const token = (row.facility || '').replace(/[\s　]/g, '').slice(0, 4);
+        if (token) {
+            const nameMatch = data.places.find((p) => (p.name || '').includes(token));
+            if (nameMatch) return nameMatch;
+        }
+        return data.places[0];
+    }
+
+    async function runCsvImport() {
+        if (!csvRows || csvRows.length === 0 || csvRunning) return;
+        csvRunning = true;
+        csvCancel = false;
+        el('btn-csv-start').disabled = true;
+        el('btn-csv-cancel').hidden = false;
+        el('csv-summary').hidden = false;
+        el('csv-progress-wrap').hidden = false;
+        el('csv-log').hidden = false;
+        el('csv-log').innerHTML = '';
+
+        const total = csvRows.length;
+        setCsvProgress(0, total);
+        const delay = Math.max(0, Math.min(5000, parseInt(el('csv-delay').value || '300', 10) || 300));
+
+        let added = 0, skipped = 0, mailFound = 0, formFound = 0;
+        const setSummary = () => {
+            el('csv-st-added').textContent   = String(added);
+            el('csv-st-skipped').textContent = String(skipped);
+            el('csv-st-mail').textContent    = String(mailFound);
+            el('csv-st-form').textContent    = String(formFound);
+        };
+
+        csvLog(`▶ 取り込み開始: ${total}件`, 'info');
+
+        for (let i = 0; i < csvRows.length; i++) {
+            if (csvCancel) {
+                csvLog('■ 中断しました', 'err');
+                break;
+            }
+            const row = csvRows[i];
+            const idx = i + 1;
+            el('csv-status').textContent = `処理中… (${idx}/${total}) ${row.facility}`;
+
+            // Build a candidate item from CSV columns up-front
+            const baseAddress = row.address || '';
+            const zipPrefix = formatZip(row.zip);
+            const fullAddress = [zipPrefix, baseAddress].filter(Boolean).join(' ').trim();
+            const prefecture = pickPrefectureFromAddress(fullAddress);
+            const city = pickCityFromAddress(fullAddress, prefecture) || stripCityCode(row.cityCode);
+
+            const memoBits = [];
+            if (row.kind)     memoBits.push(row.kind);
+            if (row.operator) memoBits.push(row.operator);
+
+            // Duplicate by phone OR name
+            const csvPhone = normalizePhone(row.phone);
+            const dupExisting = items.find((it) => {
+                const itPhone = normalizePhone(it.phone);
+                return (csvPhone && itPhone && csvPhone === itPhone)
+                    || (row.facility && it.facility && row.facility.toLowerCase() === it.facility.toLowerCase());
+            });
+            if (dupExisting) {
+                skipped++;
+                csvLog(`${idx}/${total}  ${row.facility}  → 既に登録済み（スキップ）`, 'skip');
+                setSummary();
+                setCsvProgress(idx, total);
+                continue;
+            }
+
+            // 1. Look up the place to get a website URL
+            let place = null;
+            try {
+                place = await findPlaceForRow(row);
+            } catch (err) {
+                csvLog(`${idx}/${total}  ${row.facility}  → Places検索失敗: ${err.message}`, 'err');
+                skipped++;
+                setSummary();
+                setCsvProgress(idx, total);
+                if (delay > 0) await new Promise((r) => setTimeout(r, delay));
+                continue;
+            }
+            if (!place || !place.websiteUrl) {
+                skipped++;
+                csvLog(`${idx}/${total}  ${row.facility}  → HP なし（スキップ）`, 'skip');
+                setSummary();
+                setCsvProgress(idx, total);
+                if (delay > 0) await new Promise((r) => setTimeout(r, delay));
+                continue;
+            }
+
+            // 2. Fetch + parse the HP
+            let fields = null, analysis = null;
+            try {
+                const r = await importFromUrl(place.websiteUrl);
+                fields = r.fields;
+                analysis = r.analysis;
+            } catch (err) {
+                csvLog(`${idx}/${total}  ${row.facility}  → HP取得失敗: ${err.message}（スキップ）`, 'err');
+                skipped++;
+                setSummary();
+                setCsvProgress(idx, total);
+                if (delay > 0) await new Promise((r) => setTimeout(r, delay));
+                continue;
+            }
+
+            const hasEmail = !!(fields && fields.email);
+            const hasForm  = !!(fields && fields.contactFormUrl);
+
+            if (!hasEmail && !hasForm) {
+                skipped++;
+                csvLog(`${idx}/${total}  ${row.facility}  → メール / フォームともに無し（スキップ）`, 'skip');
+                setSummary();
+                setCsvProgress(idx, total);
+                if (delay > 0) await new Promise((r) => setTimeout(r, delay));
+                continue;
+            }
+
+            const memo = memoBits.concat(hasForm && !hasEmail ? ['※HPに問い合わせフォームあり（メール未掲載）'] : []).join(' / ');
+
+            const item = {
+                facility       : row.facility,
+                prefecture     : prefecture || '',
+                city           : city || '',
+                address        : fullAddress || place.address || '',
+                phone          : row.phone || place.phone || '',
+                email          : fields.email || '',
+                websiteUrl     : place.websiteUrl,
+                contactFormUrl : fields.contactFormUrl || '',
+                gmapUrl        : place.gmapUrl || '',
+                type           : fields.type || '',
+                status         : '未送信',
+                priority       : '',
+                memo           : memo,
+                firstSentAt    : '',
+                nextActionAt   : '',
+                analysis,
+            };
+            const sug = suggestPriority(item);
+            if (sug) item.priority = sug;
+
+            addItem(item);
+            added++;
+            if (hasEmail) mailFound++;
+            if (hasForm)  formFound++;
+
+            const detail = hasEmail
+                ? `メール=${fields.email}` + (hasForm ? ' + フォームあり' : '')
+                : 'フォームあり（メール無し）';
+            csvLog(`${idx}/${total}  ${row.facility}  → 追加（${detail}）`, 'ok');
+
+            setSummary();
+            setCsvProgress(idx, total);
+            if (delay > 0) await new Promise((r) => setTimeout(r, delay));
+        }
+
+        const finished = csvCancel ? '中断' : '完了';
+        el('csv-status').textContent = `${finished}: 取込 ${added} / スキップ ${skipped}`;
+        csvLog(`■ ${finished}: 取込 ${added} / スキップ ${skipped} / メール ${mailFound} / フォーム ${formFound}`, 'info');
+        showToast(`${finished}: ${added}件 取り込み`);
+        el('btn-csv-cancel').hidden = true;
+        el('btn-csv-start').disabled = false;
+        csvRunning = false;
+    }
+
+    el('btn-csv-import').addEventListener('click', openCsvModal);
+    csvModal.addEventListener('click', (e) => {
+        if (e.target.closest('[data-close-csv]')) closeCsvModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !csvModal.hidden && !csvRunning) closeCsvModal();
+    });
+    el('csv-file').addEventListener('change', (e) => {
+        const f = e.target.files && e.target.files[0];
+        handleCsvFile(f);
+    });
+    el('btn-csv-start').addEventListener('click', runCsvImport);
+    el('btn-csv-cancel').addEventListener('click', () => {
+        if (!csvRunning) return;
+        csvCancel = true;
+        el('btn-csv-cancel').disabled = true;
+        el('csv-status').textContent = '中断要求…現在の処理が終わり次第停止します';
+        setTimeout(() => { el('btn-csv-cancel').disabled = false; }, 1000);
+    });
+
     // Initial render
     render();
 })();

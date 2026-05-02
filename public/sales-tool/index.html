@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=noto-sans-jp:400,500,700,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/sales-tool.css?v=12">
+<link rel="stylesheet" href="assets/sales-tool.css?v=13">
 </head>
 <body>
 
@@ -89,6 +89,7 @@
             </select>
         </div>
         <div class="toolbar__actions">
+            <button type="button" class="btn btn--secondary btn--lg" id="btn-csv-import">📋 CSV一括取り込み</button>
             <button type="button" class="btn btn--secondary btn--lg" id="btn-search-import">🔍 検索取り込み</button>
             <button type="button" class="btn btn--primary btn--lg" id="btn-add">+ 新規追加</button>
         </div>
@@ -304,6 +305,65 @@
     </div>
 </div>
 
+<!-- ========== Modal: CSV bulk import ========== -->
+<div class="modal" id="csv-modal" hidden>
+    <div class="modal__backdrop" data-close-csv></div>
+    <div class="modal__panel modal__panel--lg" role="dialog" aria-modal="true" aria-labelledby="csv-modal-title">
+        <header class="modal__head">
+            <h2 class="modal__title" id="csv-modal-title">CSV一括取り込み</h2>
+            <button type="button" class="modal__close" aria-label="閉じる" data-close-csv>×</button>
+        </header>
+        <div class="modal__body">
+            <p class="csv-help">
+                施設一覧 CSV（<strong>名称・所在地・電話番号</strong> の列があるもの）を読み込み、各施設の HP を Google Places で検索 → HP のメール / 問い合わせフォームを抽出して取り込みます。
+                <br>
+                <strong>HP に メール も 問い合わせフォーム もない施設はスキップ</strong>します。
+            </p>
+
+            <div class="csv-upload">
+                <label class="field" style="flex: 1; min-width: 0;">
+                    <span class="field__label">CSVファイル</span>
+                    <input class="input" type="file" id="csv-file" accept=".csv,text/csv">
+                </label>
+                <label class="field" style="width: 140px; flex: 0 0 auto;">
+                    <span class="field__label">処理間隔(ms)</span>
+                    <input class="input" type="number" id="csv-delay" value="300" min="0" max="5000" step="50">
+                </label>
+            </div>
+
+            <div class="csv-summary" id="csv-summary" hidden>
+                <div class="csv-summary__row">
+                    <span>処理</span><strong id="csv-st-done">0</strong> / <strong id="csv-st-total">0</strong>
+                </div>
+                <div class="csv-summary__row">
+                    <span>取り込み</span><strong id="csv-st-added">0</strong>
+                </div>
+                <div class="csv-summary__row">
+                    <span>スキップ</span><strong id="csv-st-skipped">0</strong>
+                </div>
+                <div class="csv-summary__row">
+                    <span>メール検出</span><strong id="csv-st-mail">0</strong>
+                </div>
+                <div class="csv-summary__row">
+                    <span>フォーム検出</span><strong id="csv-st-form">0</strong>
+                </div>
+            </div>
+
+            <div class="progress" id="csv-progress-wrap" hidden style="margin: 6px 0 12px;">
+                <div class="progress__bar" id="csv-progress" style="width:0%"></div>
+            </div>
+
+            <div class="csv-log" id="csv-log" hidden></div>
+        </div>
+        <footer class="modal__foot">
+            <span id="csv-status" style="flex: 1; font-size: 13px; color: var(--c-soft);">CSVを選んで「取り込み開始」を押してください。</span>
+            <button type="button" class="btn btn--ghost-light" data-close-csv>閉じる</button>
+            <button type="button" class="btn btn--danger" id="btn-csv-cancel" hidden>中断</button>
+            <button type="button" class="btn btn--primary" id="btn-csv-start" disabled>取り込み開始</button>
+        </footer>
+    </div>
+</div>
+
 <datalist id="prefectures">
     <option value="北海道"><option value="青森県"><option value="岩手県"><option value="宮城県"><option value="秋田県">
     <option value="山形県"><option value="福島県"><option value="茨城県"><option value="栃木県"><option value="群馬県">
@@ -322,6 +382,6 @@
 <!-- ========== Toast ========== -->
 <div class="toast" id="toast" hidden></div>
 
-<script src="assets/sales-tool.js?v=12"></script>
+<script src="assets/sales-tool.js?v=13"></script>
 </body>
 </html>
