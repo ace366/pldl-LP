@@ -30,3 +30,4 @@ yarn-error.log
 # Local SQLite DB never goes to git
 /database/database.sqlite
 /database/database.sqlite-journal
+.deploy-output.log

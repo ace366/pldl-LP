@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class GakudoLpContactController extends Controller
 {
@@ -73,7 +74,7 @@ class GakudoLpContactController extends Controller
             'email'          => ['required', 'email', 'max:255'],
             'tel'            => ['nullable', 'string', 'max:30'],
             'children_count' => ['nullable', 'integer', 'min:0', 'max:9999'],
-            'purpose'        => ['nullable', 'string', 'max:50'],
+            'purpose'        => ['nullable', 'string', Rule::in(['demo', 'price', 'consult'])],
             'message'        => ['nullable', 'string', 'max:5000'],
             'utm_source'     => ['nullable', 'string', 'max:100'],
             'utm_medium'     => ['nullable', 'string', 'max:100'],

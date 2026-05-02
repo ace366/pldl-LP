@@ -1,10 +1,10 @@
 @php
 $labels = \App\Models\GakudoLpContact::statusLabels();
 $purposeMap = [
-    'document' => '資料がほしい',
-    'demo'     => '15分デモを見たい',
+    'demo'     => '無料デモを予約したい',
     'price'    => '料金を相談したい',
-    'consult'  => 'まずは話だけ聞きたい',
+    'consult'  => 'まずは相談したい',
+    'document' => '資料がほしい',
 ];
 $purposeLabel = $purposeMap[$contact->purpose] ?? $contact->purpose;
 @endphp

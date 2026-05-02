@@ -6,10 +6,9 @@ type Props = { settings: LpSettings };
 type Status = 'idle' | 'sending' | 'success' | 'error';
 
 const purposes = [
-    { value: 'document', label: '資料がほしい' },
-    { value: 'demo',     label: '15分デモを見たい' },
-    { value: 'price',    label: '料金を相談したい' },
-    { value: 'consult',  label: 'まずは話だけ聞きたい' },
+    { value: 'demo',    label: '無料デモを予約したい' },
+    { value: 'price',   label: '料金を相談したい' },
+    { value: 'consult', label: 'まずは相談したい' },
 ];
 
 const csrfToken = (): string => {

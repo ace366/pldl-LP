@@ -88,10 +88,10 @@ class GakudoLpContactsAdminController extends Controller
     private function purposeMap(): array
     {
         return [
-            'document' => '資料がほしい',
-            'demo'     => '15分デモを見たい',
+            'demo'     => '無料デモを予約したい',
             'price'    => '料金を相談したい',
-            'consult'  => 'まずは話だけ聞きたい',
+            'consult'  => 'まずは相談したい',
+            'document' => '資料がほしい',
         ];
     }
 }

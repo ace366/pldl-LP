@@ -11,6 +11,20 @@
 
 ---
 
+## 2026-05-02  問い合わせフォーム 希望内容プルダウンを 3 択に整理
+
+「資料がほしい」（資料DLは Hero の PDF ボタンに集約済み）を削除し、デモ／料金／相談の 3 択に絞る。`demo` と `consult` のラベル文言も意図がはっきりするよう書き換え。
+
+### LP
+- `resources/js/components/lp/ContactForm.tsx` purposes を `demo: 無料デモを予約したい` / `price: 料金を相談したい` / `consult: まずは相談したい` の 3 件に
+- `app/Http/Controllers/GakudoLpContactController.php` `purpose` バリデーションを `Rule::in(['demo','price','consult'])` で縛る
+
+### 表示マップ（後方互換のため `document` ラベル残置）
+- `resources/views/emails/gakudo-lp/contact-received.blade.php` purposeMap 更新
+- `app/Http/Controllers/Admin/GakudoLpContactsAdminController.php` purposeMap 更新
+
+---
+
 ## 2026-05-02  紹介動画を `/gakudo` に YouTube 埋め込みで復活
 
 完成した紹介動画 `https://youtu.be/RIZlv2AMvcw` を LP に組み込み。配置は元と同じく Hero と WhyPldl の間（自然な流れの位置）。
