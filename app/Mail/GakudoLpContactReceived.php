@@ -19,8 +19,15 @@ class GakudoLpContactReceived extends Mailable
 
     public function envelope(): Envelope
     {
+        $planTags = [
+            'light'      => '【ライト 9,800円〜】',
+            'standard'   => '【スタンダード 29,800円〜】',
+            'enterprise' => '【法人・複数施設 49,800円〜】',
+        ];
+        $planTag = $planTags[$this->contact->plan] ?? '';
+
         return new Envelope(
-            subject: '【学童LP】無料デモ・資料請求のお問い合わせ',
+            subject: '【学童LP】'.$planTag.'無料デモ・資料請求のお問い合わせ',
         );
     }
 

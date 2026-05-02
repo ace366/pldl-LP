@@ -75,6 +75,7 @@ class GakudoLpContactController extends Controller
             'tel'            => ['nullable', 'string', 'max:30'],
             'children_count' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'purpose'        => ['nullable', 'string', Rule::in(['demo', 'price', 'consult'])],
+            'plan'           => ['nullable', 'string', Rule::in(['light', 'standard', 'enterprise'])],
             'message'        => ['nullable', 'string', 'max:5000'],
             'utm_source'     => ['nullable', 'string', 'max:100'],
             'utm_medium'     => ['nullable', 'string', 'max:100'],

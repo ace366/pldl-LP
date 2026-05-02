@@ -121,6 +121,10 @@
                 <div class="field__value">{{ $purposeMap[$contact->purpose] ?? ($contact->purpose ?: '—') }}</div>
             </div>
             <div class="field">
+                <div class="field__label">料金プラン</div>
+                <div class="field__value">{{ $contact->planLabel() ?: '—' }}</div>
+            </div>
+            <div class="field">
                 <div class="field__label">相談内容</div>
                 <div class="field__value">
                     @if($contact->message)

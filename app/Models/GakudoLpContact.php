@@ -19,6 +19,7 @@ class GakudoLpContact extends Model
         'tel',
         'children_count',
         'purpose',
+        'plan',
         'message',
         'status',
         'internal_memo',
@@ -54,5 +55,20 @@ class GakudoLpContact extends Model
     public function statusLabel(): string
     {
         return self::statusLabels()[$this->status] ?? $this->status;
+    }
+
+    public static function planLabels(): array
+    {
+        return [
+            'light'      => 'ライト（9,800円 / 月〜）',
+            'standard'   => 'スタンダード（29,800円 / 月〜）',
+            'enterprise' => '法人・複数施設（49,800円 / 月〜）',
+        ];
+    }
+
+    public function planLabel(): ?string
+    {
+        if (!$this->plan) return null;
+        return self::planLabels()[$this->plan] ?? $this->plan;
     }
 }

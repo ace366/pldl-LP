@@ -11,6 +11,12 @@ const purposes = [
     { value: 'consult', label: 'まずは相談したい' },
 ];
 
+const planLabels: Record<string, string> = {
+    light:      'ライト（9,800円 / 月〜）',
+    standard:   'スタンダード（29,800円 / 月〜）',
+    enterprise: '法人・複数施設（49,800円 / 月〜）',
+};
+
 const csrfToken = (): string => {
     const meta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
     return meta?.content ?? '';
@@ -34,6 +40,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
     const [tel, setTel] = useState('');
     const [childrenCount, setChildrenCount] = useState('');
     const [purpose, setPurpose] = useState('');
+    const [plan, setPlan] = useState('');
     const [message, setMessage] = useState('');
     const [agree, setAgree] = useState(false);
     const [website, setWebsite] = useState(''); // honeypot — keep hidden, must stay empty
@@ -44,6 +51,18 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
     const [serverMessage, setServerMessage] = useState('');
 
     const utm = useMemo(() => readUtm(), []);
+
+    useEffect(() => {
+        const onSelectPlan = (e: Event) => {
+            const detail = (e as CustomEvent<string>).detail;
+            if (detail && planLabels[detail]) {
+                setPlan(detail);
+                if (!purpose) setPurpose('price');
+            }
+        };
+        window.addEventListener('lp:select-plan', onSelectPlan);
+        return () => window.removeEventListener('lp:select-plan', onSelectPlan);
+    }, [purpose]);
 
     useEffect(() => {
         if (!policyOpen) return;
@@ -113,6 +132,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                     tel: tel || null,
                     children_count: childrenCount ? Number(childrenCount) : null,
                     purpose: purpose || null,
+                    plan: plan || null,
                     message: message || null,
                     website, // honeypot
                     ...utm,
@@ -138,7 +158,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
             setStatus('success');
             setServerMessage(data.message || 'お問い合わせありがとうございます。');
             setFacility(''); setName(''); setEmail(''); setTel('');
-            setChildrenCount(''); setPurpose(''); setMessage('');
+            setChildrenCount(''); setPurpose(''); setPlan(''); setMessage('');
             setAgree(false);
         } catch (err) {
             setStatus('error');
@@ -159,6 +179,21 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                         まずはお気軽にご相談ください。
                     </p>
                 </header>
+
+                {plan && planLabels[plan] && status !== 'success' && (
+                    <div className="lp-plan-banner" role="status">
+                        <span className="lp-plan-banner__label">選択中のプラン</span>
+                        <span className="lp-plan-banner__value">{planLabels[plan]}</span>
+                        <button
+                            type="button"
+                            className="lp-plan-banner__clear"
+                            onClick={() => setPlan('')}
+                            aria-label="プラン選択をクリア"
+                        >
+                            ×
+                        </button>
+                    </div>
+                )}
 
                 {status === 'success' && (
                     <div className="lp-alert lp-alert--success" role="status">

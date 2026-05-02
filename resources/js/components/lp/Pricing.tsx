@@ -86,7 +86,15 @@ const Pricing: React.FC<Props> = ({ settings }) => {
                                     <li key={f}>{f}</li>
                                 ))}
                             </ul>
-                            <a className="lp-btn lp-btn--primary lp-btn--block" href="#contact">
+                            <a
+                                className="lp-btn lp-btn--primary lp-btn--block"
+                                href="#contact"
+                                onClick={() => {
+                                    window.dispatchEvent(
+                                        new CustomEvent('lp:select-plan', { detail: p.key })
+                                    );
+                                }}
+                            >
                                 このプランで相談する
                             </a>
                         </article>

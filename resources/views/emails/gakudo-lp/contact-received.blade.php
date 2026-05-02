@@ -7,8 +7,13 @@ $purposeMap = [
     'document' => '資料がほしい',
 ];
 $purposeLabel = $purposeMap[$contact->purpose] ?? $contact->purpose;
+$planLabel = $contact->planLabel();
 @endphp
 学童向けLPからお問い合わせを受け付けました。
+@if($planLabel)
+
+★ 料金プランからの申し込み: {{ $planLabel }}
+@endif
 
 ------------------------------------
 受付ID      : {{ $contact->id }}
@@ -18,6 +23,7 @@ $purposeLabel = $purposeMap[$contact->purpose] ?? $contact->purpose;
 電話番号    : {{ $contact->tel ?: '-' }}
 児童数      : {{ $contact->children_count !== null ? $contact->children_count.'名' : '-' }}
 希望内容    : {{ $purposeLabel ?: '-' }}
+料金プラン  : {{ $planLabel ?: '-' }}
 ステータス  : {{ $labels[$contact->status] ?? $contact->status }}
 受付日時    : {{ $contact->created_at?->format('Y-m-d H:i') }}
 

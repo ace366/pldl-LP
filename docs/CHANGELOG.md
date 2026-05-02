@@ -11,6 +11,34 @@
 
 ---
 
+## 2026-05-03  料金プランからの申し込みをメールで識別できるように
+
+料金表 (`Pricing`) の各カードの「このプランで相談する」ボタンから来た問い合わせを、通知メールで一目で見分けられるようにした。
+
+### 流れ
+1. Pricing カードの CTA → カスタムイベント `lp:select-plan` を発火（`light` / `standard` / `enterprise`）
+2. ContactForm が同イベントを listen して `plan` を state に保持。希望内容が空なら `price` を自動セット
+3. フォームに「選択中のプラン」バナーを表示（× で解除可）
+4. POST 時に `plan` フィールドも送信 → DB に保存
+5. 通知メール件名にプラン+価格タグを付与し、本文先頭にも `★ 料金プランからの申し込み` 行を追加
+
+### 変更ファイル
+- `database/migrations/2026_05_03_000001_add_plan_to_gakudo_lp_contacts.php` 新規 — `plan` (string, nullable) カラム追加
+- `app/Models/GakudoLpContact.php` — fillable に `plan`、`planLabels()` / `planLabel()` 追加
+- `resources/js/components/lp/Pricing.tsx` — CTA で `lp:select-plan` イベント発火
+- `resources/js/components/lp/ContactForm.tsx` — イベント受信、バナー表示、`plan` を payload に追加
+- `resources/css/app.css` — `.lp-plan-banner` 追加
+- `app/Http/Controllers/GakudoLpContactController.php` — `Rule::in(['light','standard','enterprise'])` でバリデート
+- `app/Mail/GakudoLpContactReceived.php` — 件名に `【スタンダード 29,800円〜】` 等のタグを動的挿入
+- `resources/views/emails/gakudo-lp/contact-received.blade.php` — 本文に「★ 料金プランからの申し込み」と料金プラン行追加
+- `resources/views/admin/contacts/show.blade.php` — 詳細画面にも料金プラン行追加
+
+### 件名サンプル
+- 通常: `【学童LP】無料デモ・資料請求のお問い合わせ`
+- 料金カード経由: `【学童LP】【スタンダード 29,800円〜】無料デモ・資料請求のお問い合わせ`
+
+---
+
 ## 2026-05-02  問い合わせフォーム 希望内容プルダウンを 3 択に整理
 
 「資料がほしい」（資料DLは Hero の PDF ボタンに集約済み）を削除し、デモ／料金／相談の 3 択に絞る。`demo` と `consult` のラベル文言も意図がはっきりするよう書き換え。

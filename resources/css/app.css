@@ -1494,6 +1494,41 @@
 .lp-alert--success { background: var(--lp-color-primary-soft); color: var(--lp-color-success); }
 .lp-alert--error { background: #fee2e2; color: var(--lp-color-error); }
 
+.lp-plan-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--lp-color-primary-soft);
+    border: 1px solid #fde68a;
+    border-radius: var(--lp-radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--lp-color-text);
+}
+.lp-plan-banner__label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--lp-color-primary-strong);
+}
+.lp-plan-banner__value { font-weight: 700; }
+.lp-plan-banner__clear {
+    margin-left: auto;
+    background: transparent;
+    border: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--lp-color-muted);
+    cursor: pointer;
+}
+.lp-plan-banner__clear:hover { background: rgba(0,0,0,.05); color: var(--lp-color-text); }
+
 .lp-notice {
     background: #fffbeb;
     border: 1px solid #fde68a;
