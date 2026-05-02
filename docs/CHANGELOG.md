@@ -11,6 +11,18 @@
 
 ---
 
+## 2026-05-02  紹介動画を `/gakudo` に YouTube 埋め込みで復活
+
+完成した紹介動画 `https://youtu.be/RIZlv2AMvcw` を LP に組み込み。配置は元と同じく Hero と WhyPldl の間（自然な流れの位置）。
+
+### LP
+- `resources/js/components/lp/VideoSection.tsx` を新規作成。YouTube ID `RIZlv2AMvcw` を youtube-nocookie 経由で iframe 埋め込み（`rel=0`、`loading=lazy`、`strict-origin-when-cross-origin`）
+- `resources/js/pages/GakudoLp.tsx` に `<VideoSection />` を Hero 直下に追加
+- `app.css` に `.lp-video__frame`（16:9 アスペクト比のレスポンシブ iframe ラッパ、角丸 + 黒背景 + シャドウ）を追加
+- 設定化はせず YouTube ID をコンポーネントにハードコード（前回の `intro_video_url` 設定削除を踏襲）
+
+---
+
 ## 2026-04-30  「3分紹介動画」関連を一括削除（動画未完成のため）
 
 動画コンテンツの完成が未定のため、関連する文言・UI・設定を全部位から削除。

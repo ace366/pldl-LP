@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../components/lp/Header';
 import Hero from '../components/lp/Hero';
+import VideoSection from '../components/lp/VideoSection';
 import WhyPldl from '../components/lp/WhyPldl';
 import FieldIssues from '../components/lp/FieldIssues';
 import Solutions from '../components/lp/Solutions';
@@ -25,6 +26,7 @@ const GakudoLp: React.FC<Props> = ({ settings }) => {
             <Header settings={settings} />
             <main>
                 <Hero settings={settings} />
+                <VideoSection />
                 <WhyPldl />
                 <FieldIssues />
                 <Solutions />
