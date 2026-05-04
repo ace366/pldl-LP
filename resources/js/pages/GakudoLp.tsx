@@ -2,13 +2,14 @@ import React from 'react';
 import Header from '../components/lp/Header';
 import Hero from '../components/lp/Hero';
 import VideoSection from '../components/lp/VideoSection';
-import WhyPldl from '../components/lp/WhyPldl';
+import WhyGakudoor from '../components/lp/WhyGakudoor';
 import FieldIssues from '../components/lp/FieldIssues';
 import Solutions from '../components/lp/Solutions';
 import AppScreens from '../components/lp/AppScreens';
 import Capabilities from '../components/lp/Capabilities';
 import AfterEffects from '../components/lp/AfterEffects';
 import Differentiation from '../components/lp/Differentiation';
+import AdoptionRecord from '../components/lp/AdoptionRecord';
 import Pricing from '../components/lp/Pricing';
 import ContactForm from '../components/lp/ContactForm';
 import Footer from '../components/lp/Footer';
@@ -27,13 +28,14 @@ const GakudoLp: React.FC<Props> = ({ settings }) => {
             <main>
                 <Hero settings={settings} />
                 <VideoSection />
-                <WhyPldl />
+                <WhyGakudoor />
                 <FieldIssues />
                 <Solutions />
                 <AppScreens />
                 <Capabilities />
                 <AfterEffects />
                 <Differentiation />
+                <AdoptionRecord />
                 <Pricing settings={settings} />
                 <ContactForm settings={settings} />
             </main>

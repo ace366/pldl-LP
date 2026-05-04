@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { LpSettings } from './types';
+import { asset } from '../../lib/asset';
 
 type Props = { settings: LpSettings };
 
@@ -15,20 +16,23 @@ const Header: React.FC<Props> = ({ settings }) => {
     }, []);
 
     const navLinks = [
-        { href: '#why', label: 'なぜPLDLか' },
+        { href: '#why', label: 'Gakudoorとは' },
         { href: '#issues', label: '現場課題' },
-        { href: '#features', label: '解決できること' },
-        { href: '#pricing', label: '料金' },
-        { href: '#contact', label: 'お問い合わせ' },
+        { href: '#features', label: '機能' },
+        { href: '#adoption', label: '導入実績' },
+        { href: '#contact', label: '相談する' },
     ];
 
     return (
         <header className={`lp-header${scrolled ? ' is-scrolled' : ''}`}>
             <div className="lp-header__inner">
-                <a href="#top" className="lp-header__brand" aria-label="NPO法人 Playful Learning Design Lab.">
-                    <span className="lp-header__brand-mark" aria-hidden="true">PLDL</span>
+                <a href="#top" className="lp-header__brand" aria-label="Gakudoor（ガクドア）トップへ">
+                    <span className="lp-header__brand-mark" aria-hidden="true">
+                        <img src={asset('/images/gakudoor-logo.png')} alt="" width="40" height="40" />
+                    </span>
                     <span className="lp-header__brand-text">
-                        NPO法人 Playful Learning Design Lab.
+                        <span className="lp-header__brand-name">Gakudoor</span>
+                        <span className="lp-header__brand-sub">学童運営支援システム</span>
                     </span>
                 </a>
 
@@ -56,7 +60,7 @@ const Header: React.FC<Props> = ({ settings }) => {
                         </a>
                     )}
                     <a className="lp-btn lp-btn--primary lp-btn--sm" href="#contact">
-                        無料デモを予約
+                        無料相談する
                     </a>
                 </div>
 

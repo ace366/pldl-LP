@@ -37,7 +37,7 @@ const FieldIssues: React.FC = () => {
                     <p className="lp-section__eyebrow">Field Issues</p>
                     <h2 className="lp-section__title">学童でよく起きている、現場のリアル。</h2>
                     <p className="lp-section__lead">
-                        PLDLが現場で実際に運営する中で見えてきた課題です。<br className="lp-hide-sp" />
+                        実際の学童運営で日常的に挙がっている課題です。<br className="lp-hide-sp" />
                         どれも、忙しい毎日の中で「仕方ない」と諦められがちなものばかり。
                     </p>
                 </header>

@@ -1,8 +1,7 @@
 import React from 'react';
 
 /**
- * NPO法人 Playful Learning Design Lab.（PLDL）が運用する学童向け運営システムの
- * 実画面イメージを参考にした「ダミーモックアップ」を表示するセクション。
+ * Gakudoor の主要画面イメージを示すセクション。
  * 表示しているデータはすべてダミーで、実在する利用者の情報ではありません。
  */
 const AppScreens: React.FC = () => {
@@ -13,7 +12,7 @@ const AppScreens: React.FC = () => {
                     <p className="lp-section__eyebrow">App Screens</p>
                     <h2 className="lp-section__title">スマホで、現場の動きをそのまま管理。</h2>
                     <p className="lp-section__lead">
-                        実際にPLDLが運用しているシステムのイメージです（表示内容はすべてダミーです）。
+                        Gakudoorの主要画面イメージです（表示内容はすべてダミーです）。
                     </p>
                 </header>
 
@@ -109,7 +108,7 @@ const PhoneFrame: React.FC<{ label: string; children: React.ReactNode }> = ({ la
         <div className="lp-phoneframe__screen">
             <div className="lp-phoneframe__statusbar">
                 <span>9:41</span>
-                <span className="lp-phoneframe__url">app.pldl.or.jp/{label}</span>
+                <span className="lp-phoneframe__url">app.gakudoor.jp/{label}</span>
                 <span>●●●</span>
             </div>
             <div className="lp-phoneframe__content">{children}</div>

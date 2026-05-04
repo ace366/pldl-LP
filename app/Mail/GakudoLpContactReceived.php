@@ -27,7 +27,7 @@ class GakudoLpContactReceived extends Mailable
         $planTag = $planTags[$this->contact->plan] ?? '';
 
         return new Envelope(
-            subject: '【学童LP】'.$planTag.'無料デモ・資料請求のお問い合わせ',
+            subject: '【Gakudoor LP】'.$planTag.'導入相談・資料請求のお問い合わせ',
         );
     }
 

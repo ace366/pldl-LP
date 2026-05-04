@@ -11,6 +11,75 @@
 
 ---
 
+## 2026-05-04  LP リブランド: Gakudoor（ガクドア）として整理
+
+学童システムを正式に「**Gakudoor（ガクドア）**」として位置付け、LP・OGP・メール・フッター・テーマ色を一括刷新。
+PLDL は「導入実績」セクションのみで言及し、開発・提供は **株式会社Rezon** と明記する三層構造に整理。
+
+### ブランド構造の整理（誤解防止）
+
+| 役割 | 名称 |
+|---|---|
+| サービス名 | Gakudoor（ガクドア） |
+| 開発・提供 | 株式会社Rezon |
+| 導入実績（採用団体） | NPO法人 Playful Learning Design Lab.（PLDL）様 |
+
+### 主な変更点
+
+- **ロゴ追加**: `public/images/gakudoor-logo.png`（青グラデのドア型「G」+ ミントの笑顔）。Header / Hero / Footer / OGP / favicon で使用
+- **テーマ色刷新**: 黄色基調 → **青 (#5b9bd5) × ミントグリーン (#5bc8c5)** 基調へ。`resources/css/app.css` の CSS 変数とハードコード黄色を一括置換
+- **Header**: ブランド表示を「PLDL」 → ロゴ画像 + `Gakudoor / 学童運営支援システム` の縦並びに刷新。ナビは `Gakudoorとは / 現場課題 / 機能 / 導入実績 / 相談する`、CTA は `無料相談する`
+- **Hero**: 見出し「学童の連絡・出欠・お迎え管理を、スマホでやさしく一本化。」サブコピーで Gakudoor の定義 + 「導入実績：PLDL様」ピル表示
+- **WhyPldl → WhyGakudoor**: 「なぜPLDLか」セクションを「Why Gakudoor」に置換。PLDL を開発元として語る文言を全削除し、デザイン哲学（現場フィット / やさしいUI / 段階導入 / 採用団体運用実績で改善）に再構成
+- **AdoptionRecord 新設**: 「導入実績」を独立セクションとして追加（Differentiation と Pricing の間）。PLDL 様のみ採用団体として丁寧に紹介
+- **Differentiation**: 比較表の「開発元」行を `教育現場を運営するNPO（PLDL）` → `株式会社Rezon が開発・提供`、「現場知見」行で PLDL 様の運用実績に言及。表ヘッダ「PLDLの学童DX」 → 「Gakudoor」
+- **AppScreens**: モック画面の URL バー `app.pldl.or.jp/...` → `app.gakudoor.jp/...` に変更。リード文も「Gakudoorの主要画面イメージ」に
+- **ContactForm**: リード「PLDLの開発者本人がご対応します」 → 「株式会社Rezon が開発・提供する...」、送信後ノート「PLDLより24時間以内」 → 「株式会社Rezonより24時間以内」、見出しを「導入相談・資料請求」に
+- **Footer**: PLDL 中心の構成 → サービス名 Gakudoor / 開発・提供 株式会社Rezon / 導入実績 PLDL様 の三層メタ情報構成へ全面書き換え
+- **Blade (`gakudo-lp/index.blade.php`)**: title / description / OGP / favicon を Gakudoor 基準に
+- **メール件名**: `【学童LP】...` → `【Gakudoor LP】...`
+- **メール本文末尾の署名**: PLDL 名義 → サービス/開発/導入実績の三行に書き換え
+- **セクション順**: AdoptionRecord を AfterEffects → Differentiation → **AdoptionRecord** → Pricing → Contact の位置に挿入
+
+### 関連ファイル
+
+```
+追加: resources/js/components/lp/WhyGakudoor.tsx (旧 WhyPldl.tsx 置換)
+追加: resources/js/components/lp/AdoptionRecord.tsx
+追加: public/images/gakudoor-logo.png
+変更: resources/css/app.css                              (パレット + 新セクション + Footer meta CSS)
+変更: resources/js/pages/GakudoLp.tsx                    (import 差替 + 新セクション組み込み)
+変更: resources/js/components/lp/Header.tsx
+変更: resources/js/components/lp/Hero.tsx
+変更: resources/js/components/lp/FieldIssues.tsx
+変更: resources/js/components/lp/Solutions.tsx
+変更: resources/js/components/lp/AppScreens.tsx
+変更: resources/js/components/lp/Differentiation.tsx
+変更: resources/js/components/lp/ContactForm.tsx
+変更: resources/js/components/lp/Footer.tsx
+変更: resources/views/gakudo-lp/index.blade.php
+変更: resources/views/emails/gakudo-lp/contact-received.blade.php
+変更: app/Mail/GakudoLpContactReceived.php
+削除: resources/js/components/lp/WhyPldl.tsx
+```
+
+### 確認事項
+
+- ルート (`/gakudo`, `/admin/lp-settings`, `POST /gakudo/contact`) はそのまま、URL 変更なし
+- DB マイグレーション追加なし、`.env` 変更なし
+- 商標について「商標登録済み」「商標確認済み」等の断定表現は **入れていない**（J-PlatPat 確認は別途）
+- 既存 `lp_settings`（CTA文言・キャンペーン文・LINE URL等）はそのまま使用、フィールド追加削除なし
+
+### ローカル確認手順
+
+1. `npm run build`
+2. `php artisan serve`
+3. `http://127.0.0.1:8000/gakudo` を開く（APP_URL と一致するポートで）
+4. Header ロゴ・Hero の導入実績ピル・Adoption セクション・Footer 三層表記を確認
+5. PC + SP（DevTools のレスポンシブ）で崩れていないか確認
+
+---
+
 ## 2026-05-03  営業ツール: CSV一括取り込み機能を追加
 
 行政等が公開している施設一覧 CSV（学童保育実施施設一覧 等）を読み込んで、各施設の HP を Google Places で検索 → メール / 問い合わせフォームの有無を確認 → どちらか取れた施設だけ営業リストに追加する機能。

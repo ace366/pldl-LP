@@ -54,12 +54,13 @@ const Solutions: React.FC = () => {
         <section className="lp-section" id="features">
             <div className="lp-container">
                 <header className="lp-section__head">
-                    <p className="lp-section__eyebrow">Solutions</p>
+                    <p className="lp-section__eyebrow">What Gakudoor does</p>
                     <h2 className="lp-section__title">
-                        電話・紙・口頭をやめ、スマホで一元管理。
+                        Gakudoorでできること。
                     </h2>
                     <p className="lp-section__lead">
-                        現場の声で改善を続けてきた、学童に必要な機能をひと通り揃えています。
+                        電話・紙・口頭に頼っていた業務を、スマホで一元管理。<br className="lp-hide-sp" />
+                        学童運営に必要な機能をひと通り揃え、施設に合わせて段階的に拡張できます。
                     </p>
                 </header>
 

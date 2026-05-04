@@ -8,59 +8,74 @@ const Hero: React.FC<Props> = ({ settings }) => {
     return (
         <section className="lp-hero" id="top">
             <div className="lp-container">
-                <div className="lp-hero__badges">
-                    <span className="lp-badge">教育現場で実運営</span>
-                    <span className="lp-badge lp-badge--alt">現場課題から開発</span>
-                </div>
+                <div>
+                    <div className="lp-hero__logo">
+                        <img src={asset('/images/gakudoor-logo.png')} alt="Gakudoor（ガクドア）ロゴ" width="64" height="64" />
+                        <span className="lp-hero__logo-name">
+                            Gakudoor
+                            <span>ガクドア｜学童運営支援システム</span>
+                        </span>
+                    </div>
 
-                <h1 className="lp-hero__title">
-                    学童の電話・紙管理を、<br />
-                    <span className="lp-hero__title-em">スマホでやさしく</span>効率化。
-                </h1>
+                    <div className="lp-hero__badges">
+                        <span className="lp-badge">スマホで完結</span>
+                        <span className="lp-badge lp-badge--alt">自治体・NPO・施設向け</span>
+                    </div>
 
-                <p className="lp-hero__sub">
-                    欠席連絡、お迎え変更、出席確認、保護者通知を一元管理。<br />
-                    教育現場で実際に子どもたちの学びの場を運営する
-                    <strong>NPO法人 Playful Learning Design Lab.（PLDL）</strong>
-                    の知見をもとに、現場で本当に使いやすい形へ整えました。
-                </p>
+                    <h1 className="lp-hero__title">
+                        学童の連絡・出欠・お迎え管理を、<br />
+                        <span className="lp-hero__title-em">スマホでやさしく</span>一本化。
+                    </h1>
 
-                {!!settings.campaignText && (
-                    <p className="lp-hero__campaign">
-                        <span aria-hidden="true">★</span> {settings.campaignText}
+                    <p className="lp-hero__sub">
+                        <strong>Gakudoor（ガクドア）</strong>は、電話・紙・口頭連絡に頼りがちな学童運営を、
+                        保護者・施設・自治体がつながる安心の仕組みに変える学童運営支援システムです。
                     </p>
-                )}
 
-                <div className="lp-hero__ctas">
-                    <a className="lp-btn lp-btn--primary lp-btn--lg" href="#contact">
-                        {settings.fvCtaText || '無料デモを予約する'}
-                    </a>
-                    {settings.pamphletUrl && (
-                        <a
-                            className="lp-btn lp-btn--ghost lp-btn--lg"
-                            href={asset(settings.pamphletUrl)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download
-                        >
-                            <span aria-hidden="true">📄</span> 資料をダウンロード（PDF）
-                        </a>
+                    <p className="lp-hero__adoption" aria-label="導入実績">
+                        <span className="lp-hero__adoption-pill">導入実績</span>
+                        <span>
+                            <strong>NPO法人 Playful Learning Design Lab.（PLDL）</strong>様
+                        </span>
+                    </p>
+
+                    {!!settings.campaignText && (
+                        <p className="lp-hero__campaign">
+                            <span aria-hidden="true">★</span> {settings.campaignText}
+                        </p>
                     )}
-                    {settings.lineConsultUrl && (
-                        <a
-                            className="lp-btn lp-btn--ghost lp-btn--lg"
-                            href={settings.lineConsultUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            LINE相談
+
+                    <div className="lp-hero__ctas">
+                        <a className="lp-btn lp-btn--primary lp-btn--lg" href="#contact">
+                            {settings.fvCtaText || '無料相談する'}
                         </a>
-                    )}
+                        {settings.pamphletUrl && (
+                            <a
+                                className="lp-btn lp-btn--ghost lp-btn--lg"
+                                href={asset(settings.pamphletUrl)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                            >
+                                <span aria-hidden="true">📄</span> 資料をダウンロード（PDF）
+                            </a>
+                        )}
+                        {settings.lineConsultUrl && (
+                            <a
+                                className="lp-btn lp-btn--ghost lp-btn--lg"
+                                href={settings.lineConsultUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                LINE相談
+                            </a>
+                        )}
+                    </div>
+
+                    <p className="lp-hero__note">
+                        押し売りはしません。15分のオンラインデモから、お気軽にどうぞ。
+                    </p>
                 </div>
-
-                <p className="lp-hero__note">
-                    押し売りはしません。15分デモ → 無料トライアル の順でご案内します。
-                </p>
 
                 <div className="lp-hero__visual">
                     <div className="lp-hero__phone" aria-hidden="true">

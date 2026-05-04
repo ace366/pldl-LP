@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>学童の電話・紙管理を、スマホでやさしく効率化 | NPO法人 Playful Learning Design Lab.（PLDL）</title>
-    <meta name="description" content="教育現場で実際に子どもたちの居場所づくり・学びの場づくりに取り組む NPO法人 Playful Learning Design Lab.（PLDL）が、現場課題から開発した学童向け運営システム。欠席連絡・お迎え変更・出席確認・保護者通知をスマホで一元管理。">
+    <title>Gakudoor（ガクドア）｜学童の連絡・出欠・お迎え管理を、スマホでやさしく一本化。</title>
+    <meta name="description" content="Gakudoor（ガクドア）は、学童クラブ・放課後児童クラブ向けの運営支援システムです。欠席連絡、出欠確認、お迎え予定、保護者連絡、施設側の管理業務をスマホ・PCからまとめて。開発・提供：株式会社Rezon／導入実績：NPO法人 Playful Learning Design Lab.（PLDL）様。">
 
-    <meta property="og:title" content="学童の電話・紙管理を、スマホでやさしく効率化 | NPO法人 Playful Learning Design Lab.（PLDL）">
-    <meta property="og:description" content="現場課題から生まれた、学童向け運営システム。">
+    <meta property="og:title" content="Gakudoor（ガクドア）｜学童運営支援システム">
+    <meta property="og:description" content="電話・紙・口頭連絡に頼りがちな学童運営を、保護者・施設・自治体がつながる安心の仕組みに変える学童運営支援システム。">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
+    <meta property="og:image" content="{{ rtrim(config('app.url'), '/') }}/images/gakudoor-logo.png">
+    <link rel="icon" type="image/png" href="{{ rtrim(config('app.url'), '/') }}/images/gakudoor-logo.png">
 
     @if(!empty($lpSettings['noindex']))
         <meta name="robots" content="noindex,nofollow">

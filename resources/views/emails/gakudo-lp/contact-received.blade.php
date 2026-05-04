@@ -9,7 +9,7 @@ $purposeMap = [
 $purposeLabel = $purposeMap[$contact->purpose] ?? $contact->purpose;
 $planLabel = $contact->planLabel();
 @endphp
-学童向けLPからお問い合わせを受け付けました。
+Gakudoor（ガクドア）LPからお問い合わせを受け付けました。
 @if($planLabel)
 
 ★ 料金プランからの申し込み: {{ $planLabel }}
@@ -34,5 +34,7 @@ $planLabel = $contact->planLabel();
 UTM         : {{ trim(($contact->utm_source ?? '').' / '.($contact->utm_medium ?? '').' / '.($contact->utm_campaign ?? ''), ' /') ?: '-' }}
 IP / UA     : {{ $contact->ip_address ?: '-' }} / {{ $contact->user_agent ?: '-' }}
 
-NPO法人 Playful Learning Design Lab.（PLDL）
-学童向け運営システム
+------------------------------------
+サービス名   : Gakudoor（ガクドア）
+開発・提供   : 株式会社Rezon
+導入実績     : NPO法人 Playful Learning Design Lab.（PLDL）様

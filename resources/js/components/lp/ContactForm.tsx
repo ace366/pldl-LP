@@ -173,10 +173,10 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
             <div className="lp-container lp-container--narrow">
                 <header className="lp-section__head">
                     <p className="lp-section__eyebrow">Contact</p>
-                    <h2 className="lp-section__title">無料デモ・資料請求のお問い合わせ</h2>
+                    <h2 className="lp-section__title">導入相談・資料請求のお問い合わせ</h2>
                     <p className="lp-section__lead">
-                        営業会社ではありません。NPO法人 Playful Learning Design Lab.（PLDL）の開発者本人がご対応します。<br />
-                        まずはお気軽にご相談ください。
+                        Gakudoor（ガクドア）は、株式会社Rezon が開発・提供する学童運営支援システムです。<br />
+                        自治体・NPO・施設の方も、まずはお気軽にご相談ください。
                     </p>
                 </header>
 
@@ -347,7 +347,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                             {status === 'sending' ? '送信中…' : '無料で相談する'}
                         </button>
                         <p className="lp-form__note">
-                            送信後、PLDL より24時間以内にご連絡いたします（土日祝を除く）。
+                            送信後、株式会社Rezon より24時間以内にご連絡いたします（土日祝を除く）。
                         </p>
                     </div>
                 </form>
