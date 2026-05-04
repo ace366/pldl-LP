@@ -53,7 +53,7 @@ const Solutions: React.FC = () => {
     return (
         <section className="lp-section" id="features">
             <div className="lp-container">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">What Gakudoor does</p>
                     <h2 className="lp-section__title">
                         Gakudoorでできること。
@@ -65,8 +65,13 @@ const Solutions: React.FC = () => {
                 </header>
 
                 <div className="lp-grid lp-grid--3">
-                    {features.map((f) => (
-                        <article key={f.title} className="lp-feature">
+                    {features.map((f, i) => (
+                        <article
+                            key={f.title}
+                            className="lp-feature"
+                            data-reveal=""
+                            data-reveal-delay={(i % 3) * 80 + Math.floor(i / 3) * 60}
+                        >
                             <img className="lp-feature__icon" src={asset(f.icon)} alt="" width="56" height="56" />
                             <h3 className="lp-feature__title">{f.title}</h3>
                             <p className="lp-feature__body">{f.body}</p>

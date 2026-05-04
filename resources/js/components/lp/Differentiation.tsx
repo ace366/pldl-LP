@@ -21,7 +21,7 @@ const Differentiation: React.FC = () => {
     return (
         <section className="lp-section lp-section--soft" id="diff">
             <div className="lp-container">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">Difference</p>
                     <h2 className="lp-section__title">他社サービスと、ここが違います。</h2>
                     <p className="lp-section__lead">
@@ -29,7 +29,7 @@ const Differentiation: React.FC = () => {
                     </p>
                 </header>
 
-                <div className="lp-compare">
+                <div className="lp-compare" data-reveal="" data-reveal-from="scale" data-reveal-delay="120">
                     <div className="lp-compare__head">
                         <div></div>
                         <div className="lp-compare__head-us">Gakudoor</div>

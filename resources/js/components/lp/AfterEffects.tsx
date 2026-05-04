@@ -23,14 +23,19 @@ const AfterEffects: React.FC = () => {
     return (
         <section className="lp-section" id="after">
             <div className="lp-container">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">After</p>
                     <h2 className="lp-section__title">導入後、現場はこう変わります。</h2>
                 </header>
 
                 <ul className="lp-effects">
                     {items.map((it, i) => (
-                        <li key={i} className="lp-effect">
+                        <li
+                            key={i}
+                            className="lp-effect"
+                            data-reveal=""
+                            data-reveal-delay={i * 80}
+                        >
                             <div className="lp-effect__before">
                                 <span className="lp-effect__label">Before</span>
                                 <p>{it.before}</p>

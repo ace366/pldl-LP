@@ -171,7 +171,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
     return (
         <section className="lp-section" id="contact">
             <div className="lp-container lp-container--narrow">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">Contact</p>
                     <h2 className="lp-section__title">導入相談・資料請求のお問い合わせ</h2>
                     <p className="lp-section__lead">
@@ -206,7 +206,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                     </div>
                 )}
 
-                <form className="lp-form" onSubmit={handleSubmit} noValidate>
+                <form className="lp-form" onSubmit={handleSubmit} noValidate data-reveal="" data-reveal-delay="120">
                     {/* Honeypot — visually hidden + tab-skippable. Bots fill it; humans never see it. */}
                     <div
                         aria-hidden="true"

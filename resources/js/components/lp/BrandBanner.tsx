@@ -10,8 +10,10 @@ const BrandBanner: React.FC = () => {
                     src={asset('/images/gakudoor-banner.png')}
                     alt="Gakudoor（ガクドア）"
                     loading="lazy"
+                    data-reveal=""
+                    data-reveal-from="scale"
                 />
-                <p className="lp-brand-banner__caption">
+                <p className="lp-brand-banner__caption" data-reveal="" data-reveal-delay="160">
                     <strong>Gakudoor（ガクドア）</strong>で、保護者・施設・自治体をつなぐ新しい学童運営の入り口へ。
                 </p>
             </div>

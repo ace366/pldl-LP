@@ -28,7 +28,7 @@ const WhyGakudoor: React.FC = () => {
     return (
         <section className="lp-section" id="why">
             <div className="lp-container">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">Why Gakudoor</p>
                     <h2 className="lp-section__title">
                         紙と電話の学童運営から、<br />
@@ -41,8 +41,13 @@ const WhyGakudoor: React.FC = () => {
                 </header>
 
                 <div className="lp-grid lp-grid--2">
-                    {points.map((p) => (
-                        <article key={p.title} className="lp-card lp-card--with-icon">
+                    {points.map((p, i) => (
+                        <article
+                            key={p.title}
+                            className="lp-card lp-card--with-icon"
+                            data-reveal=""
+                            data-reveal-delay={i * 100}
+                        >
                             <img className="lp-card__icon" src={asset(p.icon)} alt="" width="64" height="64" />
                             <div>
                                 <h3 className="lp-card__title">{p.title}</h3>

@@ -49,7 +49,7 @@ const Capabilities: React.FC = () => {
     return (
         <section className="lp-section lp-section--soft" id="capabilities">
             <div className="lp-container">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">More Capabilities</p>
                     <h2 className="lp-section__title">
                         運営に必要なものを、ひと通り。
@@ -61,8 +61,13 @@ const Capabilities: React.FC = () => {
                 </header>
 
                 <div className="lp-cap">
-                    {groups.map((g) => (
-                        <article key={g.title} className="lp-cap__group">
+                    {groups.map((g, i) => (
+                        <article
+                            key={g.title}
+                            className="lp-cap__group"
+                            data-reveal=""
+                            data-reveal-delay={i * 100}
+                        >
                             <p className="lp-cap__eyebrow">{g.eyebrow}</p>
                             <h3 className="lp-cap__title">{g.title}</h3>
                             <ul className="lp-cap__list">

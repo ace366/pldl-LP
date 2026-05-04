@@ -8,7 +8,7 @@ const AppScreens: React.FC = () => {
     return (
         <section className="lp-section lp-section--soft" id="screens">
             <div className="lp-container">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">App Screens</p>
                     <h2 className="lp-section__title">スマホで、現場の動きをそのまま管理。</h2>
                     <p className="lp-section__lead">
@@ -21,6 +21,7 @@ const AppScreens: React.FC = () => {
                         eyebrow="01 / Staff QR"
                         title="スタッフ出勤QR"
                         body="スタッフはマイページのQRをかざすだけで出勤打刻。紙のタイムカードを廃止できます。"
+                        revealDelay={0}
                     >
                         <PhoneFrame label="my-qr">
                             <MyQrScreen />
@@ -31,6 +32,7 @@ const AppScreens: React.FC = () => {
                         eyebrow="02 / Attendance"
                         title="参加予定・送迎管理"
                         body="拠点ごとに、当日の出席状況・送迎要否・乗車済みかをひと目で把握。タップで状態更新。"
+                        revealDelay={100}
                     >
                         <PhoneFrame label="attendance-intents">
                             <AttendanceIntentsScreen />
@@ -41,6 +43,7 @@ const AppScreens: React.FC = () => {
                         eyebrow="03 / QR Scan"
                         title="児童QRスキャン受付"
                         body="カメラでQRを読み取って受付を記録。手入力フォールバック・音声案内・なぞなぞ表示にも対応。"
+                        revealDelay={200}
                     >
                         <PhoneFrame label="attendance/scan">
                             <ScanScreen />
@@ -51,6 +54,7 @@ const AppScreens: React.FC = () => {
                         eyebrow="04 / Children"
                         title="児童名簿（検索・絞り込み）"
                         body="氏名・学年・学校・在籍・アレルギー有無で素早く絞り込み。並び替えにも対応。"
+                        revealDelay={0}
                     >
                         <PhoneFrame label="admin/children">
                             <ChildrenListScreen />
@@ -61,6 +65,7 @@ const AppScreens: React.FC = () => {
                         eyebrow="05 / TEL note"
                         title="TEL票・きょうだい管理"
                         body="保護者対応の履歴を電話／面談／メール別に記録。きょうだいは1タップで往復できます。"
+                        revealDelay={100}
                     >
                         <PhoneFrame label="children/{id}/tel">
                             <ChildTelScreen />
@@ -71,6 +76,7 @@ const AppScreens: React.FC = () => {
                         eyebrow="06 / Chat"
                         title="保護者チャット"
                         body="保護者とのやり取りはスレッド管理。未読数・既読状況・児童ごとの履歴をまとめて確認。"
+                        revealDelay={200}
                     >
                         <PhoneFrame label="admin/chats">
                             <ChatsScreen />
@@ -91,8 +97,9 @@ const ScreenCard: React.FC<{
     title: string;
     body: string;
     children: React.ReactNode;
-}> = ({ eyebrow, title, body, children }) => (
-    <article className="lp-screen-card">
+    revealDelay?: number;
+}> = ({ eyebrow, title, body, children, revealDelay = 0 }) => (
+    <article className="lp-screen-card" data-reveal="" data-reveal-delay={revealDelay}>
         <div className="lp-screen-card__phone">{children}</div>
         <div className="lp-screen-card__caption">
             <p className="lp-screen-card__eyebrow">{eyebrow}</p>

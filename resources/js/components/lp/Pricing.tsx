@@ -53,7 +53,7 @@ const Pricing: React.FC<Props> = ({ settings }) => {
     return (
         <section className="lp-section" id="pricing">
             <div className="lp-container">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">Pricing</p>
                     <h2 className="lp-section__title">スモールスタートできる、わかりやすい料金。</h2>
                     {(settings.showInitialFeeZero || settings.showSupportFree) && (
@@ -69,10 +69,12 @@ const Pricing: React.FC<Props> = ({ settings }) => {
                 </header>
 
                 <div className="lp-grid lp-grid--3 lp-pricing">
-                    {plans.map((p) => (
+                    {plans.map((p, i) => (
                         <article
                             key={p.key}
                             className={`lp-plan${p.recommended ? ' lp-plan--recommended' : ''}`}
+                            data-reveal=""
+                            data-reveal-delay={i * 120}
                         >
                             {p.recommended && <span className="lp-plan__ribbon">おすすめ</span>}
                             <h3 className="lp-plan__name">{p.name}</h3>

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { initScrollReveal } from '../lib/scrollReveal';
 import Header from '../components/lp/Header';
 import Hero from '../components/lp/Hero';
 import VideoSection from '../components/lp/VideoSection';
@@ -23,6 +24,13 @@ type Props = {
 };
 
 const GakudoLp: React.FC<Props> = ({ settings }) => {
+    useEffect(() => {
+        // 初回ペイント直後に observe 開始。すでにビューポート内の要素は
+        // すぐに is-inview が付き、初期描画と同時にトランジションが走る。
+        const dispose = initScrollReveal();
+        return dispose;
+    }, []);
+
     return (
         <div className="lp-root">
             <Header settings={settings} />

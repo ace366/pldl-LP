@@ -11,6 +11,64 @@
 
 ---
 
+## 2026-05-04 (追補5)  スクロール連動アニメーションを追加
+
+LPの各ブロック・写真がスクロールに合わせて順次フェードインするように改修。
+一気に表示されず、ビューポートに入った要素から段階的に現れる。
+
+### 仕組み
+
+- `resources/js/lib/scrollReveal.ts` 新規: IntersectionObserver で `[data-reveal]`
+  要素を監視し、ビューポートに入った時に `.is-inview` クラスを付与（一回限り、付与後は unobserve）
+- CSS: `[data-reveal]` は初期状態で `opacity: 0; translate3d(0, 18px, 0)`、
+  `.is-inview` で本来位置・透明度へ 0.7s のトランジション
+- `data-reveal-delay="<ms>"` でカード stagger（80–520ms）
+- `data-reveal-from="left|right|scale"` で出現方向のバリエーション
+- `prefers-reduced-motion: reduce` ユーザーは即時表示（アニメ無効）
+- 旧ブラウザで `IntersectionObserver` がない場合も即時表示で fallback
+- `GakudoLp.tsx` の `useEffect` で初期化、unmount 時に observer.disconnect()
+
+### 適用箇所
+
+| セクション | パターン |
+|---|---|
+| Hero | ロゴ → サブ → バッジ → タイトル → サブコピー → 導入実績 → CTA を 80–520ms cascade。右側のスマホビジュアルは右からスライドイン |
+| VideoSection | ヘッダ → 動画フレームをスケール、最後にフローキャプション |
+| WhyGakudoor | ヘッダ後、4枚のカードを 0/100/200/300ms cascade |
+| FieldIssues | 5項目を 80ms ずつ stagger |
+| Solutions | 9機能カードを行内 80ms ずつ + 行ごと 60ms 累積 |
+| AppScreens | 6スクリーンを 0/100/200ms（2行）でリピート |
+| Capabilities | 4グループを 100ms cascade |
+| AfterEffects | 4行を 80ms stagger |
+| Differentiation | ヘッダ後、比較表全体をスケールイン |
+| AdoptionRecord | ヘッダ後、採用団体カードをフェードイン |
+| Pricing | 3プランを 0/120/240ms cascade |
+| BrandBanner | ロゴをスケール、キャプションは遅延フェード |
+| ContactForm | ヘッダ → フォームを段階表示 |
+
+### 関連ファイル
+
+```
+追加: resources/js/lib/scrollReveal.ts
+変更: resources/js/pages/GakudoLp.tsx                 (useEffect で初期化)
+変更: resources/css/app.css                           ([data-reveal] ルール追加)
+変更: resources/js/components/lp/Hero.tsx
+変更: resources/js/components/lp/VideoSection.tsx
+変更: resources/js/components/lp/WhyGakudoor.tsx
+変更: resources/js/components/lp/FieldIssues.tsx
+変更: resources/js/components/lp/Solutions.tsx
+変更: resources/js/components/lp/AppScreens.tsx
+変更: resources/js/components/lp/Capabilities.tsx
+変更: resources/js/components/lp/AfterEffects.tsx
+変更: resources/js/components/lp/Differentiation.tsx
+変更: resources/js/components/lp/AdoptionRecord.tsx
+変更: resources/js/components/lp/Pricing.tsx
+変更: resources/js/components/lp/BrandBanner.tsx
+変更: resources/js/components/lp/ContactForm.tsx
+```
+
+---
+
 ## 2026-05-04 (追補4)  紹介動画を YouTube → セルフホスト MP4 に差し替え
 
 LPの紹介動画を YouTube 埋め込みから、提供された MP4 をセルフホストする形に変更。

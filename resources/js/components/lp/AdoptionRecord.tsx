@@ -5,7 +5,7 @@ const AdoptionRecord: React.FC = () => {
     return (
         <section className="lp-section" id="adoption">
             <div className="lp-container lp-container--narrow">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">Adoption</p>
                     <h2 className="lp-section__title">導入実績</h2>
                     <p className="lp-section__lead">
@@ -13,7 +13,7 @@ const AdoptionRecord: React.FC = () => {
                     </p>
                 </header>
 
-                <article className="lp-adoption">
+                <article className="lp-adoption" data-reveal="" data-reveal-delay="120">
                     <figure className="lp-adoption__scene">
                         <img
                             src={asset('/images/gakudoor-scene.png')}

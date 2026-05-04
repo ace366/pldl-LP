@@ -7,7 +7,7 @@ const VideoSection: React.FC = () => {
     return (
         <section className="lp-section lp-section--soft" id="video">
             <div className="lp-container">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">Movie</p>
                     <h2 className="lp-section__title">
                         動画でわかる、Gakudoorの全体像。
@@ -17,7 +17,7 @@ const VideoSection: React.FC = () => {
                     </p>
                 </header>
 
-                <div className="lp-video">
+                <div className="lp-video" data-reveal="" data-reveal-from="scale" data-reveal-delay="120">
                     <div className="lp-video__frame">
                         <video
                             controls
@@ -31,7 +31,7 @@ const VideoSection: React.FC = () => {
                     </div>
                 </div>
 
-                <p className="lp-video__flow">
+                <p className="lp-video__flow" data-reveal="" data-reveal-delay="240">
                     紹介動画 <span aria-hidden="true">→</span> 15分デモ <span aria-hidden="true">→</span> 無料相談
                 </p>
             </div>

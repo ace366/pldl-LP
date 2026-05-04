@@ -50,6 +50,44 @@
     box-sizing: border-box;
 }
 
+/* ---------- Scroll Reveal ---------- */
+/* 初期状態: 透明 + わずかに下にずれている。
+   .is-inview が付くと元の位置/不透明度へトランジション。
+   transitionDelay は scrollReveal.ts が data-reveal-delay から設定する。 */
+.lp-root [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    transition:
+        opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: opacity, transform;
+}
+.lp-root [data-reveal].is-inview {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+.lp-root [data-reveal-from="left"] {
+    transform: translate3d(-24px, 0, 0);
+}
+.lp-root [data-reveal-from="right"] {
+    transform: translate3d(24px, 0, 0);
+}
+.lp-root [data-reveal-from="scale"] {
+    opacity: 0;
+    transform: scale(0.96);
+}
+.lp-root [data-reveal-from="scale"].is-inview {
+    transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lp-root [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}
+
 .lp-root img,
 .lp-root svg {
     max-width: 100%;

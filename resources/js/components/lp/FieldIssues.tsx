@@ -33,7 +33,7 @@ const FieldIssues: React.FC = () => {
     return (
         <section className="lp-section lp-section--soft" id="issues">
             <div className="lp-container">
-                <header className="lp-section__head">
+                <header className="lp-section__head" data-reveal="">
                     <p className="lp-section__eyebrow">Field Issues</p>
                     <h2 className="lp-section__title">学童でよく起きている、現場のリアル。</h2>
                     <p className="lp-section__lead">
@@ -43,8 +43,13 @@ const FieldIssues: React.FC = () => {
                 </header>
 
                 <ul className="lp-issues">
-                    {issues.map((i) => (
-                        <li key={i.title} className="lp-issue">
+                    {issues.map((i, idx) => (
+                        <li
+                            key={i.title}
+                            className="lp-issue"
+                            data-reveal=""
+                            data-reveal-delay={idx * 80}
+                        >
                             <span className="lp-issue__icon" aria-hidden="true">
                                 <img src={asset(i.icon)} alt="" width="36" height="36" />
                             </span>
