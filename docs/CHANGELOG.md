@@ -11,6 +11,55 @@
 
 ---
 
+## 2026-05-04 (追補4)  紹介動画を YouTube → セルフホスト MP4 に差し替え
+
+LPの紹介動画を YouTube 埋め込みから、提供された MP4 をセルフホストする形に変更。
+
+### 動画圧縮
+
+| 項目 | 元ファイル | 圧縮後 |
+|---|---|---|
+| 解像度 | 1920×1078 | 1280×720 |
+| ビットレート | 4.5 Mbps | 96 kbps（コンテンツが静的なため） |
+| サイズ | 230.95 MB | **10.5 MB**（95% 削減） |
+| コーデック | H.264 + AAC | H.264 main + AAC 96kbps stereo |
+| 拡張 | - | `+faststart`（moov atom 先頭配置でストリーミング再生） |
+
+ffmpeg コマンド:
+
+```
+ffmpeg -i input.mp4 \
+  -vf "scale=1280:-2" \
+  -c:v libx264 -crf 26 -preset slow -profile:v main -pix_fmt yuv420p \
+  -c:a aac -b:a 96k -ac 2 \
+  -movflags +faststart \
+  output.mp4
+```
+
+### 主な変更
+
+- `resources/js/components/lp/VideoSection.tsx`:
+  - YouTube iframe (`youtube-nocookie.com/embed/RIZlv2AMvcw`) を削除
+  - `<video controls preload="metadata" playsInline controlsList="nodownload">` の HTML5 video 要素に
+  - `<source src={asset('/videos/gakudoor-intro.mp4')} type="video/mp4" />`
+  - 見出しを「動画でわかる、Gakudoorの全体像。」に
+  - フロー文言「無料トライアル」→「無料相談」
+- `resources/css/app.css`:
+  - `.lp-video__frame iframe` ルールに `, .lp-video__frame video` を追加
+  - 黒背景 + `object-fit: contain` でアスペクト保持
+
+### ファイル
+
+```
+追加: public/videos/gakudoor-intro.mp4   (10.5 MB)
+変更: resources/js/components/lp/VideoSection.tsx
+変更: resources/css/app.css
+```
+
+ffmpeg は本セッションで `winget install Gyan.FFmpeg`（v8.1）でインストール。
+
+---
+
 ## 2026-05-04 (追補3)  パンフレットを Gakudoor リブランド版へ全面書き換え
 
 LP のリブランドに合わせて A4 11ページのパンフレットを Gakudoor 三層構造へ全面リライト。

@@ -1,6 +1,7 @@
 import React from 'react';
+import { asset } from '../../lib/asset';
 
-const YOUTUBE_ID = 'RIZlv2AMvcw';
+const VIDEO_SRC = '/videos/gakudoor-intro.mp4';
 
 const VideoSection: React.FC = () => {
     return (
@@ -9,28 +10,29 @@ const VideoSection: React.FC = () => {
                 <header className="lp-section__head">
                     <p className="lp-section__eyebrow">Movie</p>
                     <h2 className="lp-section__title">
-                        動画でわかる、現場のための学童DX。
+                        動画でわかる、Gakudoorの全体像。
                     </h2>
                     <p className="lp-section__lead">
-                        現場の課題と、本システムでどう解決しているかを、短い動画にまとめました。
+                        現場の課題と、Gakudoorでどう解決しているかを、短い動画にまとめました。
                     </p>
                 </header>
 
                 <div className="lp-video">
                     <div className="lp-video__frame">
-                        <iframe
-                            src={`https://www.youtube-nocookie.com/embed/${YOUTUBE_ID}?rel=0`}
-                            title="学童管理システム 紹介動画"
-                            loading="lazy"
-                            referrerPolicy="strict-origin-when-cross-origin"
-                            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowFullScreen
-                        />
+                        <video
+                            controls
+                            preload="metadata"
+                            playsInline
+                            controlsList="nodownload"
+                        >
+                            <source src={asset(VIDEO_SRC)} type="video/mp4" />
+                            お使いのブラウザは動画再生に対応していません。
+                        </video>
                     </div>
                 </div>
 
                 <p className="lp-video__flow">
-                    紹介動画 <span aria-hidden="true">→</span> 15分デモ <span aria-hidden="true">→</span> 無料トライアル
+                    紹介動画 <span aria-hidden="true">→</span> 15分デモ <span aria-hidden="true">→</span> 無料相談
                 </p>
             </div>
         </section>

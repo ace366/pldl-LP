@@ -1214,12 +1214,15 @@ img.lp-hero__brand {
     background: #000;
     box-shadow: var(--lp-shadow-md);
 }
-.lp-video__frame iframe {
+.lp-video__frame iframe,
+.lp-video__frame video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     border: 0;
+    background: #000;
+    object-fit: contain;
 }
 .lp-video__flow {
     text-align: center;
