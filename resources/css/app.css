@@ -160,10 +160,12 @@
     flex-shrink: 0;
 }
 .lp-header__brand-logo {
-    height: 36px;
+    height: 32px;
     width: auto;
+    max-width: 160px;
     object-fit: contain;
     display: block;
+    flex-shrink: 0;
 }
 .lp-header__brand-sub {
     display: none;
@@ -242,7 +244,7 @@
 .lp-header__nav.is-open a { padding: 12px; font-size: 15px; }
 
 @media (min-width: 880px) {
-    .lp-header__brand-logo { height: 40px; }
+    .lp-header__brand-logo { height: 36px; max-width: 200px; }
     .lp-header__nav { display: block; }
     .lp-header__cta { display: flex; }
     .lp-header__burger { display: none; }
@@ -353,10 +355,14 @@
 .lp-hero__adoption strong { color: var(--lp-color-text); font-weight: 700; }
 .lp-hero__brand {
     display: block;
-    width: clamp(220px, 60vw, 320px);
+    width: 100%;
+    max-width: 280px;
     height: auto;
     margin: 0 0 4px;
     object-fit: contain;
+}
+@media (min-width: 880px) {
+    .lp-hero__brand { max-width: 320px; }
 }
 .lp-hero__brand-sub {
     margin: 0 0 18px;
