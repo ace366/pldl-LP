@@ -4,16 +4,17 @@
 <meta charset="utf-8">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>学童運営支援システム ご案内 ｜ NPO法人 Playful Learning Design Lab.（PLDL）</title>
-<meta name="description" content="NPO法人 Playful Learning Design Lab.（PLDL）が、教育現場の実運営から開発した学童向け運営システムのご案内パンフレット。">
+<title>Gakudoor（ガクドア）｜学童運営支援システム ご案内</title>
+<meta name="description" content="Gakudoor（ガクドア）は、学童クラブ・放課後児童クラブ向けの運営支援システムです。欠席連絡・出欠確認・お迎え管理・保護者連絡をスマホ・PCからまとめて。開発・提供：株式会社Rezon／導入実績：NPO法人 Playful Learning Design Lab.（PLDL）様。">
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=noto-sans-jp:400,500,700,800&display=swap" rel="stylesheet">
 <style>
 /* =====================================================================
-   PLDL 学童運営支援システム ご案内パンフレット
+   Gakudoor 学童運営支援システム ご案内パンフレット
    - A4 縦 / 印刷想定
    - 画面（スクリーン）でも読みやすいレイアウト
-   - 色: 青(#0d3b66 / #1e6ec0) / 白 / オレンジ(#ea7c25)
+   - 色: ネイビー(#1d4e8a) × 青(#5b9bd5) × ミント(#2c9590 / #5bc8c5)
+   - LP の Gakudoor ブランドと同トーン
    ===================================================================== */
 
 /* ---------- Page setup ---------- */
@@ -23,21 +24,21 @@
 }
 
 :root {
-    --c-navy: #0d3b66;
-    --c-blue: #1e6ec0;
-    --c-blue-2: #2a85d6;
-    --c-blue-soft: #eaf2fb;
-    --c-blue-line: #cfe1f3;
-    --c-orange: #ea7c25;
-    --c-orange-2: #f08e3f;
-    --c-orange-soft: #fff2e6;
-    --c-orange-line: #ffd9b8;
+    --c-navy: #1d4e8a;
+    --c-blue: #2c6db5;
+    --c-blue-2: #5b9bd5;
+    --c-blue-soft: #eaf3fb;
+    --c-blue-line: #c5dbf0;
+    --c-mint: #2c9590;
+    --c-mint-2: #5bc8c5;
+    --c-mint-soft: #e0f6f5;
+    --c-mint-line: #b8e8e6;
     --c-text: #1f2a37;
     --c-muted: #475569;
     --c-soft: #6b7280;
-    --c-border: #e5e7eb;
+    --c-border: #e3eaf2;
     --c-bg: #ffffff;
-    --c-cream: #fffaf2;
+    --c-page-bg: #f3f8fc;
 }
 
 * { box-sizing: border-box; }
@@ -89,13 +90,18 @@ body { padding: 24px 0; }
     color: var(--c-navy);
     font-weight: 700;
 }
+.page__footer-brand small {
+    font-weight: 600;
+    color: var(--c-soft);
+    margin-left: 6px;
+}
 .page__num { font-weight: 700; letter-spacing: .05em; }
-.page__num em { font-style: normal; color: var(--c-orange); }
+.page__num em { font-style: normal; color: var(--c-mint); }
 
 /* ---------- Common section heads ---------- */
 .eyebrow {
     display: inline-block;
-    color: var(--c-orange);
+    color: var(--c-mint);
     font-weight: 800;
     font-size: 10pt;
     letter-spacing: .14em;
@@ -130,30 +136,43 @@ body { padding: 24px 0; }
    ============================================================ */
 .cover {
     background:
-        radial-gradient(900px 360px at 110% -10%, rgba(234,124,37,.16), transparent 70%),
-        radial-gradient(900px 420px at -10% 100%, rgba(30,110,192,.16), transparent 70%),
+        radial-gradient(900px 360px at 110% -10%, rgba(91,200,197,.20), transparent 70%),
+        radial-gradient(900px 420px at -10% 100%, rgba(91,155,213,.20), transparent 70%),
         var(--c-bg);
 }
 .cover__brand {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 12px;
     color: var(--c-navy);
     font-weight: 800;
     font-size: 10.5pt;
     letter-spacing: .02em;
 }
-.cover__brand-mark {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 38px; height: 38px;
-    border-radius: 10px;
-    background: var(--c-navy);
-    color: #fff;
-    font-size: 10pt;
+.cover__brand-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.cover__brand-name {
+    line-height: 1.2;
+}
+.cover__brand-name strong {
+    display: block;
+    font-size: 14pt;
     font-weight: 800;
+    color: var(--c-navy);
+    letter-spacing: .02em;
+}
+.cover__brand-name small {
+    display: block;
+    color: var(--c-soft);
+    font-size: 9pt;
+    font-weight: 600;
     letter-spacing: .04em;
 }
 .cover__category {
-    margin-top: 18mm;
-    color: var(--c-orange);
+    margin-top: 14mm;
+    color: var(--c-mint);
     font-weight: 800;
     letter-spacing: .18em;
     font-size: 10pt;
@@ -161,15 +180,15 @@ body { padding: 24px 0; }
 .cover__title {
     margin: 6mm 0 8mm;
     color: var(--c-navy);
-    font-size: 30pt;
+    font-size: 28pt;
     font-weight: 800;
     line-height: 1.4;
     letter-spacing: .01em;
 }
 .cover__title em {
     font-style: normal;
-    color: var(--c-orange);
-    background: linear-gradient(transparent 65%, rgba(234,124,37,.18) 65%);
+    color: var(--c-mint);
+    background: linear-gradient(transparent 65%, rgba(91,200,197,.32) 65%);
     padding: 0 .12em;
 }
 .cover__sub {
@@ -179,6 +198,7 @@ body { padding: 24px 0; }
     margin: 0 0 8mm;
     max-width: 150mm;
 }
+.cover__sub strong { color: var(--c-text); font-weight: 700; }
 
 .cover__visual {
     position: relative;
@@ -186,7 +206,7 @@ body { padding: 24px 0; }
     margin: 6mm 0;
     border-radius: 18px;
     background:
-        linear-gradient(135deg, rgba(30,110,192,.08), rgba(234,124,37,.08)),
+        linear-gradient(135deg, rgba(91,155,213,.10), rgba(91,200,197,.10)),
         var(--c-blue-soft);
     border: 1px solid var(--c-blue-line);
     overflow: hidden;
@@ -207,7 +227,7 @@ body { padding: 24px 0; }
     box-shadow: 0 1px 2px rgba(15,23,42,.04);
 }
 .cover__panel-eyebrow {
-    color: var(--c-orange);
+    color: var(--c-mint);
     font-size: 9pt;
     font-weight: 800;
     letter-spacing: .08em;
@@ -244,38 +264,48 @@ body { padding: 24px 0; }
     align-items: end;
     margin-top: 4mm;
 }
-.cover__org {
+.cover__credits {
     border-top: 3px solid var(--c-navy);
-    padding-top: 8px;
+    padding-top: 10px;
+    display: grid;
+    gap: 4px;
 }
-.cover__org-eyebrow {
-    color: var(--c-soft);
-    font-size: 9pt;
-    letter-spacing: .12em;
-    margin: 0 0 2px;
-}
-.cover__org-name {
-    margin: 0;
-    color: var(--c-navy);
-    font-size: 13pt;
-    font-weight: 800;
-}
-.cover__org-url {
-    margin: 4px 0 0;
-    color: var(--c-blue);
+.cover__credit-row {
+    display: grid;
+    grid-template-columns: 6em 1fr;
+    gap: 8px;
     font-size: 9.5pt;
-    word-break: break-all;
+}
+.cover__credit-label {
+    color: var(--c-soft);
+    font-weight: 700;
+    letter-spacing: .06em;
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    align-self: center;
+}
+.cover__credit-value {
+    color: var(--c-navy);
+    font-weight: 800;
+    font-size: 11pt;
+}
+.cover__credit-value small {
+    display: block;
+    color: var(--c-soft);
+    font-weight: 600;
+    font-size: 9pt;
+    margin-top: 1px;
 }
 
 .cover__pill {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 8px 16px;
     border-radius: 999px;
-    background: var(--c-orange);
+    background: var(--c-mint);
     color: #fff;
     font-weight: 800;
     font-size: 10pt;
-    box-shadow: 0 4px 10px rgba(234,124,37,.32);
+    box-shadow: 0 4px 10px rgba(44,149,144,.32);
 }
 .cover__pill::before {
     content: "●";
@@ -302,14 +332,14 @@ body { padding: 24px 0; }
     padding: 12px 14px;
     background: #fff;
     border: 1px solid var(--c-border);
-    border-left: 4px solid var(--c-orange);
+    border-left: 4px solid var(--c-mint);
     border-radius: 10px;
 }
 .pain__icon {
     width: 46px; height: 46px;
     border-radius: 12px;
-    background: var(--c-orange-soft);
-    color: var(--c-orange);
+    background: var(--c-mint-soft);
+    color: var(--c-mint);
     display: inline-flex; align-items: center; justify-content: center;
     font-size: 22pt;
     line-height: 1;
@@ -340,7 +370,7 @@ body { padding: 24px 0; }
 }
 
 /* ============================================================
-   Page 3: SOLUTIONS (6 cards)
+   Page 3: SOLUTIONS (9 cards)
    ============================================================ */
 .feature-grid {
     display: grid;
@@ -383,8 +413,8 @@ body { padding: 24px 0; }
 .feature-note {
     margin-top: 14px;
     padding: 10px 14px;
-    background: var(--c-cream);
-    border: 1px dashed var(--c-orange-line);
+    background: var(--c-mint-soft);
+    border: 1px dashed var(--c-mint-line);
     border-radius: 10px;
     color: var(--c-muted);
     font-size: 9.5pt;
@@ -392,82 +422,124 @@ body { padding: 24px 0; }
 }
 
 /* ============================================================
-   Page 4: TRUST (NPO 紹介)
+   Page 6: WHY GAKUDOOR + 導入実績
    ============================================================ */
-.trust-headline {
+.why-headline {
     color: var(--c-navy);
     font-size: 16pt;
     font-weight: 800;
     line-height: 1.6;
     margin: 0 0 12px;
 }
-.trust-body {
+.why-body {
     color: var(--c-muted);
-    font-size: 11pt;
-    line-height: 2;
-    margin: 0 0 14px;
+    font-size: 10.5pt;
+    line-height: 1.95;
+    margin: 0 0 12px;
 }
-.trust-body strong {
+.why-body strong {
     color: var(--c-navy);
     font-weight: 700;
 }
-.trust-quote {
-    margin: 0 0 18px;
-    padding: 16px 20px;
-    background: linear-gradient(135deg, rgba(30,110,192,.08), rgba(234,124,37,.06));
-    border-left: 4px solid var(--c-blue);
-    border-radius: 10px;
-    color: var(--c-navy);
-    font-size: 11.5pt;
-    line-height: 1.9;
+.why-points {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
 }
-.trust-link-card {
-    margin-top: auto;
+.why-point {
     background: #fff;
     border: 1px solid var(--c-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+}
+.why-point__head {
+    display: flex; gap: 8px; align-items: center;
+    margin-bottom: 6px;
+}
+.why-point__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    background: var(--c-mint-soft);
+    color: var(--c-mint);
+    font-size: 11pt;
+    font-weight: 800;
+    border: 1px solid var(--c-mint-line);
+}
+.why-point__title {
+    margin: 0;
+    color: var(--c-navy);
+    font-size: 11pt;
+    font-weight: 800;
+    line-height: 1.4;
+}
+.why-point__body {
+    margin: 0;
+    color: var(--c-muted);
+    font-size: 9.5pt;
+    line-height: 1.7;
+}
+
+.adoption-card {
+    margin-top: auto;
+    background: linear-gradient(135deg, rgba(91,155,213,.10), rgba(91,200,197,.08));
+    border: 1px solid var(--c-blue-line);
     border-radius: 14px;
     padding: 16px 20px;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr auto;
     gap: 16px;
     align-items: center;
 }
-.trust-link-card__title {
+.adoption-card__pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--c-navy);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 9.5pt;
+    font-weight: 800;
+    letter-spacing: .08em;
+    align-self: flex-start;
+    white-space: nowrap;
+}
+.adoption-card__name {
     margin: 0 0 4px;
     color: var(--c-navy);
     font-size: 12pt;
     font-weight: 800;
-}
-.trust-link-card__sub {
-    margin: 0 0 6px;
-    color: var(--c-muted);
-    font-size: 10pt;
-}
-.trust-link-card__url {
-    color: var(--c-blue);
-    font-size: 11pt;
-    font-weight: 700;
-    word-break: break-all;
-}
-.trust-link-card__badge {
-    text-align: center;
-    color: var(--c-orange);
-    font-size: 11pt;
-    font-weight: 800;
-    border-left: 1px solid var(--c-border);
-    padding-left: 16px;
     line-height: 1.4;
 }
-.trust-link-card__badge small {
+.adoption-card__body {
+    margin: 0;
+    color: var(--c-muted);
+    font-size: 9.5pt;
+    line-height: 1.7;
+}
+.adoption-card__url {
+    text-align: right;
+    color: var(--c-blue);
+    font-size: 9pt;
+    font-weight: 700;
+    line-height: 1.4;
+}
+.adoption-card__url small {
     display: block;
     color: var(--c-soft);
     font-weight: 600;
-    font-size: 9pt;
+    font-size: 8.5pt;
     margin-top: 2px;
 }
 
 /* ============================================================
-   Page 5: BEFORE / AFTER
+   Page 7: BEFORE / AFTER
    ============================================================ */
 .ba-table {
     width: 100%;
@@ -488,7 +560,7 @@ body { padding: 24px 0; }
     letter-spacing: .04em;
 }
 .ba-table thead th.is-after {
-    background: var(--c-orange);
+    background: var(--c-mint);
 }
 .ba-table tbody td {
     padding: 12px 14px;
@@ -505,13 +577,12 @@ body { padding: 24px 0; }
 .ba-table .ba-after {
     color: var(--c-navy);
     font-weight: 700;
-    background-image: linear-gradient(transparent, rgba(234,124,37,.0));
 }
-.ba-table .ba-after strong { color: var(--c-orange); }
+.ba-table .ba-after strong { color: var(--c-mint); }
 .ba-table .ba-arrow {
     width: 32px;
     text-align: center;
-    color: var(--c-orange);
+    color: var(--c-mint);
     font-weight: 800;
 }
 
@@ -533,7 +604,7 @@ body { padding: 24px 0; }
 }
 
 /* ============================================================
-   Page 6: PRICING
+   Page 9: PRICING
    ============================================================ */
 .plans {
     display: grid;
@@ -553,21 +624,21 @@ body { padding: 24px 0; }
     gap: 8px;
 }
 .plan--recommended {
-    border: 2px solid var(--c-orange);
-    background: linear-gradient(180deg, #fffaf2, #ffffff 70%);
-    box-shadow: 0 4px 14px rgba(234,124,37,.18);
+    border: 2px solid var(--c-mint);
+    background: linear-gradient(180deg, var(--c-mint-soft), #ffffff 70%);
+    box-shadow: 0 4px 14px rgba(44,149,144,.18);
 }
 .plan__ribbon {
     position: absolute;
     top: -12px; left: 50%; transform: translateX(-50%);
     padding: 4px 14px;
-    background: var(--c-orange);
+    background: var(--c-mint);
     color: #fff;
     border-radius: 999px;
     font-weight: 800;
     font-size: 9.5pt;
     letter-spacing: .08em;
-    box-shadow: 0 4px 8px rgba(234,124,37,.28);
+    box-shadow: 0 4px 8px rgba(44,149,144,.28);
 }
 .plan__name {
     margin: 0;
@@ -618,8 +689,8 @@ body { padding: 24px 0; }
 .plans-bottom {
     margin-top: auto;
     padding: 14px 18px;
-    background: linear-gradient(135deg, var(--c-orange-soft), #ffffff 85%);
-    border: 1px solid var(--c-orange-line);
+    background: linear-gradient(135deg, var(--c-mint-soft), #ffffff 85%);
+    border: 1px solid var(--c-mint-line);
     border-radius: 12px;
     display: grid;
     grid-template-columns: auto 1fr;
@@ -629,7 +700,7 @@ body { padding: 24px 0; }
 .plans-bottom__icon {
     width: 44px; height: 44px;
     border-radius: 12px;
-    background: var(--c-orange);
+    background: var(--c-mint);
     color: #fff;
     display: inline-flex; align-items: center; justify-content: center;
     font-size: 18pt;
@@ -637,7 +708,7 @@ body { padding: 24px 0; }
 }
 .plans-bottom__title {
     margin: 0;
-    color: var(--c-orange);
+    color: var(--c-mint);
     font-size: 12pt;
     font-weight: 800;
 }
@@ -656,7 +727,7 @@ body { padding: 24px 0; }
 }
 
 /* ============================================================
-   Page 7: FLOW (4 steps)
+   Page 10: FLOW (4 steps)
    ============================================================ */
 .flow {
     display: flex;
@@ -682,9 +753,9 @@ body { padding: 24px 0; }
     display: inline-flex; align-items: center; justify-content: center;
     font-size: 20pt;
     font-weight: 800;
-    box-shadow: 0 3px 8px rgba(30,110,192,.28);
+    box-shadow: 0 3px 8px rgba(44,109,181,.28);
 }
-.flow-step--accent .flow-step__num { background: var(--c-orange); box-shadow: 0 3px 8px rgba(234,124,37,.28); }
+.flow-step--accent .flow-step__num { background: var(--c-mint); box-shadow: 0 3px 8px rgba(44,149,144,.28); }
 .flow-step__title {
     margin: 0 0 2px;
     color: var(--c-navy);
@@ -698,7 +769,7 @@ body { padding: 24px 0; }
     line-height: 1.7;
 }
 .flow-step__time {
-    color: var(--c-orange);
+    color: var(--c-mint);
     font-size: 9.5pt;
     font-weight: 800;
     letter-spacing: .06em;
@@ -718,7 +789,7 @@ body { padding: 24px 0; }
 }
 
 /* ============================================================
-   Page 8: FINAL CTA
+   Page 11: FINAL CTA
    ============================================================ */
 .cta-grid {
     display: grid;
@@ -743,6 +814,7 @@ body { padding: 24px 0; }
 .cta-card--primary .cta-card__icon { background: rgba(255,255,255,.16); color: #fff; }
 .cta-card--primary .cta-card__title { color: #fff; }
 .cta-card--primary .cta-card__body { color: rgba(255,255,255,.85); }
+.cta-card--primary .cta-card__label { color: var(--c-mint-2); }
 
 .cta-card__icon {
     width: 40px; height: 40px;
@@ -754,7 +826,7 @@ body { padding: 24px 0; }
     font-weight: 800;
 }
 .cta-card__label {
-    color: var(--c-orange);
+    color: var(--c-mint);
     font-size: 9pt;
     font-weight: 800;
     letter-spacing: .12em;
@@ -776,7 +848,7 @@ body { padding: 24px 0; }
 .closing {
     margin: auto 0;
     padding: 22px 26px;
-    background: linear-gradient(135deg, var(--c-blue-soft), var(--c-orange-soft));
+    background: linear-gradient(135deg, var(--c-blue-soft), var(--c-mint-soft));
     border-radius: 18px;
     border: 1px solid var(--c-blue-line);
     text-align: center;
@@ -791,7 +863,7 @@ body { padding: 24px 0; }
 }
 .closing__title em {
     font-style: normal;
-    color: var(--c-orange);
+    color: var(--c-mint);
 }
 .closing__sub {
     margin: 0;
@@ -805,40 +877,50 @@ body { padding: 24px 0; }
     border-top: 3px solid var(--c-navy);
     padding-top: 10px;
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 16px;
+    grid-template-columns: auto 1fr auto;
+    gap: 14px;
     align-items: center;
 }
-.signature__org-eyebrow {
+.signature__logo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+.signature__lines {
+    display: grid;
+    gap: 2px;
+}
+.signature__line {
+    display: grid;
+    grid-template-columns: 6em 1fr;
+    gap: 8px;
+    font-size: 9.5pt;
+}
+.signature__label {
     color: var(--c-soft);
-    font-size: 9pt;
-    letter-spacing: .12em;
-    margin: 0 0 2px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    font-size: 8.5pt;
+    text-transform: uppercase;
 }
-.signature__org-name {
-    margin: 0;
+.signature__value {
     color: var(--c-navy);
-    font-size: 13pt;
-    font-weight: 800;
-}
-.signature__url {
-    margin: 4px 0 0;
-    color: var(--c-blue);
-    font-size: 10pt;
-    word-break: break-all;
+    font-weight: 700;
+    font-size: 10.5pt;
 }
 .signature__pill {
     display: inline-flex;
     padding: 6px 14px;
     border-radius: 999px;
-    background: var(--c-orange);
+    background: var(--c-mint);
     color: #fff;
     font-weight: 800;
     font-size: 10pt;
+    align-self: center;
 }
 
 /* ============================================================
-   ADDED: App Screens / Capabilities / Comparison
+   App Screens / Capabilities / Comparison
    ============================================================ */
 
 /* --- App Screens (6 phone tiles) --- */
@@ -860,7 +942,7 @@ body { padding: 24px 0; }
     margin: 0;
     font-size: 8pt;
     font-weight: 800;
-    color: var(--c-orange);
+    color: var(--c-mint);
     letter-spacing: .12em;
     text-transform: uppercase;
 }
@@ -878,7 +960,7 @@ body { padding: 24px 0; }
     line-height: 1.55;
 }
 
-/* --- Mini phone frame for pamphlet --- */
+/* --- Mini phone frame --- */
 .mini-phone {
     margin: 0 auto;
     width: 100%;
@@ -938,7 +1020,7 @@ body { padding: 24px 0; }
 .mp-row--head { background: var(--c-navy); color: #fff; border-color: var(--c-navy); font-weight: 700; }
 .mp-row--ok { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
 .mp-row--alert { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
-.mp-row--soft { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+.mp-row--soft { background: var(--c-mint-soft); border-color: var(--c-mint-line); color: #0f766e; }
 .mp-row strong { font-weight: 700; }
 .mp-pill {
     background: var(--c-blue-soft); color: var(--c-navy);
@@ -946,7 +1028,7 @@ body { padding: 24px 0; }
     padding: 0 5px; border-radius: 999px;
     font-size: 6.5pt; font-weight: 700;
 }
-.mp-pill--orange { background: var(--c-orange-soft); color: var(--c-orange); border-color: var(--c-orange-line); }
+.mp-pill--mint { background: var(--c-mint-soft); color: var(--c-mint); border-color: var(--c-mint-line); }
 .mp-pill--red { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
 .mp-pill--green { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
 .mp-qr {
@@ -984,13 +1066,13 @@ body { padding: 24px 0; }
 .mp-scan-frame::before, .mp-scan-frame::after {
     content: ""; position: absolute;
     width: 12px; height: 12px;
-    border: 2px solid var(--c-orange);
+    border: 2px solid var(--c-mint-2);
 }
 .mp-scan-frame::before { top: 4px; left: 4px; border-right: 0; border-bottom: 0; }
 .mp-scan-frame::after { bottom: 4px; right: 4px; border-left: 0; border-top: 0; }
 .mp-scan-line {
     position: absolute; left: 8px; right: 8px; top: 50%;
-    height: 2px; background: var(--c-orange); opacity: .8;
+    height: 2px; background: var(--c-mint-2); opacity: .85;
 }
 .mp-scan-result {
     background: #1e293b; color: #fff;
@@ -1037,7 +1119,7 @@ body { padding: 24px 0; }
 }
 .cap-group__eyebrow {
     margin: 0 0 2px;
-    color: var(--c-orange);
+    color: var(--c-mint);
     font-size: 8pt;
     font-weight: 800;
     letter-spacing: .12em;
@@ -1170,6 +1252,7 @@ body { padding: 24px 0; }
     .cover__title { font-size: 22pt; }
     .section-title { font-size: 17pt; }
     .feature-grid { grid-template-columns: 1fr; }
+    .why-points { grid-template-columns: 1fr; }
     .plans { grid-template-columns: 1fr; }
     .cta-grid { grid-template-columns: 1fr; }
     .cover__visual-grid { grid-template-columns: 1fr; }
@@ -1185,6 +1268,9 @@ body { padding: 24px 0; }
     }
     .ba-table { font-size: 10pt; }
     .ba-table thead th, .ba-table tbody td { padding: 8px 10px; }
+    .adoption-card { grid-template-columns: 1fr; gap: 10px; }
+    .adoption-card__url { text-align: left; }
+    .signature { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -1195,20 +1281,23 @@ body { padding: 24px 0; }
      ===================================================== -->
 <section class="page cover">
     <header class="cover__brand">
-        <span class="cover__brand-mark">PLDL</span>
-        <span>NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <img class="cover__brand-logo" src="../public/images/gakudoor-logo.png" alt="Gakudoor（ガクドア）">
+        <span class="cover__brand-name">
+            <strong>Gakudoor</strong>
+            <small>ガクドア｜学童運営支援システム</small>
+        </span>
     </header>
 
-    <p class="cover__category">Brochure ／ 学童運営支援システム ご案内</p>
+    <p class="cover__category">Brochure ／ ご案内</p>
 
     <h1 class="cover__title">
-        学童の電話・紙管理を、<br>
-        <em>スマホでやさしく</em>効率化。
+        学童の連絡・出欠・お迎え管理を、<br>
+        <em>スマホでやさしく</em>一本化。
     </h1>
 
     <p class="cover__sub">
-        現場の知見から生まれた、学童運営支援システム。<br>
-        欠席連絡・お迎え変更・出席確認・保護者通知を、ひとつにまとめます。
+        <strong>Gakudoor（ガクドア）</strong>は、電話・紙・口頭連絡に頼りがちな学童運営を、
+        保護者・施設・自治体がつながる安心の仕組みに変える学童運営支援システムです。
     </p>
 
     <div class="cover__visual" aria-hidden="true">
@@ -1258,12 +1347,21 @@ body { padding: 24px 0; }
     </div>
 
     <div class="cover__bottom">
-        <div class="cover__org">
-            <p class="cover__org-eyebrow">運営団体</p>
-            <p class="cover__org-name">NPO法人 Playful Learning Design Lab.（PLDL）</p>
-            <p class="cover__org-url">公式サイト：https://pldl.or.jp/</p>
+        <div class="cover__credits">
+            <div class="cover__credit-row">
+                <span class="cover__credit-label">Service</span>
+                <span class="cover__credit-value">Gakudoor（ガクドア）</span>
+            </div>
+            <div class="cover__credit-row">
+                <span class="cover__credit-label">Provider</span>
+                <span class="cover__credit-value">株式会社Rezon<small>開発・提供</small></span>
+            </div>
+            <div class="cover__credit-row">
+                <span class="cover__credit-label">Adoption</span>
+                <span class="cover__credit-value">NPO法人 Playful Learning Design Lab.（PLDL）様<small>導入実績</small></span>
+            </div>
         </div>
-        <span class="cover__pill">無料デモ受付中</span>
+        <span class="cover__pill">無料相談受付中</span>
     </div>
 </section>
 
@@ -1314,10 +1412,10 @@ body { padding: 24px 0; }
         </li>
     </ul>
 
-    <p class="pain-cta">その負担、仕組みで減らせます。</p>
+    <p class="pain-cta">その負担、Gakudoor で減らせます。</p>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>02</em> / 11</span>
     </div>
 </section>
@@ -1327,7 +1425,7 @@ body { padding: 24px 0; }
      ===================================================== -->
 <section class="page">
     <p class="eyebrow">02 ／ 解決策</p>
-    <h2 class="section-title">PLDLの仕組みでできること
+    <h2 class="section-title">Gakudoorでできること
         <small>学童に必要な機能を、ひと通り揃えています。</small>
     </h2>
 
@@ -1402,18 +1500,18 @@ body { padding: 24px 0; }
     </p>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>03</em> / 11</span>
     </div>
 </section>
 
 <!-- =====================================================
-     PAGE 4 / APP SCREENS (NEW)
+     PAGE 4 / APP SCREENS
      ===================================================== -->
 <section class="page">
     <p class="eyebrow">03 ／ アプリ画面</p>
     <h2 class="section-title">スマホで、現場の動きをそのまま管理
-        <small>実際の運用イメージです（表示内容はすべてダミーです）。</small>
+        <small>Gakudoorの主要画面イメージです（表示内容はすべてダミーです）。</small>
     </h2>
 
     <div class="screens-grid">
@@ -1464,7 +1562,7 @@ body { padding: 24px 0; }
                     <div class="mini-phone__body">
                         <div class="mp-row mp-row--head"><span>本日の出席</span><strong>38/42</strong></div>
                         <div class="mp-row mp-row--alert"><span>さとう だいち</span><span class="mp-pill mp-pill--red">未到着</span></div>
-                        <div class="mp-row mp-row--soft"><span>たかはし みゆ</span><span class="mp-pill mp-pill--orange">送迎 未</span></div>
+                        <div class="mp-row mp-row--soft"><span>たかはし みゆ</span><span class="mp-pill mp-pill--mint">送迎 未</span></div>
                         <div class="mp-row mp-row--ok"><span>やまもと そう</span><span class="mp-pill mp-pill--green">出席</span></div>
                         <div class="mp-row mp-row--ok"><span>なかがわ あおい</span><span class="mp-pill mp-pill--green">乗車済</span></div>
                     </div>
@@ -1546,7 +1644,7 @@ body { padding: 24px 0; }
                             </div>
                         </div>
                         <div class="mp-row"><span class="mp-tab">電話</span><span style="font-size:6.5pt;">お迎え 17:30 へ変更</span></div>
-                        <div class="mp-row"><span class="mp-tab" style="background:var(--c-orange)">面談</span><span style="font-size:6.5pt;">学校との連携相談</span></div>
+                        <div class="mp-row"><span class="mp-tab" style="background:var(--c-mint)">面談</span><span style="font-size:6.5pt;">学校との連携相談</span></div>
                         <div class="mp-row"><span class="mp-tab" style="background:var(--c-blue-2)">メール</span><span style="font-size:6.5pt;">アレルギー追加連絡</span></div>
                     </div>
                 </div>
@@ -1598,13 +1696,13 @@ body { padding: 24px 0; }
     </p>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>04</em> / 11</span>
     </div>
 </section>
 
 <!-- =====================================================
-     PAGE 5 / CAPABILITIES (NEW)
+     PAGE 5 / CAPABILITIES
      ===================================================== -->
 <section class="page">
     <p class="eyebrow">04 ／ さらにできること</p>
@@ -1659,58 +1757,79 @@ body { padding: 24px 0; }
     </div>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>05</em> / 11</span>
     </div>
 </section>
 
 <!-- =====================================================
-     PAGE 6 / TRUST
+     PAGE 6 / WHY GAKUDOOR + 導入実績
      ===================================================== -->
 <section class="page">
-    <p class="eyebrow">05 ／ 運営団体について</p>
-    <h2 class="section-title">現場を知らないIT会社ではありません
-        <small>教育現場で実際に運営する団体が、課題から開発しています。</small>
+    <p class="eyebrow">05 ／ Gakudoorのこだわり</p>
+    <h2 class="section-title">紙と電話の学童運営から、スマホでつながる入り口へ
+        <small>Gakudoor（ガクドア）は「学童への入り口」を意味するサービス名です。</small>
     </h2>
 
-    <p class="trust-headline">
-        子どもたちの学びのワクワクを育み、<br>
-        安心して過ごせる居場所をつくる。
+    <p class="why-headline">
+        保護者・施設・自治体をつなぐ、<br>
+        現場にやさしい仕組みづくり。
     </p>
 
-    <p class="trust-body">
-        <strong>NPO法人 Playful Learning Design Lab.（PLDL）</strong>は、
-        子どもたちの居場所づくり・学びの場づくりに取り組む団体です。
-        実際の現場運営・教育活動の中で見えてきた課題をもとに、
-        本システムを開発しています。
+    <p class="why-body">
+        <strong>Gakudoor</strong> は、電話・紙・口頭連絡に頼りがちな学童運営を、
+        スマホでつながる安心の仕組みに変えるために設計された運営支援システムです。
+        IT の専門知識がなくても、紙と電話に慣れた支援員・保護者・お子さままで、誰もが迷わず操作できることを最優先にしています。
     </p>
 
-    <p class="trust-body">
-        営業会社ではなく、現場を持つ団体だからこそ、
-        「忙しい朝にどの操作を減らしたいか」「保護者にどう伝われば安心か」といった
-        日々の小さな違和感から仕様を組み立てています。
-        ご導入後も、現場の声をシステムへ継続的に反映していきます。
-    </p>
+    <ul class="why-points">
+        <li class="why-point">
+            <div class="why-point__head">
+                <span class="why-point__chip">1</span>
+                <h3 class="why-point__title">現場の運営実態に合わせた設計</h3>
+            </div>
+            <p class="why-point__body">電話ラッシュ・紙の出席簿・お迎え変更の共有漏れ。学童で実際に起きている業務を起点に設計しています。</p>
+        </li>
+        <li class="why-point">
+            <div class="why-point__head">
+                <span class="why-point__chip">2</span>
+                <h3 class="why-point__title">やさしいUI、誰もが迷わない</h3>
+            </div>
+            <p class="why-point__body">大きなタップ領域・最小限の選択肢・音声案内など、スマホ操作に不慣れな方でも使える設計です。</p>
+        </li>
+        <li class="why-point">
+            <div class="why-point__head">
+                <span class="why-point__chip">3</span>
+                <h3 class="why-point__title">小さく始めて段階的に拡張</h3>
+            </div>
+            <p class="why-point__body">欠席連絡だけ・出欠管理だけといった部分導入から開始可能。施設の体制に合わせて拡張していけます。</p>
+        </li>
+        <li class="why-point">
+            <div class="why-point__head">
+                <span class="why-point__chip">4</span>
+                <h3 class="why-point__title">採用団体の運用実績で改善</h3>
+            </div>
+            <p class="why-point__body">下記の導入実績団体での実運用フィードバックを継続的に反映。日々の業務に合う形へ改善を重ねています。</p>
+        </li>
+    </ul>
 
-    <p class="trust-quote">
-        「現場で本当に困っていることに、しずかに効く道具をつくる」<br>
-        — それが PLDL の開発スタンスです。
-    </p>
-
-    <div class="trust-link-card">
+    <article class="adoption-card">
+        <span class="adoption-card__pill">導入実績</span>
         <div>
-            <p class="trust-link-card__title">運営団体について詳しく見る</p>
-            <p class="trust-link-card__sub">活動内容・所在地・連絡先などを掲載しています。</p>
-            <p class="trust-link-card__url">https://pldl.or.jp/</p>
+            <p class="adoption-card__name">NPO法人 Playful Learning Design Lab.（PLDL）様</p>
+            <p class="adoption-card__body">
+                Gakudoorは PLDL 様に採用いただき、実際の学童運営の現場で活用されています。
+                現場での運用を通じて、保護者連絡・出欠確認・お迎え管理など、日々の業務に合う形で改善を重ねています。
+            </p>
         </div>
-        <div class="trust-link-card__badge">
-            NPO法人<br>
-            <small>非営利活動法人</small>
+        <div class="adoption-card__url">
+            pldl.or.jp
+            <small>採用団体公式サイト</small>
         </div>
-    </div>
+    </article>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>06</em> / 11</span>
     </div>
 </section>
@@ -1759,38 +1878,38 @@ body { padding: 24px 0; }
     <p class="ba-note">※ 運用方法・施設規模・既存業務との組み合わせにより効果は異なります。</p>
 
     <div class="ba-bottom">
-        現場の声で改善を続けています。
-        「ここを変えたい」というご要望は、開発者本人へ直接お届けいただける体制です。
+        採用団体での運用フィードバックを継続的に反映しています。
+        「ここを変えたい」というご要望は、開発元（株式会社Rezon）へ直接お届けいただける体制です。
         導入後も、現場にとって使いやすい形へ少しずつ整えていけます。
     </div>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>07</em> / 11</span>
     </div>
 </section>
 
 <!-- =====================================================
-     PAGE 8 / DIFFERENTIATION (NEW)
+     PAGE 8 / DIFFERENTIATION
      ===================================================== -->
 <section class="page">
     <p class="eyebrow">07 ／ 他社との比較</p>
     <h2 class="section-title">他社サービスと、ここが違います
-        <small>現場で実運営しているからこそ気づいた細部に、確かな差があります。</small>
+        <small>実運営している学童の現場から積み上げた細部に、確かな差があります。</small>
     </h2>
 
     <table class="diff-table">
         <thead>
             <tr>
                 <th>項目</th>
-                <th class="is-us">PLDLの学童DX</th>
+                <th class="is-us">Gakudoor</th>
                 <th class="is-them">一般的なITサービス</th>
             </tr>
         </thead>
         <tbody>
-            <tr><td class="diff-label">開発元</td><td class="diff-us">教育現場を運営する NPO（PLDL）</td><td class="diff-them">IT企業・営業会社</td></tr>
-            <tr><td class="diff-label">相談相手</td><td class="diff-us">開発者本人と直接相談できる</td><td class="diff-them">営業窓口経由・担当者交代あり</td></tr>
-            <tr><td class="diff-label">現場知見</td><td class="diff-us">実際の運営から仕様を設計</td><td class="diff-them">一般的なヒアリングベース</td></tr>
+            <tr><td class="diff-label">開発・提供</td><td class="diff-us">株式会社Rezon が開発・提供</td><td class="diff-them">大手IT企業・営業会社</td></tr>
+            <tr><td class="diff-label">現場知見</td><td class="diff-us">採用団体（NPO法人 PLDL）の運用実績を継続反映</td><td class="diff-them">一般的なヒアリングベース</td></tr>
+            <tr><td class="diff-label">相談相手</td><td class="diff-us">開発元と直接相談できる</td><td class="diff-them">営業窓口経由・担当者交代あり</td></tr>
             <tr><td class="diff-label">QRカード忘れ対応</td><td class="diff-us">手入力フォールバック標準搭載</td><td class="diff-them">スキャン不可のままになりがち</td></tr>
             <tr><td class="diff-label">受付の体験</td><td class="diff-us">音声案内・なぞなぞ表示で子どもにやさしく</td><td class="diff-them">事務的な打刻のみ</td></tr>
             <tr><td class="diff-label">きょうだい管理</td><td class="diff-us">きょうだい紐付け・1タップで往復</td><td class="diff-them">別々の児童として個別管理</td></tr>
@@ -1800,7 +1919,7 @@ body { padding: 24px 0; }
             <tr><td class="diff-label">出力</td><td class="diff-us">CSV／PDF を月次・施設別に出力</td><td class="diff-them">CSVのみ・固定フォーマット</td></tr>
             <tr><td class="diff-label">スタッフ運用</td><td class="diff-us">出勤QR・シフト・給与まで一体運用</td><td class="diff-them">別システムを併用しがち</td></tr>
             <tr><td class="diff-label">権限管理</td><td class="diff-us">ロール別の閲覧／編集を細かく制御</td><td class="diff-them">管理者・一般の2段階のみ</td></tr>
-            <tr><td class="diff-label">改善方針</td><td class="diff-us">現場の声を継続的に反映（NPO自身が利用）</td><td class="diff-them">機能要望はチケット待ち</td></tr>
+            <tr><td class="diff-label">改善方針</td><td class="diff-us">採用団体の運用フィードバックを継続的に反映</td><td class="diff-them">機能要望はチケット待ち</td></tr>
             <tr><td class="diff-label">スタンス</td><td class="diff-us">相談型・押し売りなし</td><td class="diff-them">商談クロージング型</td></tr>
         </tbody>
     </table>
@@ -1810,7 +1929,7 @@ body { padding: 24px 0; }
     </p>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>08</em> / 11</span>
     </div>
 </section>
@@ -1879,7 +1998,7 @@ body { padding: 24px 0; }
             <p class="plans-bottom__title">先着5施設限定</p>
             <p class="plans-bottom__body">
                 <strong>初期費用 0円 ＋ 導入サポート無料</strong>。<br>
-                ご相談から導入まで、開発者本人が現場の言葉で伴走いたします。
+                ご相談から導入まで、株式会社Rezon が現場の言葉で伴走いたします。
             </p>
         </div>
     </div>
@@ -1887,7 +2006,7 @@ body { padding: 24px 0; }
     <p class="plans-note">※ 表示価格は税抜きです。施設規模・要件により最適なプランをご提案します。お気軽にご相談ください。</p>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>09</em> / 11</span>
     </div>
 </section>
@@ -1933,7 +2052,7 @@ body { padding: 24px 0; }
             <span class="flow-step__num">4</span>
             <div>
                 <h3 class="flow-step__title">ご利用開始</h3>
-                <p class="flow-step__body">導入後は、現場の声をもとに改善を続けます。困ったときは開発者本人にご相談ください。</p>
+                <p class="flow-step__body">導入後は、現場の声をもとに改善を続けます。お困りごとは株式会社Rezon へ直接ご相談ください。</p>
             </div>
             <p class="flow-step__time">本格運用<br><small>継続改善</small></p>
         </div>
@@ -1942,7 +2061,7 @@ body { padding: 24px 0; }
     <p class="flow-note">※ 各ステップの内容・期間は、施設のご状況に合わせて柔軟にご相談いたします。</p>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>10</em> / 11</span>
     </div>
 </section>
@@ -1983,22 +2102,32 @@ body { padding: 24px 0; }
             <em>もっと増やしませんか。</em>
         </h3>
         <p class="closing__sub">
-            PLDLは、現場の小さな手間を仕組みでやさしく減らし、<br>
+            Gakudoor は、現場の小さな手間を仕組みでやさしく減らし、<br>
             先生方が子どもたちと過ごす時間を取り戻すための仕組みづくりを続けます。
         </p>
     </div>
 
     <div class="signature">
-        <div>
-            <p class="signature__org-eyebrow">運営団体</p>
-            <p class="signature__org-name">NPO法人 Playful Learning Design Lab.（PLDL）</p>
-            <p class="signature__url">公式サイト：https://pldl.or.jp/</p>
+        <img class="signature__logo" src="../public/images/gakudoor-logo.png" alt="">
+        <div class="signature__lines">
+            <div class="signature__line">
+                <span class="signature__label">Service</span>
+                <span class="signature__value">Gakudoor（ガクドア）</span>
+            </div>
+            <div class="signature__line">
+                <span class="signature__label">Provider</span>
+                <span class="signature__value">株式会社Rezon</span>
+            </div>
+            <div class="signature__line">
+                <span class="signature__label">Adoption</span>
+                <span class="signature__value">NPO法人 Playful Learning Design Lab.（PLDL）様</span>
+            </div>
         </div>
-        <span class="signature__pill">無料デモ受付中</span>
+        <span class="signature__pill">無料相談受付中</span>
     </div>
 
     <div class="page__footer">
-        <span class="page__footer-brand">NPO法人 Playful Learning Design Lab.（PLDL）</span>
+        <span class="page__footer-brand">Gakudoor<small>株式会社Rezon</small></span>
         <span class="page__num">P. <em>11</em> / 11</span>
     </div>
 </section>

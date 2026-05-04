@@ -11,6 +11,67 @@
 
 ---
 
+## 2026-05-04 (追補3)  パンフレットを Gakudoor リブランド版へ全面書き換え
+
+LP のリブランドに合わせて A4 11ページのパンフレットを Gakudoor 三層構造へ全面リライト。
+配色も LP と同じ青×ミント基調に統一（旧オレンジ/ネイビー基調は廃止）。
+
+### 配色刷新
+
+| 旧 | 新 |
+|---|---|
+| `--c-navy: #0d3b66` | `--c-navy: #1d4e8a` |
+| `--c-blue: #1e6ec0` | `--c-blue: #2c6db5` |
+| `--c-blue-2: #2a85d6` | `--c-blue-2: #5b9bd5` |
+| `--c-orange: #ea7c25` | `--c-mint: #2c9590` |
+| `--c-orange-2: #f08e3f` | `--c-mint-2: #5bc8c5` |
+| `--c-orange-soft: #fff2e6` | `--c-mint-soft: #e0f6f5` |
+
+LP の Gakudoor ブランドカラーと完全に揃え、印刷時の視認性も保ったやや深めのミント `#2c9590` を採用。
+
+### ページ別変更
+
+- **Page 1 / Cover**: PLDLマーク → Gakudoor ロゴ画像を配置。タイトルを「学童の連絡・出欠・お迎え管理を、スマホでやさしく一本化。」に。フッタを Service/Provider/Adoption の3行クレジット構造に
+- **Page 3 / Solutions**: 「PLDLの仕組みでできること」 → 「Gakudoorでできること」
+- **Page 4 / App Screens**: 「実際にPLDLが運用しているシステムのイメージ」 → 「Gakudoorの主要画面イメージ」
+- **Page 6**: 旧「現場を知らないIT会社ではありません（PLDL紹介）」を **Gakudoorのこだわり + 導入実績PLDL様** ハイブリッドに作り変え。Why Gakudoor の 4 ポイントカード + 採用団体カードを同一ページに収容
+- **Page 8 / Differentiation**: 比較表ヘッダ「PLDLの学童DX」 → 「Gakudoor」。「開発元: 教育現場を運営するNPO（PLDL）」 → 「開発・提供: 株式会社Rezon が開発・提供」、現場知見の行で「採用団体（NPO法人 PLDL）の運用実績を継続反映」に
+- **Page 9 / Pricing**: 「先着5施設」案内文を Rezon 名義に
+- **Page 10 / Flow**: ステップ4 のサポート言及を「株式会社Rezon へ直接ご相談」に
+- **Page 11 / Closing**: closing 文言を Gakudoor ベースに。signature を Service/Provider/Adoption 三層構造 + Gakudoor ロゴ表示に
+- **全ページフッタ**: `NPO法人 Playful Learning Design Lab.（PLDL）` → `Gakudoor / 株式会社Rezon` 表記に統一
+
+### 関連ファイル
+
+```
+変更: docs/pamphlet.html                          (2007 → 1456 行 / 全面リライト)
+変更: public/downloads/pldl-gakudo-pamphlet.pdf  (Chrome headless で再生成、2.24 MB)
+```
+
+PDF は Chrome のヘッドレスモードで HTML から自動生成。
+
+```
+"C:/Program Files/Google/Chrome/Application/chrome.exe" --headless --disable-gpu \
+  --print-to-pdf="public/downloads/pldl-gakudo-pamphlet.pdf" --no-margins \
+  "file:///C:/work/PLDL-LP/docs/pamphlet.html"
+```
+
+ファイル名 `pldl-gakudo-pamphlet.pdf` は `lp_settings.pamphlet_url` から参照されているのでそのまま維持。
+将来的に `gakudoor-pamphlet.pdf` 等へリネームする場合は同設定も合わせて更新が必要。
+
+---
+
+## 2026-05-04 (追補2)  Header / Hero ブランドロゴのサイズ制限不具合を修正
+
+`.lp-root img { max-width: 100%; height: auto }` のグローバルルール (specificity 0,1,1) が
+`.lp-header__brand-logo` 等 (specificity 0,1,0) に勝っていたため、画像が natural width
+(~1000px) まで膨張してヘッダーが画面いっぱいになる現象が発生。
+
+セレクタを `img.lp-header__brand-logo` / `img.lp-hero__brand` / `img.lp-brand-banner__img`
+に変更し specificity を揃え、ソース順で勝つよう修正。
+
+---
+
 ## 2026-05-04 (追補)  追加ロゴ・現場写真・ブランドバナー4枚を配置
 
 リブランド直後にユーザー追加提供のブランド画像を適材適所へ。
