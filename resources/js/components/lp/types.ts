@@ -12,4 +12,14 @@ export type LpSettings = {
     privacyPolicy: string;
     pamphletUrl: string;
     contactEndpoint: string;
+    lineLoginEnabled: boolean;
+    lineRedirectUrl: string;
+    lineProfile: LineProfile | null;
+    lineError: string | null;
+};
+
+export type LineProfile = {
+    user_id?: string;
+    name?: string;
+    email?: string | null;
 };

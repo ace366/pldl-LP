@@ -34,9 +34,10 @@ const readUtm = (): { utm_source?: string; utm_medium?: string; utm_campaign?: s
 };
 
 const ContactForm: React.FC<Props> = ({ settings }) => {
+    const lineProfile = settings.lineProfile;
     const [facility, setFacility] = useState('');
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [name, setName] = useState(lineProfile?.name ?? '');
+    const [email, setEmail] = useState(lineProfile?.email ?? '');
     const [tel, setTel] = useState('');
     const [childrenCount, setChildrenCount] = useState('');
     const [purpose, setPurpose] = useState('');
@@ -45,12 +46,25 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
     const [agree, setAgree] = useState(false);
     const [website, setWebsite] = useState(''); // honeypot — keep hidden, must stay empty
     const [policyOpen, setPolicyOpen] = useState(false);
+    const [lineLinked, setLineLinked] = useState<boolean>(!!lineProfile?.user_id);
 
     const [status, setStatus] = useState<Status>('idle');
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [serverMessage, setServerMessage] = useState('');
 
     const utm = useMemo(() => readUtm(), []);
+
+    // LINE Login で戻ってきた直後はフォームへ自動スクロール（URLハッシュ #contact のため）
+    useEffect(() => {
+        if (lineProfile?.user_id && typeof window !== 'undefined') {
+            const el = document.getElementById('contact');
+            if (el) {
+                // 描画後に少し遅らせてスクロール
+                setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 250);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         const onSelectPlan = (e: Event) => {
@@ -135,6 +149,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                     plan: plan || null,
                     message: message || null,
                     website, // honeypot
+                    line_user_id: lineProfile?.user_id || null,
                     ...utm,
                 }),
             });
@@ -160,6 +175,7 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
             setFacility(''); setName(''); setEmail(''); setTel('');
             setChildrenCount(''); setPurpose(''); setPlan(''); setMessage('');
             setAgree(false);
+            setLineLinked(false);
         } catch (err) {
             setStatus('error');
             setServerMessage('通信エラーが発生しました。時間を置いて再度お試しください。');
@@ -203,6 +219,44 @@ const ContactForm: React.FC<Props> = ({ settings }) => {
                 {status === 'error' && serverMessage && (
                     <div className="lp-alert lp-alert--error" role="alert">
                         {serverMessage}
+                    </div>
+                )}
+                {settings.lineError && (
+                    <div className="lp-alert lp-alert--error" role="alert">
+                        {settings.lineError}
+                    </div>
+                )}
+
+                {settings.lineLoginEnabled && !lineLinked && status !== 'success' && (
+                    <div className="lp-line-login">
+                        <a className="lp-btn lp-btn--line lp-btn--block" href={settings.lineRedirectUrl}>
+                            <span className="lp-btn__line-mark" aria-hidden="true">LINE</span>
+                            LINE で名前・メールを自動入力
+                        </a>
+                        <p className="lp-line-login__note">
+                            LINE 認可後、お名前と（許可いただける場合は）メールが自動入力されます。
+                            送信内容は問い合わせ目的でのみ使用します。
+                        </p>
+                    </div>
+                )}
+                {lineLinked && status !== 'success' && (
+                    <div className="lp-line-linked" role="status">
+                        <span className="lp-line-linked__icon" aria-hidden="true">✓</span>
+                        <span>
+                            LINE と連携しました
+                            {lineProfile?.name && <strong>（{lineProfile.name} 様）</strong>}
+                        </span>
+                        <button
+                            type="button"
+                            className="lp-line-linked__clear"
+                            onClick={() => {
+                                setLineLinked(false);
+                                setName(''); setEmail('');
+                            }}
+                            aria-label="LINE 連携情報をクリア"
+                        >
+                            ×
+                        </button>
                     </div>
                 )}
 

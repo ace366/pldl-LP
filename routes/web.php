@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\GakudoLpContactsAdminController;
 use App\Http\Controllers\Admin\LpSettingsController;
 use App\Http\Controllers\GakudoLpContactController;
+use App\Http\Controllers\LineAuthController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,12 @@ Route::get('/gakudo', [GakudoLpContactController::class, 'show'])
 Route::post('/gakudo/contact', [GakudoLpContactController::class, 'store'])
     ->middleware('throttle:5,1') // 1分あたり5回まで（IP単位）
     ->name('gakudo-lp.contact');
+
+// LINE Login (OAuth) — フォーム prefill 用
+Route::get('/auth/line/redirect', [LineAuthController::class, 'redirect'])
+    ->name('line.redirect');
+Route::get('/auth/line/callback', [LineAuthController::class, 'callback'])
+    ->name('line.callback');
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/lp-settings', [LpSettingsController::class, 'index'])

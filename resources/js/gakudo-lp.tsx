@@ -22,6 +22,10 @@ if (mount) {
         privacyPolicy: '',
         pamphletUrl: '',
         contactEndpoint: asset('/gakudo/contact'),
+        lineLoginEnabled: false,
+        lineRedirectUrl: '',
+        lineProfile: null,
+        lineError: null,
     };
 
     const raw = mount.getAttribute('data-settings');

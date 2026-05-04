@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'line_login' => [
+        'channel_id'     => env('LINE_LOGIN_CHANNEL_ID'),
+        'channel_secret' => env('LINE_LOGIN_CHANNEL_SECRET'),
+    ],
+
 ];

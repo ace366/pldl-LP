@@ -11,6 +11,63 @@
 
 ---
 
+## 2026-05-04 (追補6)  LINE Login (OAuth) 連携を実装
+
+問合せフォームに「LINE で名前・メールを自動入力」ボタンを追加。
+LINE Login OAuth を使い、LINE 認可後にユーザーの displayName / email / userId を取得して
+フォーム prefill するフロー。送信時には `line_user_id` も保存。
+
+### 仕組み
+
+1. 「LINE で名前・メールを自動入力」ボタン → `/auth/line/redirect`
+2. LINE の `https://access.line.me/oauth2/v2.1/authorize` へ送出（state, nonce 付与）
+3. ユーザー認可後、`/auth/line/callback` に `code` + `state` で戻る
+4. state 検証 → token endpoint で access_token + id_token に交換
+5. `/v2/profile` で displayName, userId 取得 + id_token JWT payload から email 抽出
+6. session に flash → `/gakudo#contact` リダイレクト → React 側で prefill
+
+### 関連ファイル
+
+```
+追加: app/Http/Controllers/LineAuthController.php
+追加: database/migrations/2026_05_04_000001_add_line_user_id_to_gakudo_lp_contacts.php
+変更: config/services.php                                       (line_login 設定追加)
+変更: routes/web.php                                            (line.redirect / line.callback)
+変更: app/Http/Controllers/GakudoLpContactController.php        (line prefill 受け渡し + line_user_id 保存)
+変更: app/Models/GakudoLpContact.php                            (fillable に line_user_id)
+変更: resources/js/components/lp/types.ts                       (LineProfile 型追加)
+変更: resources/js/components/lp/ContactForm.tsx                (LINE ボタン + prefill + linked 状態)
+変更: resources/js/gakudo-lp.tsx                                (デフォルト値追加)
+変更: resources/css/app.css                                     (LINE ボタン #06C755 + linked 表示)
+```
+
+### 必要な環境変数
+
+`.env` に以下を追加（ローカル + 本番）:
+
+```
+LINE_LOGIN_CHANNEL_ID=2009335487
+LINE_LOGIN_CHANNEL_SECRET=552bc56d8ac942f4a214131b5795cf84
+```
+
+未設定時はボタン非表示・UX への影響なし（feature flag として動作）。
+
+### LINE Developers Console 側で必要な設定
+
+- LINE Login channel に **Callback URL** を登録:
+  - 本番: `https://top-ace-picard.sakura.ne.jp/pldl-lp/auth/line/callback`
+  - ローカル開発: `http://127.0.0.1:8000/auth/line/callback`
+- email 取得を有効にする場合は「Email address permission」をリクエスト（要審査）
+
+### セキュリティメモ
+
+- `state` は session に保存して CSRF 対策
+- `id_token` は HS256 署名検証は **未実装**（直接 token endpoint から取得しているため中間者リスクは低い）。
+  email prefill 用途のため payload decode のみ。本番でログイン認証等に使う場合は HMAC-SHA256 検証 + aud/iss/exp 検証を追加すること
+- `line_user_id` は `gakudo_lp_contacts.line_user_id` (string 64) に保存
+
+---
+
 ## 2026-05-04 (追補5)  スクロール連動アニメーションを追加
 
 LPの各ブロック・写真がスクロールに合わせて順次フェードインするように改修。

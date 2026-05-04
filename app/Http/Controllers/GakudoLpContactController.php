@@ -13,12 +13,16 @@ use Illuminate\Validation\Rule;
 
 class GakudoLpContactController extends Controller
 {
-    public function show()
+    public function show(Request $request)
     {
         $settings = LpSetting::allCached();
 
         $bool = fn ($k) => isset($settings[$k]) && $settings[$k]['value'] === '1';
         $val  = fn ($k, $d = '') => $settings[$k]['value'] ?? $d;
+
+        // LINE Login で持ち越した prefill 情報（あれば）
+        $lineProfile = $request->session()->get('line_profile');
+        $lineError   = $request->session()->get('line_error');
 
         $payload = [
             'lineConsultUrl'      => $val('line_consult_url'),
@@ -35,6 +39,10 @@ class GakudoLpContactController extends Controller
             'privacyPolicy'       => $val('privacy_policy'),
             'pamphletUrl'         => $val('pamphlet_url'),
             'contactEndpoint'     => route('gakudo-lp.contact'),
+            'lineLoginEnabled'    => (bool) config('services.line_login.channel_id'),
+            'lineRedirectUrl'     => route('line.redirect'),
+            'lineProfile'         => is_array($lineProfile) ? $lineProfile : null,
+            'lineError'           => is_string($lineError) ? $lineError : null,
         ];
 
         return view('gakudo-lp.index', [
@@ -80,6 +88,7 @@ class GakudoLpContactController extends Controller
             'utm_source'     => ['nullable', 'string', 'max:100'],
             'utm_medium'     => ['nullable', 'string', 'max:100'],
             'utm_campaign'   => ['nullable', 'string', 'max:100'],
+            'line_user_id'   => ['nullable', 'string', 'max:64'],
         ]);
 
         $contact = GakudoLpContact::create(array_merge($validated, [

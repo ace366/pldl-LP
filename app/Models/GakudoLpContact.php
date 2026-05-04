@@ -30,6 +30,7 @@ class GakudoLpContact extends Model
         'utm_source',
         'utm_medium',
         'utm_campaign',
+        'line_user_id',
         'ip_address',
         'user_agent',
     ];

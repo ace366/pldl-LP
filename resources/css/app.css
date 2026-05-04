@@ -162,6 +162,32 @@
 }
 .lp-btn--ghost:hover { background: var(--lp-color-bg-soft); }
 
+/* LINE ブランドカラー (#06C755) */
+.lp-btn--line {
+    background: #06c755;
+    color: #ffffff;
+    border-color: #06c755;
+    gap: 10px;
+}
+.lp-btn--line:hover {
+    background: #04a043;
+    border-color: #04a043;
+    color: #ffffff;
+}
+.lp-btn__line-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .2);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .04em;
+}
+
 .lp-btn--lg { padding: 14px 24px; font-size: 16px; }
 .lp-btn--sm { padding: 8px 14px; font-size: 13px; }
 .lp-btn--block { width: 100%; }
@@ -1615,6 +1641,61 @@ img.lp-hero__brand {
     cursor: pointer;
 }
 .lp-plan-banner__clear:hover { background: rgba(0,0,0,.05); color: var(--lp-color-text); }
+
+/* LINE Login section */
+.lp-line-login {
+    margin-bottom: 16px;
+    padding: 16px 18px;
+    background: #f0fdf4;
+    border: 1px solid #c4f1d6;
+    border-radius: var(--lp-radius-sm);
+}
+.lp-line-login__note {
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: var(--lp-color-soft);
+    line-height: 1.7;
+}
+.lp-line-linked {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: var(--lp-radius-sm);
+    color: #065f46;
+    font-size: 14px;
+}
+.lp-line-linked strong { font-weight: 700; }
+.lp-line-linked__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #06c755;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+.lp-line-linked__clear {
+    margin-left: auto;
+    background: transparent;
+    border: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 18px;
+    line-height: 1;
+    color: #065f46;
+    cursor: pointer;
+}
+.lp-line-linked__clear:hover { background: rgba(0,0,0,.06); }
 
 .lp-notice {
     background: #fffbeb;
