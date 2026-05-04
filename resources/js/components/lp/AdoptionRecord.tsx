@@ -1,4 +1,5 @@
 import React from 'react';
+import { asset } from '../../lib/asset';
 
 const AdoptionRecord: React.FC = () => {
     return (
@@ -13,26 +14,36 @@ const AdoptionRecord: React.FC = () => {
                 </header>
 
                 <article className="lp-adoption">
-                    <div className="lp-adoption__head">
-                        <span className="lp-adoption__pill">採用団体</span>
-                        <h3 className="lp-adoption__name">
-                            NPO法人 Playful Learning Design Lab.（PLDL）様
-                        </h3>
+                    <figure className="lp-adoption__scene">
+                        <img
+                            src={asset('/images/gakudoor-scene.png')}
+                            alt="学童の現場で Gakudoor が活用されているイメージ"
+                            loading="lazy"
+                        />
+                    </figure>
+
+                    <div className="lp-adoption__body-wrap">
+                        <div className="lp-adoption__head">
+                            <span className="lp-adoption__pill">採用団体</span>
+                            <h3 className="lp-adoption__name">
+                                NPO法人 Playful Learning Design Lab.（PLDL）様
+                            </h3>
+                        </div>
+                        <p className="lp-adoption__body">
+                            Gakudoorは、NPO法人 Playful Learning Design Lab.（PLDL）様に採用いただき、
+                            実際の学童運営の現場で活用されています。
+                            現場での運用を通じて、保護者連絡・出欠確認・お迎え管理など、
+                            日々の業務に合う形で改善を重ねています。
+                        </p>
+                        <a
+                            className="lp-adoption__link"
+                            href="https://pldl.or.jp/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            NPO法人 Playful Learning Design Lab. 公式サイト →
+                        </a>
                     </div>
-                    <p className="lp-adoption__body">
-                        Gakudoorは、NPO法人 Playful Learning Design Lab.（PLDL）様に採用いただき、
-                        実際の学童運営の現場で活用されています。
-                        現場での運用を通じて、保護者連絡・出欠確認・お迎え管理など、
-                        日々の業務に合う形で改善を重ねています。
-                    </p>
-                    <a
-                        className="lp-adoption__link"
-                        href="https://pldl.or.jp/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        NPO法人 Playful Learning Design Lab. 公式サイト →
-                    </a>
                 </article>
 
                 <p className="lp-adoption__caution">

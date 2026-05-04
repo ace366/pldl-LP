@@ -9,13 +9,14 @@ const Hero: React.FC<Props> = ({ settings }) => {
         <section className="lp-hero" id="top">
             <div className="lp-container">
                 <div>
-                    <div className="lp-hero__logo">
-                        <img src={asset('/images/gakudoor-logo.png')} alt="Gakudoor（ガクドア）ロゴ" width="64" height="64" />
-                        <span className="lp-hero__logo-name">
-                            Gakudoor
-                            <span>ガクドア｜学童運営支援システム</span>
-                        </span>
-                    </div>
+                    <img
+                        className="lp-hero__brand"
+                        src={asset('/images/gakudoor-brand-stack.png')}
+                        alt="Gakudoor（ガクドア）"
+                        width="320"
+                        height="180"
+                    />
+                    <p className="lp-hero__brand-sub">ガクドア｜学童運営支援システム</p>
 
                     <div className="lp-hero__badges">
                         <span className="lp-badge">スマホで完結</span>

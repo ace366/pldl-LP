@@ -11,6 +11,7 @@ import AfterEffects from '../components/lp/AfterEffects';
 import Differentiation from '../components/lp/Differentiation';
 import AdoptionRecord from '../components/lp/AdoptionRecord';
 import Pricing from '../components/lp/Pricing';
+import BrandBanner from '../components/lp/BrandBanner';
 import ContactForm from '../components/lp/ContactForm';
 import Footer from '../components/lp/Footer';
 import type { LpSettings } from '../components/lp/types';
@@ -37,6 +38,7 @@ const GakudoLp: React.FC<Props> = ({ settings }) => {
                 <Differentiation />
                 <AdoptionRecord />
                 <Pricing settings={settings} />
+                <BrandBanner />
                 <ContactForm settings={settings} />
             </main>
             <Footer />

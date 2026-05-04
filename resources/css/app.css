@@ -159,35 +159,24 @@
     color: var(--lp-color-text);
     flex-shrink: 0;
 }
-.lp-header__brand-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-}
-.lp-header__brand-mark img {
-    width: 100%;
-    height: 100%;
+.lp-header__brand-logo {
+    height: 36px;
+    width: auto;
     object-fit: contain;
-}
-.lp-header__brand-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.15;
-}
-.lp-header__brand-name {
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: .02em;
-    color: var(--lp-color-primary-strong);
+    display: block;
 }
 .lp-header__brand-sub {
-    font-size: 10px;
+    display: none;
+    font-size: 11px;
     color: var(--lp-color-soft);
     font-weight: 600;
     letter-spacing: .04em;
+    border-left: 1px solid var(--lp-color-border);
+    padding-left: 10px;
+    line-height: 1.2;
+}
+@media (min-width: 720px) {
+    .lp-header__brand-sub { display: inline-block; }
 }
 .lp-header__nav { display: none; flex: 1; }
 .lp-header__nav ul {
@@ -253,7 +242,7 @@
 .lp-header__nav.is-open a { padding: 12px; font-size: 15px; }
 
 @media (min-width: 880px) {
-    .lp-header__brand-name { font-size: 20px; }
+    .lp-header__brand-logo { height: 40px; }
     .lp-header__nav { display: block; }
     .lp-header__cta { display: flex; }
     .lp-header__burger { display: none; }
@@ -362,30 +351,19 @@
     letter-spacing: .04em;
 }
 .lp-hero__adoption strong { color: var(--lp-color-text); font-weight: 700; }
-.lp-hero__logo {
-    margin: 0 0 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.lp-hero__logo img {
-    width: 64px;
-    height: 64px;
+.lp-hero__brand {
+    display: block;
+    width: clamp(220px, 60vw, 320px);
+    height: auto;
+    margin: 0 0 4px;
     object-fit: contain;
 }
-.lp-hero__logo-name {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--lp-color-primary-strong);
-    line-height: 1.1;
-}
-.lp-hero__logo-name span {
-    display: block;
-    font-size: 11px;
+.lp-hero__brand-sub {
+    margin: 0 0 18px;
+    font-size: 12px;
     color: var(--lp-color-soft);
     font-weight: 600;
-    margin-top: 2px;
-    letter-spacing: .04em;
+    letter-spacing: .06em;
 }
 
 .lp-hero__visual {
@@ -1605,9 +1583,29 @@
     background: linear-gradient(135deg, rgba(91,155,213,.12), rgba(91,200,197,.10));
     border: 1px solid rgba(91,155,213,.25);
     border-radius: var(--lp-radius);
-    padding: 28px;
+    padding: 0;
+    overflow: hidden;
     display: grid;
-    gap: 20px;
+    gap: 0;
+}
+.lp-adoption__scene {
+    margin: 0;
+    background: #fff;
+}
+.lp-adoption__scene img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+.lp-adoption__body-wrap {
+    padding: 24px;
+    display: grid;
+    gap: 14px;
+}
+@media (min-width: 720px) {
+    .lp-adoption__scene img { height: 260px; }
+    .lp-adoption__body-wrap { padding: 32px; }
 }
 .lp-adoption__head {
     display: flex;
@@ -1658,8 +1656,38 @@
     font-size: 12px;
 }
 
-@media (min-width: 720px) {
-    .lp-adoption { padding: 36px; }
+/* ---------- Brand banner (Pricing → Contact 間) ---------- */
+.lp-brand-banner {
+    padding: 32px 0;
+    background:
+        radial-gradient(800px 220px at 80% 50%, rgba(91,200,197,.16), transparent 70%),
+        radial-gradient(800px 220px at 20% 50%, rgba(91,155,213,.14), transparent 70%),
+        var(--lp-color-bg);
+}
+.lp-brand-banner__inner {
+    max-width: var(--lp-container);
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+.lp-brand-banner__img {
+    display: block;
+    margin: 0 auto;
+    max-width: min(100%, 520px);
+    height: auto;
+    border-radius: var(--lp-radius);
+}
+.lp-brand-banner__caption {
+    margin: 14px auto 0;
+    color: var(--lp-color-muted);
+    font-size: 14px;
+    max-width: 36em;
+    line-height: 1.8;
+}
+.lp-brand-banner__caption strong { color: var(--lp-color-primary-strong); font-weight: 800; }
+
+@media (min-width: 880px) {
+    .lp-brand-banner { padding: 56px 0; }
 }
 
 /* ---------- Footer ---------- */

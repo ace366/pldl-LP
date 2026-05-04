@@ -11,6 +11,45 @@
 
 ---
 
+## 2026-05-04 (追補)  追加ロゴ・現場写真・ブランドバナー4枚を配置
+
+リブランド直後にユーザー追加提供のブランド画像を適材適所へ。
+
+### 配置
+
+| 画像 | ファイル名 | 配置先 | 役割 |
+|---|---|---|---|
+| 横長ロゴ（G + GAKUDOOR） | `public/images/gakudoor-logo-horizontal.png` | Header | 横並びロゴで Header 表示 |
+| 縦ロゴ大（G + GAKUDOOR スタック） | `public/images/gakudoor-brand-stack.png` | Hero | メインビジュアルとして大きく表示 |
+| 現場シーン写真（学童風景 + Gマーク） | `public/images/gakudoor-scene.png` | AdoptionRecord | 「実際に使われている」説得力を補強 |
+| 横長ブランドバナー | `public/images/gakudoor-banner.png` | BrandBanner（新セクション） | Pricing → Contact 間にブランド再想起 |
+
+### 主な変更
+- `Header.tsx`: 個別 img+text → 横長ロゴ画像 1 枚 + サブタイトル「学童運営支援システム」（720px+ で表示）
+- `Hero.tsx`: 小さい縦並びブランド表記 → 縦ロゴ画像（最大 320px）+ ガクドア｜学童運営支援システムの小キャプション
+- `AdoptionRecord.tsx`: 採用団体カードに `<figure>` でシーン写真を上部に配置（200-260px の object-fit: cover）
+- `BrandBanner.tsx` 新設: Pricing と ContactForm の間に挟むブランド再想起セクション。淡いラジアルグラデ背景 + 中央配置のロゴバナー + 1 行キャッチ
+- CSS: `.lp-header__brand-logo` / `.lp-hero__brand` / `.lp-adoption__scene` / `.lp-brand-banner__*` を追加。旧 `.lp-header__brand-mark`, `.lp-hero__logo*` 関連のスタイルは削除
+
+### 関連ファイル
+```
+追加: public/images/gakudoor-logo-horizontal.png
+追加: public/images/gakudoor-brand-stack.png
+追加: public/images/gakudoor-scene.png
+追加: public/images/gakudoor-banner.png
+追加: resources/js/components/lp/BrandBanner.tsx
+変更: resources/js/components/lp/Header.tsx
+変更: resources/js/components/lp/Hero.tsx
+変更: resources/js/components/lp/AdoptionRecord.tsx
+変更: resources/js/pages/GakudoLp.tsx
+変更: resources/css/app.css
+```
+
+ビルド成果物 `GakudoLp-*.js` に 4 画像パスすべて埋め込まれていることを確認済み。
+オリジナルの `gakudoor-logo.png`（小ロゴ）は OGP / favicon 用としてそのまま残置。
+
+---
+
 ## 2026-05-04  LP リブランド: Gakudoor（ガクドア）として整理
 
 学童システムを正式に「**Gakudoor（ガクドア）**」として位置付け、LP・OGP・メール・フッター・テーマ色を一括刷新。

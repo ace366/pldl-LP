@@ -27,13 +27,14 @@ const Header: React.FC<Props> = ({ settings }) => {
         <header className={`lp-header${scrolled ? ' is-scrolled' : ''}`}>
             <div className="lp-header__inner">
                 <a href="#top" className="lp-header__brand" aria-label="Gakudoor（ガクドア）トップへ">
-                    <span className="lp-header__brand-mark" aria-hidden="true">
-                        <img src={asset('/images/gakudoor-logo.png')} alt="" width="40" height="40" />
-                    </span>
-                    <span className="lp-header__brand-text">
-                        <span className="lp-header__brand-name">Gakudoor</span>
-                        <span className="lp-header__brand-sub">学童運営支援システム</span>
-                    </span>
+                    <img
+                        className="lp-header__brand-logo"
+                        src={asset('/images/gakudoor-logo-horizontal.png')}
+                        alt="Gakudoor（ガクドア）"
+                        width="180"
+                        height="40"
+                    />
+                    <span className="lp-header__brand-sub">学童運営支援システム</span>
                 </a>
 
                 <nav className={`lp-header__nav${open ? ' is-open' : ''}`}>
