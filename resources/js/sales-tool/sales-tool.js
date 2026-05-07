@@ -1,33 +1,80 @@
 /* =====================================================================
    PLDL 営業リスト管理ツール
-   - 完全フロントエンド・localStorage 保管・Laravel 本体に依存しない
+   - 認証必須・サーバー DB 共有保存（/admin/api/sales）
+   - フィルタ UI 状態と都市キャッシュのみ localStorage を使う
    ===================================================================== */
 (function () {
     'use strict';
 
     // --------------------------------------------------------------
-    // Storage
+    // Page-injected config (from <body data-*>)
     // --------------------------------------------------------------
-    const STORAGE_KEY = 'pldl_sales_list_v1';
-    const FILTERS_KEY = 'pldl_sales_filters_v1';
+    const BODY = document.body;
+    const APP_URL    = (BODY?.dataset.appUrl    || '').replace(/\/$/, '');
+    const API_BASE   = (BODY?.dataset.apiBase   || (APP_URL + '/admin/api/sales')).replace(/\/$/, '');
+    const PLACES_URL = BODY?.dataset.placesUrl || (APP_URL + '/sales-tool/places.php');
+    const PROXY_URL  = BODY?.dataset.proxyUrl  || (APP_URL + '/sales-tool/proxy.php');
+    const LOGIN_URL  = BODY?.dataset.loginUrl  || (APP_URL + '/login');
 
-    /** @returns {Array<Item>} */
-    function loadAll() {
+    function csrfToken() {
+        const m = document.querySelector('meta[name="csrf-token"]');
+        return m ? m.getAttribute('content') : '';
+    }
+
+    /**
+     * 共通 fetch ラッパー。
+     * - 401 を検知したら /login にリダイレクト（intended で戻す）。
+     * - 422 は呼び出し側で扱えるように throw する。
+     */
+    async function apiFetch(path, opts) {
+        opts = opts || {};
+        opts.credentials = 'same-origin';
+        opts.headers = Object.assign({
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': csrfToken(),
+        }, opts.headers || {});
+        if (opts.body && typeof opts.body !== 'string' && !(opts.body instanceof FormData)) {
+            opts.body = JSON.stringify(opts.body);
+            opts.headers['Content-Type'] = 'application/json';
+        }
+        const url = path.startsWith('http') ? path : (API_BASE + path);
+        const res = await fetch(url, opts);
+        if (res.status === 401) {
+            const here = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.href = LOGIN_URL + (LOGIN_URL.includes('?') ? '&' : '?') + 'intended=' + here;
+            // 永遠に await し続けることでこの先のコードは走らない
+            return new Promise(() => {});
+        }
+        if (!res.ok) {
+            let payload = null;
+            try { payload = await res.json(); } catch {}
+            const err = new Error(payload?.message || ('HTTP ' + res.status));
+            err.status = res.status;
+            err.payload = payload;
+            throw err;
+        }
+        // 204 (no content) などのケース
+        const ct = res.headers.get('content-type') || '';
+        return ct.includes('application/json') ? res.json() : null;
+    }
+
+    /** サーバーから全件取得。 @returns {Promise<Array<Item>>} */
+    async function loadAll() {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return [];
-            const parsed = JSON.parse(raw);
-            return Array.isArray(parsed) ? parsed : [];
+            const data = await apiFetch('/');
+            return Array.isArray(data?.items) ? data.items : [];
         } catch (e) {
-            console.warn('localStorage 読み込み失敗', e);
+            console.warn('loadAll 失敗', e);
+            showToast('一覧の読み込みに失敗しました');
             return [];
         }
     }
 
-    /** @param {Array<Item>} items */
-    function saveAll(items) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    }
+    // --------------------------------------------------------------
+    // Filters localStorage (UI 設定はサーバー保存しない)
+    // --------------------------------------------------------------
+    const FILTERS_KEY = 'pldl_sales_filters_v1';
 
     function loadFilters() {
         try {
@@ -122,11 +169,10 @@
     //   - skillScore: 0..10 based on tech-quality signals
     //   - skillLevel: high / mid / low
     // --------------------------------------------------------------
-    // First entry is same-origin (Laravel-side proxy.php). When the tool
-    // is opened via file:// or another origin, that endpoint is missing,
-    // so allorigins.win is kept as a public fallback.
+    // First entry is same-origin (Laravel-side proxy.php).
+    // allorigins.win is kept as a public fallback for hosts that block our IP.
     const PROXY_ENDPOINTS = [
-        'proxy.php?url=',
+        PROXY_URL + '?url=',
         'https://api.allorigins.win/get?url=',
     ];
 
@@ -607,10 +653,10 @@
     }
 
     // --------------------------------------------------------------
-    // State
+    // State (loadAll は async なので初期は空、init() で埋める)
     // --------------------------------------------------------------
     /** @type {Array<Item>} */
-    let items = loadAll();
+    let items = [];
 
     const filters = {
         q: '',
@@ -897,28 +943,80 @@
         return items.find((it) => it.id === id) || null;
     }
 
-    function addItem(data) {
-        const item = Object.assign({
-            id: uid(),
-            createdAt: nowIso(),
-        }, data, { updatedAt: nowIso() });
-        items.unshift(item);
-        saveAll(items);
-        render();
+    async function addItem(data) {
+        const payload = sanitizeForApi(data);
+        try {
+            const res = await apiFetch('/', { method: 'POST', body: payload });
+            if (res?.item) {
+                items.unshift(res.item);
+                render();
+            }
+            return res?.item;
+        } catch (err) {
+            handleApiError(err, '保存に失敗しました');
+            return null;
+        }
     }
 
-    function updateItem(id, patch) {
+    async function updateItem(id, patch) {
         const idx = items.findIndex((it) => it.id === id);
         if (idx < 0) return;
-        items[idx] = Object.assign({}, items[idx], patch, { updatedAt: nowIso() });
-        saveAll(items);
-        render();
+        const merged = Object.assign({}, items[idx], patch);
+        const payload = sanitizeForApi(merged);
+        try {
+            const res = await apiFetch('/' + encodeURIComponent(id), { method: 'PUT', body: payload });
+            if (res?.item) {
+                items[idx] = res.item;
+                render();
+            }
+        } catch (err) {
+            handleApiError(err, '更新に失敗しました');
+        }
     }
 
-    function deleteItem(id) {
-        items = items.filter((it) => it.id !== id);
-        saveAll(items);
-        render();
+    async function deleteItem(id) {
+        try {
+            await apiFetch('/' + encodeURIComponent(id), { method: 'DELETE' });
+            items = items.filter((it) => it.id !== id);
+            render();
+        } catch (err) {
+            handleApiError(err, '削除に失敗しました');
+        }
+    }
+
+    /**
+     * API に送るためにサーバー側 FormRequest が受け付けるキーだけに絞る。
+     * id / createdAt / updatedAt は不要（サーバーが採番・更新）。
+     */
+    function sanitizeForApi(data) {
+        const out = {};
+        const allow = [
+            'facility','prefecture','city','address','phone','email',
+            'websiteUrl','contactFormUrl','gmapUrl','type',
+            'priority','status','memo','firstSentAt','nextActionAt','analysis',
+        ];
+        allow.forEach((k) => {
+            if (data[k] !== undefined && data[k] !== null && data[k] !== '') {
+                out[k] = data[k];
+            }
+        });
+        return out;
+    }
+
+    function handleApiError(err, fallbackMsg) {
+        console.error(err);
+        let msg = fallbackMsg || 'エラーが発生しました';
+        if (err?.payload?.errors) {
+            const fields = Object.keys(err.payload.errors);
+            if (fields.length > 0) {
+                const first = fields[0];
+                const detail = err.payload.errors[first];
+                msg = `入力エラー (${first}): ` + (Array.isArray(detail) ? detail[0] : detail);
+            }
+        } else if (err?.payload?.message) {
+            msg = err.payload.message;
+        }
+        showToast(msg);
     }
 
     // --------------------------------------------------------------
@@ -983,106 +1081,88 @@
     }
 
     // --------------------------------------------------------------
-    // Export / Import
+    // Export / Import — サーバー側で生成したファイルをダウンロード
     // --------------------------------------------------------------
     function exportJson() {
-        const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
-        const stamp = todayStr();
-        triggerDownload(blob, `pldl-sales-list-${stamp}.json`);
-        showToast('JSON を書き出しました');
+        window.location.href = API_BASE + '/export.json';
     }
 
     function exportCsv() {
-        const cols = [
-            ['facility','施設名'],
-            ['prefecture','都道府県'],
-            ['city','市区町村'],
-            ['address','住所'],
-            ['phone','電話番号'],
-            ['email','メールアドレス'],
-            ['websiteUrl','Webサイト'],
-            ['contactFormUrl','問い合わせフォーム'],
-            ['gmapUrl','GoogleMap'],
-            ['type','種別'],
-            ['priority','優先度'],
-            ['status','ステータス'],
-            ['memo','メモ'],
-            ['firstSentAt','初回送信日'],
-            ['nextActionAt','次回対応日'],
-            ['createdAt','作成日'],
-            ['updatedAt','更新日'],
-        ];
-        const csvEscape = (v) => {
-            const s = String(v == null ? '' : v).replace(/\r?\n/g, ' ');
-            if (/[",]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
-            return s;
-        };
-        const lines = [];
-        lines.push(cols.map((c) => csvEscape(c[1])).join(','));
-        items.forEach((it) => {
-            lines.push(cols.map((c) => csvEscape(it[c[0]])).join(','));
-        });
-        // BOM 付きで Excel が文字化けしないように
-        const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
-        const stamp = todayStr();
-        triggerDownload(blob, `pldl-sales-list-${stamp}.csv`);
-        showToast('CSV を書き出しました');
-    }
-
-    function triggerDownload(blob, filename) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 500);
+        window.location.href = API_BASE + '/export.csv';
     }
 
     function importJson(file) {
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function (e) {
+        reader.onload = async function (e) {
             try {
                 const parsed = JSON.parse(String(e.target.result));
                 if (!Array.isArray(parsed)) throw new Error('JSON ルートが配列ではありません');
 
+                let mode = 'append';
                 if (items.length > 0) {
                     const choice = window.prompt(
-                        '取り込み方法を選んでください。\n  1: 上書き（既存を全削除）\n  2: 追加（id 重複は新IDで追加）\n  キャンセルで中止',
+                        '取り込み方法を選んでください。\n  1: 上書き（既存を全削除）\n  2: 追加（既存と「施設名+住所」が重複する場合は中断します）\n  キャンセルで中止',
                         '2'
                     );
                     if (choice == null) return;
-                    if (choice.trim() === '1') {
-                        items = [];
-                    }
+                    mode = choice.trim() === '1' ? 'overwrite' : 'append';
                 }
 
-                const existingIds = new Set(items.map((i) => i.id));
-                let added = 0;
-                parsed.forEach((row) => {
-                    if (!row || typeof row !== 'object') return;
-                    const newRow = Object.assign({}, row);
-                    if (!newRow.id || existingIds.has(newRow.id)) {
-                        newRow.id = uid();
-                    }
-                    if (!newRow.facility) return; // skip empty
-                    newRow.createdAt = newRow.createdAt || nowIso();
-                    newRow.updatedAt = nowIso();
-                    items.unshift(newRow);
-                    existingIds.add(newRow.id);
-                    added++;
-                });
-                saveAll(items);
-                render();
-                showToast(`${added} 件取り込みました`);
+                const cleaned = parsed
+                    .filter((r) => r && typeof r === 'object' && r.facility)
+                    .map((r) => sanitizeForApi(r));
+
+                await bulkImport(mode, cleaned, 'JSON');
             } catch (err) {
                 console.error(err);
                 alert('JSON の取り込みに失敗しました: ' + err.message);
             }
         };
         reader.readAsText(file, 'utf-8');
+    }
+
+    /**
+     * サーバーへ bulk-import を送る。重複は 422 で返ってくるので detailed report を表示。
+     */
+    async function bulkImport(mode, cleanedItems, sourceLabel) {
+        if (!cleanedItems.length) {
+            showToast('取り込めるアイテムがありません');
+            return false;
+        }
+        try {
+            const res = await apiFetch('/bulk-import', {
+                method: 'POST',
+                body: { mode, items: cleanedItems },
+            });
+            // 成功（201）: items を再取得してレンダ
+            items = await loadAll();
+            render();
+            showToast(`${res?.imported ?? cleanedItems.length} 件 取り込みました（${mode === 'overwrite' ? '上書き' : '追加'}）`);
+            return true;
+        } catch (err) {
+            if (err?.status === 422 && err?.payload?.errors) {
+                const e2 = err.payload.errors;
+                const lines = [];
+                lines.push(`${sourceLabel} 取り込み失敗: 重複が見つかりました。`);
+                if (e2.payload_duplicates?.length) {
+                    lines.push(`■ ファイル内重複 ${e2.payload_duplicates.length} 件:`);
+                    e2.payload_duplicates.slice(0, 10).forEach((d) => {
+                        lines.push(`  - ${d.facility} / ${d.address}`);
+                    });
+                }
+                if (e2.server_duplicates?.length) {
+                    lines.push(`■ 既存と重複 ${e2.server_duplicates.length} 件:`);
+                    e2.server_duplicates.slice(0, 10).forEach((d) => {
+                        lines.push(`  - ${d.facility} / ${d.address}`);
+                    });
+                }
+                alert(lines.join('\n'));
+                return false;
+            }
+            handleApiError(err, '取り込みに失敗しました');
+            return false;
+        }
     }
 
     // --------------------------------------------------------------
@@ -1151,7 +1231,7 @@
     });
 
     // Form submit
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = readForm();
         if (!data.facility) {
@@ -1160,22 +1240,22 @@
         }
         if (data.id) {
             const { id, ...patch } = data;
-            updateItem(id, patch);
+            await updateItem(id, patch);
             showToast('更新しました');
         } else {
             const { id, ...payload } = data;
-            addItem(payload);
-            showToast('追加しました');
+            const created = await addItem(payload);
+            if (created) showToast('追加しました');
         }
         closeModal();
     });
 
     // Delete in modal
-    el('btn-delete').addEventListener('click', () => {
+    el('btn-delete').addEventListener('click', async () => {
         const id = form.elements['id'].value;
         if (!id) return;
         if (!window.confirm('この施設を削除します。よろしいですか？')) return;
-        deleteItem(id);
+        await deleteItem(id);
         closeModal();
         showToast('削除しました');
     });
@@ -1444,7 +1524,7 @@
         setSearchStatus('検索中…', 'loading');
 
         try {
-            const res = await fetch('places.php?query=' + encodeURIComponent(q) + '&total=' + count, { cache: 'no-store' });
+            const res = await fetch(PLACES_URL + '?query=' + encodeURIComponent(q) + '&total=' + count, { cache: 'no-store' });
             const data = await res.json();
             if (!res.ok) {
                 throw new Error(data?.error || ('HTTP ' + res.status));
@@ -1531,7 +1611,7 @@
             const sug = suggestPriority(item);
             if (sug) item.priority = sug;
 
-            addItem(item);
+            await addItem(item);
             added++;
         }
 
@@ -1716,7 +1796,7 @@
      */
     async function findPlaceForRow(row) {
         const query = [row.facility, row.address].filter(Boolean).join(' ');
-        const res = await fetch('places.php?query=' + encodeURIComponent(query) + '&pageSize=5', { cache: 'no-store' });
+        const res = await fetch(PLACES_URL + '?query=' + encodeURIComponent(query) + '&pageSize=5', { cache: 'no-store' });
         const data = await res.json();
         if (!res.ok || !Array.isArray(data.places)) {
             throw new Error(data?.error || ('Places HTTP ' + res.status));
@@ -1867,7 +1947,7 @@
             const sug = suggestPriority(item);
             if (sug) item.priority = sug;
 
-            addItem(item);
+            await addItem(item);
             added++;
             if (hasEmail) mailFound++;
             if (hasForm)  formFound++;
@@ -1911,8 +1991,12 @@
         setTimeout(() => { el('btn-csv-cancel').disabled = false; }, 1000);
     });
 
-    // Initial render
-    render();
+    // Initial load — サーバーから取得してから初回レンダリング
+    (async function init() {
+        render(); // 一度空でレンダ（empty state を即時表示）
+        items = await loadAll();
+        render();
+    })();
 })();
 
 /**

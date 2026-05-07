@@ -6,11 +6,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>営業リスト | PLDL Sales Tool</title>
 <meta name="robots" content="noindex,nofollow">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=noto-sans-jp:400,500,700,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/sales-tool.css?v=13">
+@vite(['resources/css/sales-tool.css', 'resources/js/sales-tool/sales-tool.js'])
 </head>
-<body>
+<body
+    data-app-url="{{ rtrim(config('app.url'), '/') }}"
+    data-api-base="{{ url('/admin/api/sales') }}"
+    data-places-url="{{ url('/sales-tool/places.php') }}"
+    data-proxy-url="{{ url('/sales-tool/proxy.php') }}"
+    data-login-url="{{ route('login') }}"
+>
 
 <!-- ========== Header ========== -->
 <header class="app-header">
@@ -20,6 +27,7 @@
             <span class="brand-text">営業リスト管理</span>
         </div>
         <nav class="app-header__nav">
+            <a href="{{ route('admin.lp-settings.index') }}" class="btn btn--ghost btn--sm" title="LP設定へ戻る">← LP設定</a>
             <button type="button" class="btn btn--ghost btn--sm" id="btn-export-json" title="JSON 書き出し">JSON 書き出し</button>
             <button type="button" class="btn btn--ghost btn--sm" id="btn-import-json" title="JSON 取り込み">JSON 取り込み</button>
             <button type="button" class="btn btn--ghost btn--sm" id="btn-export-csv" title="CSV 書き出し">CSV 書き出し</button>
@@ -382,6 +390,5 @@
 <!-- ========== Toast ========== -->
 <div class="toast" id="toast" hidden></div>
 
-<script src="assets/sales-tool.js?v=13"></script>
 </body>
 </html>

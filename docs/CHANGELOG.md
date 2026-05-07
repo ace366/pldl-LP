@@ -11,6 +11,80 @@
 
 ---
 
+## 2026-05-07 13:30 JST  uncommitted  営業リスト管理ツールをログイン式・サーバーDB保存に拡張
+
+旧 `public/sales-tool/`（localStorage 保管・認証なし）を Laravel 管理画面配下に移行。
+全ユーザー共有の DB テーブル `sales_entries` と CRUD/Import/Export API を追加。フロントは
+従来の vanilla JS UI を維持しつつ storage 層だけ API 呼び出しに差し替え。
+
+### 仕組み
+- 画面 URL: `/admin/sales`（既存 admin 認証で保護）
+- API: `/admin/api/sales/*`（`auth` ミドルウェア配下、CSRF + Cookie セッション）
+- ビルド: `resources/css/sales-tool.css` + `resources/js/sales-tool/sales-tool.js` を `@vite` で配信
+- 認証導線: 401 検知時に `<body data-login-url>` に書かれた `/login?intended=...` へ自動リダイレクト
+- 既存 `public/sales-tool/places.php` / `proxy.php`（Google Places プロキシ）は認証なしで残置
+
+### バックエンド
+- migration: `2026_05_07_000001_create_sales_entries_table.php`
+  - 共有モード（`user_id` 持たず）。SoftDeletes 採用
+  - カラム: facility (必須) / prefecture / city / address / phone / email / website_url /
+    contact_form_url / gmap_url / type / priority (S/A/B/C) / status / memo /
+    first_sent_at / next_action_at / analysis (JSON)
+- Model: `app/Models/SalesEntry.php`
+  - `toApi()` で snake_case → JS 互換の camelCase 変換
+  - `dedupKey($facility, $address)` で重複検知キー生成（小文字 trim）
+- Controller: `app/Http/Controllers/Admin/SalesEntriesController.php`
+  - `index` / `store` / `update` / `destroy` / `bulkImport` / `exportJson` / `exportCsv` / `showApp`
+  - bulkImport は `mode=overwrite|append`、append 時は payload 内 + 既存との「施設名+住所」重複を 422 で拒否し件数レポート
+  - 並びは「未送信を上 / next_action_at 昇順 / updated_at 降順」
+- FormRequest: `Admin\StoreSalesEntryRequest` / `UpdateSalesEntryRequest` / `BulkImportSalesRequest`
+
+### ルート (`routes/web.php`)
+- `Route::redirect('/', '/gakudo')` — 旧 closure ルートを置換（route:cache 時に 405 になる事象の対策）
+- `/admin/sales` GET → `SalesEntriesController@showApp`
+- `/admin/api/sales` 配下に CRUD/Import/Export を追加
+
+### フロント (`resources/js/sales-tool/sales-tool.js`)
+- localStorage 全廃止。`STORAGE_KEY` (`pldl_sales_list_v1`) は撤去
+- `loadAll()` を async fetch 化、`addItem` / `updateItem` / `deleteItem` を API 経由に
+- `apiFetch()` ラッパー: 401 → `/login?intended=...` 自動遷移、422 errors を `handleApiError` で表示
+- bulk-import の重複拒否レポート（payload 内重複 / 既存と重複）を alert で詳細表示
+- export.json / export.csv はサーバー生成にしてリンク遷移
+- フィルタ UI 状態（`pldl_sales_filters_v1`）と HeartRails 都市キャッシュは localStorage に残置（個人設定・キャッシュ用途のみ）
+- `places.php` / `proxy.php` 参照を Blade 注入の絶対 URL に切替（`<body data-places-url>` / `data-proxy-url`）
+
+### Blade / 管理画面ナビ
+- `resources/views/admin/sales/index.blade.php` 新規（旧 `public/sales-tool/index.html` の body をそのまま移植 + CSRF/data-* 属性注入）
+- `resources/views/admin/layout.blade.php` のヘッダに「営業リスト」リンク追加
+
+### ユーザー運用
+- `php artisan user:create` 追加（対話入力で数字4桁パスワード設定、`email_verified_at` も即時セット）
+- `routes/auth.php` の `register` は 404 化（自己登録閉鎖。ルート名は他テンプレ互換のため残置）
+
+### 削除
+- `public/sales-tool/index.html` / `README.md` / `assets/sales-tool.{css,js}` 削除
+- `public/sales-tool/places.php` / `proxy.php` は認証なしのまま残置
+
+### Vite
+- `vite.config.js` の input に `resources/css/sales-tool.css` と `resources/js/sales-tool/sales-tool.js` を追加
+
+### 本番デプロイ手順（次回）
+1. ローカルで `git pull` → `composer install`（必要なら）→ `npm run build`
+2. 「サーバーにあげて」 → `deploy_pldl_lp_to_sakura.bat` 実行（自動で `php artisan migrate --force` も走る）
+3. SSH で `php artisan user:create`（`admin@gmail.com` / 数字4桁を対話入力）
+4. 既存 localStorage に営業データがある場合は、旧画面で JSON 書き出し → `/admin/sales` で取り込み
+
+### ローカル動作確認済 (2026-05-07)
+- POST /login → 302
+- GET /admin/sales (HTML) → 200 with `@vite` CSS/JS link
+- CRUD: POST / GET / PUT / DELETE すべて成功
+- bulk-import 重複拒否: 既存と被るデータで 422 + `server_duplicates` レポート確認
+- bulk-import 通常: 201 imported:1
+- export.csv: BOM付きUTF-8 で日本語ヘッダ出力
+- `php artisan route:cache` 投入後も `/`（→ /gakudo）・`/admin/sales`・`/admin/api/sales` 全 200
+
+---
+
 ## 2026-05-04 (追補6)  LINE Login (OAuth) 連携を実装
 
 問合せフォームに「LINE で名前・メールを自動入力」ボタンを追加。

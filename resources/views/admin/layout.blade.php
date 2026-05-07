@@ -173,7 +173,8 @@
 <body>
     @php
         $current = request()->routeIs('admin.contacts.*') ? 'contacts'
-                : (request()->routeIs('admin.lp-settings.*') ? 'settings' : '');
+                : (request()->routeIs('admin.lp-settings.*') ? 'settings'
+                : (request()->routeIs('admin.sales.*') ? 'sales' : ''));
     @endphp
     <header class="admin-header">
         <a class="admin-header__brand" href="{{ route('admin.lp-settings.index') }}">
@@ -185,6 +186,8 @@
                class="{{ $current === 'contacts' ? 'is-active' : '' }}">問い合わせ一覧</a>
             <a href="{{ route('admin.lp-settings.index') }}"
                class="{{ $current === 'settings' ? 'is-active' : '' }}">LP設定</a>
+            <a href="{{ route('admin.sales.index') }}"
+               class="{{ $current === 'sales' ? 'is-active' : '' }}">営業リスト</a>
         </nav>
         <div class="admin-header__util">
             <a href="{{ route('gakudo-lp.index') }}" target="_blank" rel="noopener">LPを見る</a>

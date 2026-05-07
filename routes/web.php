@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\Admin\GakudoLpContactsAdminController;
 use App\Http\Controllers\Admin\LpSettingsController;
+use App\Http\Controllers\Admin\SalesEntriesController;
 use App\Http\Controllers\GakudoLpContactController;
 use App\Http\Controllers\LineAuthController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('gakudo-lp.index'));
+// closure を使うと route:cache 時に / が壊れる事案があったため Route::redirect を使用。
+Route::redirect('/', '/gakudo');
 
 Route::get('/gakudo', [GakudoLpContactController::class, 'show'])
     ->name('gakudo-lp.index');
@@ -34,6 +36,20 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         ->name('contacts.show');
     Route::put('/contacts/{contact}', [GakudoLpContactsAdminController::class, 'update'])
         ->name('contacts.update');
+
+    // 営業リスト管理ツール（HTML 画面 + API、共有DB）
+    Route::get('/sales', [SalesEntriesController::class, 'showApp'])
+        ->name('sales.index');
+
+    Route::prefix('api/sales')->name('sales.api.')->group(function () {
+        Route::get('/',                 [SalesEntriesController::class, 'index'])->name('list');
+        Route::post('/',                [SalesEntriesController::class, 'store'])->name('store');
+        Route::put('/{salesEntry}',     [SalesEntriesController::class, 'update'])->name('update');
+        Route::delete('/{salesEntry}',  [SalesEntriesController::class, 'destroy'])->name('destroy');
+        Route::post('/bulk-import',     [SalesEntriesController::class, 'bulkImport'])->name('bulkImport');
+        Route::get('/export.json',      [SalesEntriesController::class, 'exportJson'])->name('exportJson');
+        Route::get('/export.csv',       [SalesEntriesController::class, 'exportCsv'])->name('exportCsv');
+    });
 });
 
 Route::get('/dashboard', function () {

@@ -9,6 +9,8 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.tsx',
                 'resources/js/gakudo-lp.tsx',
+                'resources/css/sales-tool.css',
+                'resources/js/sales-tool/sales-tool.js',
             ],
             refresh: true,
         }),
