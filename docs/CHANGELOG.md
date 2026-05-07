@@ -11,7 +11,36 @@
 
 ---
 
-## 2026-05-07 14:50 JST  uncommitted  営業ツール「検索/CSV取り込み」の silent fail を解消
+## 2026-05-07 15:00 JST  uncommitted  検索取り込み 422 原因特定用の診断ログ投入（一時）
+
+`url` ルール緩和 + JS 側エラー集計を入れたあとも検索取り込みで 20/20 失敗が継続。
+tinker 上で `Validator::make` を直接走らせると Google Places のサンプルは pass する
+（=サーバー側 validation 単体ではないか、別ステータス 419/401 等で落ちている可能性）。
+
+実 HTTP に乗っているペイロードと validation エラーを掴むため、一時的に診断ログを投入:
+- `Admin\StoreSalesEntryRequest::failedValidation()` で `Log::warning('SalesEntry.store validation failed', [...])` 出力
+  - errors / sent_keys / facility (80字) / 各 URL の長さ / phone と email は伏字 + 長さ
+- `Admin\UpdateSalesEntryRequest::failedValidation()` も同様
+- JS `apiFetch` の non-OK 分岐で `console.error('[sales-tool apiFetch] non-OK', { url, method, status, payload, raw_preview })` を出力（DevTools で確認可能）
+
+PII 配慮:
+- email / phone は `先頭2文字 + ***  + 末尾2文字` 形式 + 長さ表示のみ
+- address は長さのみ（中身は出さない）
+- memo / facility 等は最大 80 字程度に切り詰め
+
+**原因特定後にこの診断ログは削除する**（PR 化 or 直 commit）。
+
+---
+
+## 2026-05-07 14:50 JST  fc30d0a  検索取り込みの 422 失敗を理由内訳付きで通知
+
+X-3 強化: `_postSalesEntry` を内部で throw する形に分離し、`doImport` / `runCsvImport` を
+try/catch + `summarizeFailureReason` + `buildReasonSummary` で「○件成功 / ○件失敗
+（理由: facility=必須が3件、…）」形式のサマリ表示に。失敗時は alert で例も列挙。
+
+---
+
+## 2026-05-07 14:30 JST  1435ce5  営業ツール「検索/CSV取り込み」の silent fail を解消
 
 ### 症状
 ユーザー報告: 「検索取り込みボタンから取り込んだ施設がモーダルを閉じてもリストに反映されない」。

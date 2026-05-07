@@ -48,7 +48,16 @@
         }
         if (!res.ok) {
             let payload = null;
-            try { payload = await res.json(); } catch {}
+            let raw = null;
+            try {
+                raw = await res.text();
+                payload = raw ? JSON.parse(raw) : null;
+            } catch { /* not JSON */ }
+            // DevTools 確認用に詳細をコンソールに残す（PII を含むので一時的）。
+            console.error('[sales-tool apiFetch] non-OK', {
+                url, method: opts.method || 'GET', status: res.status,
+                payload, raw_preview: raw ? raw.slice(0, 200) : null,
+            });
             const err = new Error(payload?.message || ('HTTP ' + res.status));
             err.status = res.status;
             err.payload = payload;

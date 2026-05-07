@@ -2,13 +2,34 @@
 
 namespace App\Http\Requests\Admin;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class UpdateSalesEntryRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return $this->user() !== null;
+    }
+
+    /** 一時診断用 (2026-05-07): Store と同様 422 詳細を laravel.log に PII 伏字付きで記録。 */
+    protected function failedValidation(Validator $validator)
+    {
+        $input = $this->all();
+        Log::warning('SalesEntry.update validation failed', [
+            'errors'      => $validator->errors()->toArray(),
+            'sent_keys'   => array_keys($input),
+            'facility'    => mb_substr((string) ($input['facility'] ?? ''), 0, 80),
+            'address_len' => mb_strlen((string) ($input['address'] ?? '')),
+            'phone_len'   => mb_strlen((string) ($input['phone'] ?? '')),
+            'website_len' => mb_strlen((string) ($input['websiteUrl'] ?? '')),
+            'gmap_len'    => mb_strlen((string) ($input['gmapUrl'] ?? '')),
+            'type'        => $input['type'] ?? null,
+            'priority'    => $input['priority'] ?? null,
+            'status'      => $input['status'] ?? null,
+        ]);
+        parent::failedValidation($validator);
     }
 
     public function rules(): array
