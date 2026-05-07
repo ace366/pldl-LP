@@ -38,7 +38,13 @@
             opts.body = JSON.stringify(opts.body);
             opts.headers['Content-Type'] = 'application/json';
         }
-        const url = path.startsWith('http') ? path : (API_BASE + path);
+        // path === '/' の時は API_BASE 直下を指す。trailing slash を付けると Apache の
+        // .htaccess (RewriteCond %{REQUEST_URI} (.+)/$) が 301 で剥がしに行き、
+        // Sakura のサブパス + public 解決と相まって `/pldl-lp/public/admin/api/sales`
+        // (404) に飛んでしまう。POST が GET 化される + ルート未定義の二重ペナルティで
+        // 検索取り込みが 20/20 失敗していた事案 (2026-05-07 検出)。
+        const apiPath = (path === '/' || path === '') ? '' : path;
+        const url = path.startsWith('http') ? path : (API_BASE + apiPath);
         const res = await fetch(url, opts);
         if (res.status === 401) {
             const here = encodeURIComponent(window.location.pathname + window.location.search);

@@ -11,7 +11,40 @@
 
 ---
 
-## 2026-05-07 15:00 JST  uncommitted  検索取り込み 422 原因特定用の診断ログ投入（一時）
+## 2026-05-07 15:15 JST  uncommitted  apiFetch の trailing-slash バグを修正（検索取り込み真因）
+
+検索取り込みで 20/20 失敗していた真因を特定。`apiFetch('/', { method: 'POST' })` が
+`API_BASE + '/'` = `.../admin/api/sales/` (末尾スラッシュ付き) を叩いていた。
+さくらの .htaccess `RewriteCond %{REQUEST_URI} (.+)/$ → 301 R=L` が末尾スラッシュを剥がす過程で
+**最終 URL が `/pldl-lp/public/admin/api/sales` (404)** に化けることが curl で確認:
+- `POST /pldl-lp/admin/api/sales`  → 419（Laravel が応答、CSRF 待ち = ルート存在）
+- `POST /pldl-lp/admin/api/sales/` → 301 → 404 (`/pldl-lp/public/admin/api/sales`)
+
+tinker 上で `Validator::make` が通ったのに HTTP 経由で常に失敗するという矛盾の原因。
+
+### 修正
+`apiFetch` の URL 構築で `path === '/'`（または空）のときは API_BASE 直下を表す
+ものとし trailing slash を付けない:
+
+```js
+const apiPath = (path === '/' || path === '') ? '' : path;
+const url = path.startsWith('http') ? path : (API_BASE + apiPath);
+```
+
+これで `_postSalesEntry` / `loadAll` / `bulkImport` が正しく `.../admin/api/sales` を叩く。
+
+### 経過
+- 1435ce5: silent fail 解消 + url validation 緩和（必要だが十分でなかった）
+- fc30d0a: 理由内訳サマリ表示
+- e14c60b: 422 診断ログ投入（PII 伏字付き）
+- ☆ 本修正で経路バグが直り、validation 緩和も診断ログも実機で意味を持つようになった
+
+診断ログ (failedValidation の Log::warning と JS の console.error) は数日様子を
+見て無傷なら別 commit で削除予定。
+
+---
+
+## 2026-05-07 15:00 JST  e14c60b  検索取り込み 422 原因特定用の診断ログ投入（一時）
 
 `url` ルール緩和 + JS 側エラー集計を入れたあとも検索取り込みで 20/20 失敗が継続。
 tinker 上で `Validator::make` を直接走らせると Google Places のサンプルは pass する
