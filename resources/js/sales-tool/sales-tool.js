@@ -1470,12 +1470,16 @@
     el('btn-import-json').addEventListener('click', () => el('import-json-file').click());
 
     // DM 出力 / ラベル印刷ボタン (status="DM対応" の全件を PDF 化)
-    el('btn-print-dm').addEventListener('click', () => printDmAttachments('dm-letters.pdf', 'DM 案内文'));
-    el('btn-print-labels').addEventListener('click', () => printDmAttachments('labels.pdf', '宛名ラベル (A4×12面)'));
+    const btnDm = el('btn-print-dm');
+    const btnLabels = el('btn-print-labels');
+    if (btnDm) btnDm.addEventListener('click', () => printDmAttachments('dm-letters.pdf', 'DM 案内文'));
+    if (btnLabels) btnLabels.addEventListener('click', () => printDmAttachments('labels.pdf', '宛名ラベル (A4×12面)'));
 
     /**
      * status="DM対応" の件数を in-memory items から数えて confirm し、
-     * OK なら新規タブで PDF エンドポイントを開く（ブラウザ標準ダウンロード）。
+     * OK なら PDF エンドポイントを取得する。ポップアップブロック対策のため、
+     * window.open が拒否された (null 戻り) 場合は同タブで navigate する
+     * フォールバックを実装。
      */
     function printDmAttachments(endpoint, label) {
         const targets = items.filter((it) => it.status === 'DM対応');
@@ -1489,8 +1493,17 @@
             `処理に数十秒かかる場合があります。よろしいですか？`
         );
         if (!ok) return;
-        // 新規タブで開く（PDF はブラウザがダウンロード or プレビューする）
-        window.open(API_BASE + '/' + endpoint, '_blank', 'noopener');
+
+        const url = API_BASE + '/' + endpoint;
+        showToast(`${label}を生成中…`);
+        // 新規タブで開く。モバイル等でポップアップブロックされた場合は
+        // window.open が null を返すので、その時は同タブに遷移して PDF を表示する。
+        const w = window.open(url, '_blank', 'noopener');
+        if (!w) {
+            // ポップアップがブロックされた
+            console.warn('[sales-tool] window.open blocked, falling back to same-tab navigate');
+            window.location.href = url;
+        }
     }
     el('import-json-file').addEventListener('change', (e) => {
         const f = e.target.files && e.target.files[0];
