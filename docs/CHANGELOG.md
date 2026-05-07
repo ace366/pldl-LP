@@ -11,7 +11,30 @@
 
 ---
 
-## 2026-05-07 13:30 JST  uncommitted  営業リスト管理ツールをログイン式・サーバーDB保存に拡張
+## 2026-05-07 14:10 JST  uncommitted  deploy bat から `php artisan route:cache` を恒久除外
+
+本日の営業ツールデプロイ（commit `159f8ed`）後、本番で `Route::redirect('/', '/gakudo')` を含む
+`/` がメソッド別 405 を返す事象が再発。SSH で `php artisan route:clear` を実行して即復旧したが、
+次回デプロイで `deploy_pldl_lp_to_sakura.bat` の最終チェーンに含まれる `&& php artisan route:cache`
+が走ると再発確実なため、**route:cache をデプロイチェーンから恒久的に除外**。
+
+### 変更
+- `deploy_pldl_lp_to_sakura.bat` line 152 の SSH チェーンから `&& php artisan route:cache` を削除。
+  `config:cache` と `view:cache` は同事象を起こさないので残置。コメント注記で経緯を記録。
+
+### 背景（2回再発の事実）
+- 第1波: closure ルート `Route::get('/', fn () => redirect()->route('gakudo-lp.index'))` で GET / → 405,
+  `Allow: HEAD`。SerializableClosure 起因と推定。
+- 第2波: closure を `Route::redirect('/', '/gakudo')`（Controller ベース）に置換しても **同症状再発**。
+  closure 由来ではなくホスト側 PHP (8.3.30) / OPcache の低レベル不整合が疑われる。
+- パフォーマンス影響: route:cache の恩恵は数 ms 程度。`/` と `/admin/*` 全落ちのリスクのほうが圧倒的に大きい。
+
+### 関連メモリ
+- 新規: `~/.claude/projects/C--work-PLDL-LP/memory/project_route_cache_405_incident.md`
+
+---
+
+## 2026-05-07 13:30 JST  159f8ed  営業リスト管理ツールをログイン式・サーバーDB保存に拡張
 
 旧 `public/sales-tool/`（localStorage 保管・認証なし）を Laravel 管理画面配下に移行。
 全ユーザー共有の DB テーブル `sales_entries` と CRUD/Import/Export API を追加。フロントは

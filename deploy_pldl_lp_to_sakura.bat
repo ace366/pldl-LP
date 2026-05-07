@@ -149,7 +149,15 @@ if errorlevel 1 (
 
 echo.
 echo [6/7] Run remote deploy, migrate, rebuild caches...
-ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "bash %REMOTE_SCRIPT% %REMOTE_APP_DIR% %REMOTE_TMP_DIR%/pldl_lp_%TS%.tar.gz %TS% && cd %REMOTE_APP_DIR% && php artisan migrate --force && php artisan optimize:clear && php artisan cache:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache"
+REM NOTE (2026-05-07): `php artisan route:cache` をこのチェーンから恒久的に外した。
+REM さくら共有レンタルサーバー(www2916)+PHP 8.3.30 の組み合わせで、route:cache を投入すると
+REM 「特定のルートが特定のメソッドだけで 405 Method Not Allowed」を返す事象が再現する。
+REM closure ルートだけでなく Route::redirect() / Controller@method ルートでも発生したため、
+REM Laravel/SerializableClosure 由来ではなくホスト側 PHP の低レベル不整合の疑い。
+REM 復旧手順は `php artisan route:clear` のみ。route:cache の性能メリット(数ms)よりも
+REM 全 / と /admin/* が落ちるリスクのほうが圧倒的に大きいので、外したまま運用する。
+REM config:cache と view:cache は同事象を起こさないので残す。
+ssh -i "%SSH_KEY%" %SSH_USER%@%SSH_HOST% "bash %REMOTE_SCRIPT% %REMOTE_APP_DIR% %REMOTE_TMP_DIR%/pldl_lp_%TS%.tar.gz %TS% && cd %REMOTE_APP_DIR% && php artisan migrate --force && php artisan optimize:clear && php artisan cache:clear && php artisan config:cache && php artisan view:cache"
 if errorlevel 1 (
   echo ERROR: remote deploy failed
   pause
