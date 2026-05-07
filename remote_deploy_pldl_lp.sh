@@ -63,6 +63,15 @@ for f in .htaccess artisan composer.json composer.lock package.json package-lock
   fi
 done
 
+# ---- composer install (本番側で依存解決) ----
+# vendor/ は deploy bat の robocopy で除外しているため、composer.json/lock の差分を
+# 反映させるには本番で composer install を回す必要がある。
+# 2026-05-07 mpdf/mpdf 追加に伴い chain に組み込み。
+if [ -f "${REMOTE_APP_DIR}/composer.json" ]; then
+  echo "[REMOTE] composer install (no-dev, optimize-autoloader)"
+  cd "${REMOTE_APP_DIR}" && composer install --no-dev --optimize-autoloader --no-interaction 2>&1 | tail -20
+fi
+
 # ---- Ensure storage tree exists (preserved across deploys) ----
 mkdir -p "${REMOTE_APP_DIR}/storage/app/public"
 mkdir -p "${REMOTE_APP_DIR}/storage/framework/cache/data"

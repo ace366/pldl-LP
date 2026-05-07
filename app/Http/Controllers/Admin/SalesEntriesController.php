@@ -170,7 +170,112 @@ class SalesEntriesController extends Controller
     }
 
     /**
-     * GET /api/admin/sales/export.json
+     * GET /admin/api/sales/dm-letters.pdf
+     * status="DM対応" 全件をまとめた連結 PDF を返す（1件1ページ A4縦）。
+     */
+    public function dmLetters()
+    {
+        $entries = SalesEntry::query()
+            ->whereNull('deleted_at')
+            ->where('status', 'DM対応')
+            ->orderBy('id')
+            ->get();
+
+        if ($entries->isEmpty()) {
+            return response()->json(['message' => 'DM対応の施設がありません。'], 404);
+        }
+
+        $tempDir = storage_path('app/mpdf');
+        if (! is_dir($tempDir)) {
+            mkdir($tempDir, 0775, true);
+        }
+
+        $mpdf = new \Mpdf\Mpdf([
+            'mode'          => 'ja',
+            'format'        => 'A4',
+            'margin_top'    => 22,
+            'margin_bottom' => 18,
+            'margin_left'   => 22,
+            'margin_right'  => 22,
+            'tempDir'       => $tempDir,
+            'default_font'  => 'sun-exta',
+        ]);
+        $mpdf->SetTitle('Gakudoor DM 案内文');
+        $mpdf->SetCreator('Gakudoor Sales Tool');
+
+        $today = now()->format('Y年n月j日');
+
+        foreach ($entries as $i => $entry) {
+            if ($i > 0) {
+                $mpdf->AddPage();
+            }
+            $html = view('admin.sales.pdf.dm-letter', [
+                'entry' => $entry,
+                'today' => $today,
+            ])->render();
+            $mpdf->WriteHTML($html);
+        }
+
+        $stamp = now()->format('Ymd_His');
+        $filename = "dm-letters-{$stamp}.pdf";
+
+        return response($mpdf->Output($filename, \Mpdf\Output\Destination::STRING_RETURN), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    /**
+     * GET /admin/api/sales/labels.pdf
+     * status="DM対応" 全件のラベルシート (A-One 28379 互換 / A4×12面) を PDF 化。
+     */
+    public function labels()
+    {
+        $entries = SalesEntry::query()
+            ->whereNull('deleted_at')
+            ->where('status', 'DM対応')
+            ->orderBy('id')
+            ->get();
+
+        if ($entries->isEmpty()) {
+            return response()->json(['message' => 'DM対応の施設がありません。'], 404);
+        }
+
+        $tempDir = storage_path('app/mpdf');
+        if (! is_dir($tempDir)) {
+            mkdir($tempDir, 0775, true);
+        }
+
+        // ラベルシートは @page { margin: 0 } を Blade 側で出すので mpdf 側余白は 0 にする
+        $mpdf = new \Mpdf\Mpdf([
+            'mode'          => 'ja',
+            'format'        => 'A4',
+            'margin_top'    => 0,
+            'margin_bottom' => 0,
+            'margin_left'   => 0,
+            'margin_right'  => 0,
+            'tempDir'       => $tempDir,
+            'default_font'  => 'sun-exta',
+        ]);
+        $mpdf->SetTitle('Gakudoor DM ラベルシート');
+        $mpdf->SetCreator('Gakudoor Sales Tool');
+
+        $html = view('admin.sales.pdf.labels', [
+            'entries' => $entries,
+        ])->render();
+        $mpdf->WriteHTML($html);
+
+        $stamp = now()->format('Ymd_His');
+        $filename = "labels-{$stamp}.pdf";
+
+        return response($mpdf->Output($filename, \Mpdf\Output\Destination::STRING_RETURN), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    /**
+     * GET /admin/api/sales/export.json
      */
     public function exportJson()
     {

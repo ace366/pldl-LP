@@ -93,10 +93,12 @@
                 <option value="商談">商談</option>
                 <option value="契約">契約</option>
                 <option value="見送り">見送り</option>
-                <option value="対象外">対象外</option>
+                <option value="DM対応">DM対応</option>
             </select>
         </div>
         <div class="toolbar__actions">
+            <button type="button" class="btn btn--ghost btn--lg" id="btn-print-dm" title="status=DM対応 の全件で案内文 PDF を生成">📄 DM出力</button>
+            <button type="button" class="btn btn--ghost btn--lg" id="btn-print-labels" title="status=DM対応 の全件でラベルシート PDF を生成 (A4×12面)">🏷 ラベル印刷</button>
             <button type="button" class="btn btn--secondary btn--lg" id="btn-csv-import">📋 CSV一括取り込み</button>
             <button type="button" class="btn btn--secondary btn--lg" id="btn-search-import">🔍 検索取り込み</button>
             <button type="button" class="btn btn--primary btn--lg" id="btn-add">+ 新規追加</button>
@@ -224,7 +226,7 @@
                         <option value="商談">商談</option>
                         <option value="契約">契約</option>
                         <option value="見送り">見送り</option>
-                        <option value="対象外">対象外</option>
+                        <option value="DM対応">DM対応</option>
                     </select>
                 </label>
 

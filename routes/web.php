@@ -49,6 +49,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/bulk-import',     [SalesEntriesController::class, 'bulkImport'])->name('bulkImport');
         Route::get('/export.json',      [SalesEntriesController::class, 'exportJson'])->name('exportJson');
         Route::get('/export.csv',       [SalesEntriesController::class, 'exportCsv'])->name('exportCsv');
+        // DM 出力 / ラベル印刷 (status="DM対応" 全件を PDF 化)
+        Route::get('/dm-letters.pdf',   [SalesEntriesController::class, 'dmLetters'])->name('dmLetters');
+        Route::get('/labels.pdf',       [SalesEntriesController::class, 'labels'])->name('labels');
     });
 });
 

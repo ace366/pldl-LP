@@ -680,7 +680,7 @@
     };
 
     const PRIORITIES = ['S', 'A', 'B', 'C'];
-    const STATUSES = ['未送信', '送信済み', '返信あり', '商談', '契約', '見送り', '対象外'];
+    const STATUSES = ['未送信', '送信済み', '返信あり', '商談', '契約', '見送り', 'DM対応'];
 
     const SALES_TEMPLATE = [
         '突然のご連絡失礼いたします。',
@@ -1468,6 +1468,30 @@
     el('btn-export-json').addEventListener('click', exportJson);
     el('btn-export-csv').addEventListener('click', exportCsv);
     el('btn-import-json').addEventListener('click', () => el('import-json-file').click());
+
+    // DM 出力 / ラベル印刷ボタン (status="DM対応" の全件を PDF 化)
+    el('btn-print-dm').addEventListener('click', () => printDmAttachments('dm-letters.pdf', 'DM 案内文'));
+    el('btn-print-labels').addEventListener('click', () => printDmAttachments('labels.pdf', '宛名ラベル (A4×12面)'));
+
+    /**
+     * status="DM対応" の件数を in-memory items から数えて confirm し、
+     * OK なら新規タブで PDF エンドポイントを開く（ブラウザ標準ダウンロード）。
+     */
+    function printDmAttachments(endpoint, label) {
+        const targets = items.filter((it) => it.status === 'DM対応');
+        if (targets.length === 0) {
+            alert('status が「DM対応」の施設がありません。\n対象としたい施設のステータスを「DM対応」に変更してから再度お試しください。');
+            return;
+        }
+        const ok = window.confirm(
+            `${label}を生成します。\n\n` +
+            `対象: ${targets.length} 件 (status=DM対応)\n\n` +
+            `処理に数十秒かかる場合があります。よろしいですか？`
+        );
+        if (!ok) return;
+        // 新規タブで開く（PDF はブラウザがダウンロード or プレビューする）
+        window.open(API_BASE + '/' + endpoint, '_blank', 'noopener');
+    }
     el('import-json-file').addEventListener('change', (e) => {
         const f = e.target.files && e.target.files[0];
         if (f) importJson(f);

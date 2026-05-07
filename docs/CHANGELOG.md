@@ -11,7 +11,46 @@
 
 ---
 
-## 2026-05-07 15:15 JST  uncommitted  apiFetch の trailing-slash バグを修正（検索取り込み真因）
+## 2026-05-07 16:50 JST  uncommitted  営業ツールに「DM出力」「ラベル印刷」機能追加 + 「対象外」→「DM対応」リネーム
+
+### 機能追加
+- **DM出力**: status="DM対応" 全件をまとめた A4 縦・1件1ページの連結 PDF を生成
+  - `GET /admin/api/sales/dm-letters.pdf`（auth 配下）
+  - 案内文は `resources/views/admin/sales/pdf/dm-letter.blade.php` にテンプレ化（プレースホルダ
+    `{{facility_name}} / {{address}} / {{prefecture}} / {{city}} / {{date}}` 対応）
+  - 末尾に窓付き封筒対応の宛先・住所ブロック表示
+  - 文面は Rezon が開発・提供 / PLDL は導入実績、の三層を遵守
+- **ラベル印刷**: status="DM対応" 全件のラベルシート (A-One 28379 互換 / A4×12面 / 86.4×42.3mm) PDF
+  - `GET /admin/api/sales/labels.pdf`
+  - 余白上下 21.6mm 左右 18.6mm。〒抜き出し → 住所 → 施設名+御中 の3段構成
+- **UI**: 「📄 DM出力」「🏷 ラベル印刷」ボタンを toolbar に追加。confirm で対象件数を提示後に新規タブで PDF を開く
+
+### ステータスリネーム
+- 既存 `対象外` → `DM対応` に統一（status 自体は free-form string なので validation 変更なし）
+  - migration `2026_05_07_150000_rename_sales_status_taishogai_to_dm_taio.php` で旧データ一括 UPDATE（本番 0 行のため実質 no-op）
+  - `resources/js/sales-tool/sales-tool.js` の STATUSES / `resources/views/admin/sales/index.blade.php` の filter & form select / `resources/css/sales-tool.css` の `.pill--st-*` クラスを更新
+
+### PDF ライブラリ選定
+- `mpdf/mpdf ^8.3` を採用（IPA Gothic 互換の `Sun-ExtA.ttf` 同梱で日本語が `composer require` のみで動作、Laravel 11 / PHP 8.3 互換、Sakura 共有でも実績）
+- mpdf 設定は `'mode' => 'ja', 'default_font' => 'sun-exta', 'tempDir' => storage_path('app/mpdf')`
+- ローカル検証で日本語 PDF 出力 OK 確認（pdftotext 抽出で本文・プレースホルダ・宛先ブロックすべて正しく出る）
+
+### デプロイ scriptの変更
+- `remote_deploy_pldl_lp.sh` に `composer install --no-dev --optimize-autoloader` を追加
+- 従来は vendor が deploy で除外されており新規依存を本番反映するには手動 SSH が必要だった
+- mpdf 追加に伴い恒久的に composer install を組み込んで再現性を確保
+
+### TODO（仮置き値）
+- 案内文末尾の Web URL: `https://top-ace-picard.sakura.ne.jp/pldl-lp/gakudo`（運用ドメイン確定後に差し替え）
+- お問合せメール: 仮文「お問合せ窓口は本書面送付後、別途ご案内いたします」で運用開始（実アドレス決まり次第差し替え）
+- 将来 `dm_templates` テーブル + 編集 UI を作る際は Blade 内のテンプレ部を DB 駆動に移行できる構造
+
+### 一時診断ログ（前 commit から継続）
+- `StoreSalesEntryRequest::failedValidation()` / `UpdateSalesEntryRequest::failedValidation()` の Log::warning は引き続き残置。trailing-slash バグが直ったので無症状なら別 commit で削除予定
+
+---
+
+## 2026-05-07 15:15 JST  2be888e  apiFetch の trailing-slash バグを修正（検索取り込み真因）
 
 検索取り込みで 20/20 失敗していた真因を特定。`apiFetch('/', { method: 'POST' })` が
 `API_BASE + '/'` = `.../admin/api/sales/` (末尾スラッシュ付き) を叩いていた。

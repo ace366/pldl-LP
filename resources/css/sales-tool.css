@@ -306,7 +306,7 @@ textarea.input { min-height: 70px; resize: vertical; }
 .pill--st-商談     { background: #fde68a; color: #92400e; }
 .pill--st-契約     { background: #dcfce7; color: var(--c-success); }
 .pill--st-見送り   { background: #f1f5f9; color: var(--c-soft); }
-.pill--st-対象外   { background: #fee2e2; color: var(--c-error); }
+.pill--st-DM対応   { background: #fee2e2; color: var(--c-error); }
 
 /* ---------- Desktop table ---------- */
 .data-table {
