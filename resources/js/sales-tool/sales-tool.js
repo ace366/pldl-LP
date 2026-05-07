@@ -943,19 +943,70 @@
         return items.find((it) => it.id === id) || null;
     }
 
-    async function addItem(data) {
+    /**
+     * 内部: POST /admin/api/sales を叩いて新規 item を返す。エラー時は throw する。
+     * 一括取り込み (検索取り込み・CSV) は try/catch で個別に拾い、
+     * 失敗理由をサマリ集計するためにこちら経由で呼ぶ。
+     */
+    async function _postSalesEntry(data) {
         const payload = sanitizeForApi(data);
+        const res = await apiFetch('/', { method: 'POST', body: payload });
+        return res?.item ?? null;
+    }
+
+    /**
+     * 単発フォーム submit 用ラッパー。エラーをトーストで通知して null を返す。
+     * 取り込みループからは使わないこと（理由集約できないため）。
+     */
+    async function addItem(data) {
         try {
-            const res = await apiFetch('/', { method: 'POST', body: payload });
-            if (res?.item) {
-                items.unshift(res.item);
+            const item = await _postSalesEntry(data);
+            if (item) {
+                items.unshift(item);
                 render();
             }
-            return res?.item;
+            return item;
         } catch (err) {
             handleApiError(err, '保存に失敗しました');
             return null;
         }
+    }
+
+    /**
+     * 422 など API エラーから「人間が読める短い理由」を抽出する。
+     * - 422 with errors: 最初のフィールド + メッセージ (例 "facility: 必須")
+     * - 422 with message のみ: その message
+     * - その他: HTTP {status}
+     */
+    function summarizeFailureReason(err) {
+        if (err?.payload?.errors) {
+            const fields = Object.keys(err.payload.errors);
+            if (fields.length > 0) {
+                const f = fields[0];
+                const v = err.payload.errors[f];
+                const msg = (Array.isArray(v) ? v[0] : v) || '';
+                return `${f}: ${String(msg).replace(/。$/, '').slice(0, 60)}`;
+            }
+        }
+        if (err?.payload?.message) {
+            return String(err.payload.message).replace(/。$/, '').slice(0, 80);
+        }
+        if (err?.status) return `HTTP ${err.status}`;
+        return err?.message || 'unknown';
+    }
+
+    /**
+     * 失敗 list ({name, reason}[]) を理由ごとに集計してサマリ文字列を作る。
+     */
+    function buildReasonSummary(failures) {
+        const counts = {};
+        failures.forEach((f) => {
+            counts[f.reason] = (counts[f.reason] || 0) + 1;
+        });
+        return Object.entries(counts)
+            .sort((a, b) => b[1] - a[1])
+            .map(([reason, n]) => `${reason}（${n}件）`)
+            .join('、');
     }
 
     async function updateItem(id, patch) {
@@ -1562,9 +1613,9 @@
         btn.disabled = true;
         // 旧実装は addItem の戻り値を見ずに added++ していたため、API 422 等の silent fail で
         // 「N件取り込み完了」と表示されながら DB には1件も入らない事故が起きていた。
-        // 戻り値が null なら failed としてカウントし、最後に明示する。
+        // 今は _postSalesEntry を try/catch で呼んで「○件成功 / ○件失敗 (理由内訳)」を出す。
         let added = 0, failed = 0, skipped = 0, mailFound = 0;
-        const failedNames = [];
+        const failures = []; // [{name, reason}, ...]
 
         for (let i = 0; i < picked.length; i++) {
             const p = picked[i];
@@ -1615,12 +1666,20 @@
             const sug = suggestPriority(item);
             if (sug) item.priority = sug;
 
-            const created = await addItem(item);
-            if (created) {
-                added++;
-            } else {
+            try {
+                const created = await _postSalesEntry(item);
+                if (created) {
+                    added++;
+                } else {
+                    failed++;
+                    failures.push({ name: p.name || '(無題)', reason: 'no item returned' });
+                }
+            } catch (err) {
                 failed++;
-                failedNames.push(p.name || '(無題)');
+                const reason = summarizeFailureReason(err);
+                failures.push({ name: p.name || '(無題)', reason });
+                // 個別エラーもトーストで即時通知（最後のエラーがチラ見できる）
+                showToast(`${p.name || '取り込み'}: ${reason}`);
             }
         }
 
@@ -1629,17 +1688,23 @@
         items = await loadAll();
         render();
 
-        const statusParts = [`完了: ${added}件追加`, `${skipped}件スキップ`];
-        if (failed > 0) statusParts.push(`${failed}件失敗`);
-        if (fetchMail) statusParts.push(`${mailFound}件メール取得`);
-        const statusKind = failed > 0 ? 'error' : 'ok';
-        setSearchStatus(statusParts.join(' / '), statusKind);
+        const reasonSummary = failed > 0 ? buildReasonSummary(failures) : '';
+        const statusParts = [`${added}件成功`];
+        if (skipped > 0) statusParts.push(`${skipped}件スキップ`);
+        if (failed  > 0) statusParts.push(`${failed}件失敗`);
+        if (fetchMail)   statusParts.push(`${mailFound}件メール取得`);
+        const statusLine = statusParts.join(' / ') + (reasonSummary ? `（理由: ${reasonSummary}）` : '');
+        setSearchStatus(statusLine, failed > 0 ? 'error' : 'ok');
 
         if (failed > 0) {
-            const sample = failedNames.slice(0, 5).map((n) => '・' + n).join('\n');
-            alert(`${failed} 件の保存に失敗しました。サーバーが弾いた可能性があります。\n\n` +
-                  `失敗の例:\n${sample}` +
-                  (failedNames.length > 5 ? `\n…ほか ${failedNames.length - 5} 件` : ''));
+            const sample = failures.slice(0, 5)
+                .map((f) => `・${f.name} → ${f.reason}`).join('\n');
+            alert(
+                `${added}件成功 / ${failed}件失敗\n` +
+                `理由内訳: ${reasonSummary}\n\n` +
+                `失敗の例:\n${sample}` +
+                (failures.length > 5 ? `\n…ほか ${failures.length - 5} 件` : '')
+            );
         } else {
             showToast(`${added}件 取り込み完了`);
         }
@@ -1858,6 +1923,7 @@
         const delay = Math.max(0, Math.min(5000, parseInt(el('csv-delay').value || '300', 10) || 300));
 
         let added = 0, failed = 0, skipped = 0, mailFound = 0, formFound = 0;
+        const csvFailures = []; // [{name, reason}, ...]
         const setSummary = () => {
             el('csv-st-added').textContent   = String(added);
             el('csv-st-skipped').textContent = String(skipped);
@@ -1973,19 +2039,26 @@
             const sug = suggestPriority(item);
             if (sug) item.priority = sug;
 
-            const created = await addItem(item);
-            if (created) {
-                added++;
-                if (hasEmail) mailFound++;
-                if (hasForm)  formFound++;
-                const detail = hasEmail
-                    ? `メール=${fields.email}` + (hasForm ? ' + フォームあり' : '')
-                    : 'フォームあり（メール無し）';
-                csvLog(`${idx}/${total}  ${row.facility}  → 追加（${detail}）`, 'ok');
-            } else {
-                // addItem が null を返した = サーバー側で 422 等で弾かれた
+            try {
+                const created = await _postSalesEntry(item);
+                if (created) {
+                    added++;
+                    if (hasEmail) mailFound++;
+                    if (hasForm)  formFound++;
+                    const detail = hasEmail
+                        ? `メール=${fields.email}` + (hasForm ? ' + フォームあり' : '')
+                        : 'フォームあり（メール無し）';
+                    csvLog(`${idx}/${total}  ${row.facility}  → 追加（${detail}）`, 'ok');
+                } else {
+                    failed++;
+                    csvFailures.push({ name: row.facility, reason: 'no item returned' });
+                    csvLog(`${idx}/${total}  ${row.facility}  → ★保存失敗（応答異常）`, 'err');
+                }
+            } catch (err) {
                 failed++;
-                csvLog(`${idx}/${total}  ${row.facility}  → ★保存失敗（サーバーが弾いた）`, 'err');
+                const reason = summarizeFailureReason(err);
+                csvFailures.push({ name: row.facility, reason });
+                csvLog(`${idx}/${total}  ${row.facility}  → ★保存失敗（${reason}）`, 'err');
             }
 
             setSummary();
@@ -1998,12 +2071,24 @@
         render();
 
         const finished = csvCancel ? '中断' : '完了';
+        const reasonSummary = failed > 0 ? buildReasonSummary(csvFailures) : '';
         const summary = failed > 0
-            ? `${finished}: 取込 ${added} / 失敗 ${failed} / スキップ ${skipped}`
+            ? `${finished}: 成功 ${added} / 失敗 ${failed} / スキップ ${skipped}`
+              + (reasonSummary ? `（理由: ${reasonSummary}）` : '')
             : `${finished}: 取込 ${added} / スキップ ${skipped}`;
         el('csv-status').textContent = summary;
         csvLog(`■ ${summary} / メール ${mailFound} / フォーム ${formFound}`, failed > 0 ? 'err' : 'info');
-        showToast(failed > 0 ? `${added}件取込 / ${failed}件失敗` : `${finished}: ${added}件 取り込み`);
+
+        if (failed > 0) {
+            const sample = csvFailures.slice(0, 5)
+                .map((f) => `・${f.name} → ${f.reason}`).join('\n');
+            showToast(`${added}件成功 / ${failed}件失敗`);
+            // CSV はバッチ大の前提なので alert は出さず、csv-log 内に詳細を残す
+            csvLog(`失敗の例:\n${sample}` +
+                   (csvFailures.length > 5 ? `\n…ほか ${csvFailures.length - 5} 件` : ''), 'err');
+        } else {
+            showToast(`${finished}: ${added}件 取り込み`);
+        }
         el('btn-csv-cancel').hidden = true;
         el('btn-csv-start').disabled = false;
         csvRunning = false;
