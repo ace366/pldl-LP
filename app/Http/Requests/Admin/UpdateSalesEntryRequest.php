@@ -21,9 +21,10 @@ class UpdateSalesEntryRequest extends FormRequest
             'address'        => ['nullable', 'string', 'max:200'],
             'phone'          => ['nullable', 'string', 'max:30'],
             'email'          => ['nullable', 'email', 'max:255'],
-            'websiteUrl'     => ['nullable', 'url', 'max:500'],
-            'contactFormUrl' => ['nullable', 'url', 'max:500'],
-            'gmapUrl'        => ['nullable', 'url', 'max:500'],
+            // Store と同様に url 検証を string に緩和（経緯は StoreSalesEntryRequest 参照）。
+            'websiteUrl'     => ['nullable', 'string', 'max:500'],
+            'contactFormUrl' => ['nullable', 'string', 'max:500'],
+            'gmapUrl'        => ['nullable', 'string', 'max:500'],
             'type'           => ['nullable', 'string', 'max:30'],
             'priority'       => ['nullable', 'in:S,A,B,C'],
             'status'         => ['nullable', 'string', 'max:20'],

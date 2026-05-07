@@ -11,7 +11,43 @@
 
 ---
 
-## 2026-05-07 14:10 JST  uncommitted  deploy bat から `php artisan route:cache` を恒久除外
+## 2026-05-07 14:50 JST  uncommitted  営業ツール「検索/CSV取り込み」の silent fail を解消
+
+### 症状
+ユーザー報告: 「検索取り込みボタンから取り込んだ施設がモーダルを閉じてもリストに反映されない」。
+本番 `sales_entries` テーブルを直接確認したところ **0 行**。取り込み完了トーストは出るのに DB に何も書き込まれていない silent failure 状態。
+
+### 原因
+`StoreSalesEntryRequest` / `UpdateSalesEntryRequest` の URL バリデーションが `nullable, url, max:500` で
+**`http(s)://` プレフィックス必須**だったため、Google Places API が返す `gmapUrl`
+（`maps.google.com/...` 等プロトコル無し）や旧 localStorage 出力データの URL で 422 を返していた。
+一方 `BulkImportSalesRequest` は `nullable, string, max:500` で緩く設定済みだったため、
+JSON 取り込み (bulk-import 経由) は通っていたが、**検索取り込み・CSV 取り込みは個別 POST 経由
+だったため逐一 422 で弾かれていた**。
+
+`doImport` / CSV 取り込みループは `addItem(item)` の戻り値を見ずに `added++` していたため、
+全件失敗していても「N件取り込み完了」と表示する致命的な silent fail 状態になっていた。
+
+### 修正
+- `StoreSalesEntryRequest` / `UpdateSalesEntryRequest` の websiteUrl / contactFormUrl / gmapUrl を
+  `url` → `string` に緩和。BulkImport と整合。
+- `doImport` (Google Places 検索取り込み) を改修:
+  - `addItem` の戻り値を見て `added` / `failed` を分離カウント
+  - 末尾で `items = await loadAll()` を呼んでサーバーから再同期 (in-memory 不整合を防ぐ)
+  - 失敗があれば alert で具体的に通知（施設名サンプル付き）
+- CSV 一括取り込み (`runCsvImport`) も同様に修正:
+  - `failed` カウンタ追加、サマリ・トーストに反映
+  - 末尾で `items = await loadAll()` 再同期
+  - csvLog に失敗行を ★ マーク付きで記録
+
+### 影響
+- 既存 DB データ無し（0行）→ 後方互換の懸念なし
+- 表示側は元々 `isUrl()` で `http(s)://` を都度チェックしているので、
+  プロトコル無し URL を保存できても画面崩れなし
+
+---
+
+## 2026-05-07 14:10 JST  530cc5e  deploy bat から `php artisan route:cache` を恒久除外
 
 本日の営業ツールデプロイ（commit `159f8ed`）後、本番で `Route::redirect('/', '/gakudo')` を含む
 `/` がメソッド別 405 を返す事象が再発。SSH で `php artisan route:clear` を実行して即復旧したが、

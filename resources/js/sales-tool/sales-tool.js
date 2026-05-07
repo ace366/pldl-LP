@@ -1560,7 +1560,11 @@
         const fetchMail = el('search-fetch-mail').value === '1';
         const btn = el('btn-do-import');
         btn.disabled = true;
-        let added = 0, skipped = 0, mailFound = 0;
+        // 旧実装は addItem の戻り値を見ずに added++ していたため、API 422 等の silent fail で
+        // 「N件取り込み完了」と表示されながら DB には1件も入らない事故が起きていた。
+        // 戻り値が null なら failed としてカウントし、最後に明示する。
+        let added = 0, failed = 0, skipped = 0, mailFound = 0;
+        const failedNames = [];
 
         for (let i = 0; i < picked.length; i++) {
             const p = picked[i];
@@ -1611,12 +1615,34 @@
             const sug = suggestPriority(item);
             if (sug) item.priority = sug;
 
-            await addItem(item);
-            added++;
+            const created = await addItem(item);
+            if (created) {
+                added++;
+            } else {
+                failed++;
+                failedNames.push(p.name || '(無題)');
+            }
         }
 
-        setSearchStatus(`完了: ${added}件追加 / ${skipped}件スキップ${fetchMail ? ` / ${mailFound}件メール取得` : ''}`, 'ok');
-        showToast(`${added}件 取り込み完了`);
+        // 防御的にサーバーから再ロードして in-memory items を整合させる
+        // (途中で他端末が変更した／ローカル mutation が壊れていた等のケースに備える)
+        items = await loadAll();
+        render();
+
+        const statusParts = [`完了: ${added}件追加`, `${skipped}件スキップ`];
+        if (failed > 0) statusParts.push(`${failed}件失敗`);
+        if (fetchMail) statusParts.push(`${mailFound}件メール取得`);
+        const statusKind = failed > 0 ? 'error' : 'ok';
+        setSearchStatus(statusParts.join(' / '), statusKind);
+
+        if (failed > 0) {
+            const sample = failedNames.slice(0, 5).map((n) => '・' + n).join('\n');
+            alert(`${failed} 件の保存に失敗しました。サーバーが弾いた可能性があります。\n\n` +
+                  `失敗の例:\n${sample}` +
+                  (failedNames.length > 5 ? `\n…ほか ${failedNames.length - 5} 件` : ''));
+        } else {
+            showToast(`${added}件 取り込み完了`);
+        }
         // Refresh the duplicate flags for any remaining results
         renderSearchResults();
         btn.disabled = false;
@@ -1831,7 +1857,7 @@
         setCsvProgress(0, total);
         const delay = Math.max(0, Math.min(5000, parseInt(el('csv-delay').value || '300', 10) || 300));
 
-        let added = 0, skipped = 0, mailFound = 0, formFound = 0;
+        let added = 0, failed = 0, skipped = 0, mailFound = 0, formFound = 0;
         const setSummary = () => {
             el('csv-st-added').textContent   = String(added);
             el('csv-st-skipped').textContent = String(skipped);
@@ -1947,25 +1973,37 @@
             const sug = suggestPriority(item);
             if (sug) item.priority = sug;
 
-            await addItem(item);
-            added++;
-            if (hasEmail) mailFound++;
-            if (hasForm)  formFound++;
-
-            const detail = hasEmail
-                ? `メール=${fields.email}` + (hasForm ? ' + フォームあり' : '')
-                : 'フォームあり（メール無し）';
-            csvLog(`${idx}/${total}  ${row.facility}  → 追加（${detail}）`, 'ok');
+            const created = await addItem(item);
+            if (created) {
+                added++;
+                if (hasEmail) mailFound++;
+                if (hasForm)  formFound++;
+                const detail = hasEmail
+                    ? `メール=${fields.email}` + (hasForm ? ' + フォームあり' : '')
+                    : 'フォームあり（メール無し）';
+                csvLog(`${idx}/${total}  ${row.facility}  → 追加（${detail}）`, 'ok');
+            } else {
+                // addItem が null を返した = サーバー側で 422 等で弾かれた
+                failed++;
+                csvLog(`${idx}/${total}  ${row.facility}  → ★保存失敗（サーバーが弾いた）`, 'err');
+            }
 
             setSummary();
             setCsvProgress(idx, total);
             if (delay > 0) await new Promise((r) => setTimeout(r, delay));
         }
 
+        // 防御的にサーバーから再ロードして in-memory items を整合させる
+        items = await loadAll();
+        render();
+
         const finished = csvCancel ? '中断' : '完了';
-        el('csv-status').textContent = `${finished}: 取込 ${added} / スキップ ${skipped}`;
-        csvLog(`■ ${finished}: 取込 ${added} / スキップ ${skipped} / メール ${mailFound} / フォーム ${formFound}`, 'info');
-        showToast(`${finished}: ${added}件 取り込み`);
+        const summary = failed > 0
+            ? `${finished}: 取込 ${added} / 失敗 ${failed} / スキップ ${skipped}`
+            : `${finished}: 取込 ${added} / スキップ ${skipped}`;
+        el('csv-status').textContent = summary;
+        csvLog(`■ ${summary} / メール ${mailFound} / フォーム ${formFound}`, failed > 0 ? 'err' : 'info');
+        showToast(failed > 0 ? `${added}件取込 / ${failed}件失敗` : `${finished}: ${added}件 取り込み`);
         el('btn-csv-cancel').hidden = true;
         el('btn-csv-start').disabled = false;
         csvRunning = false;

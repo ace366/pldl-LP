@@ -21,9 +21,13 @@ class StoreSalesEntryRequest extends FormRequest
             'address'        => ['nullable', 'string', 'max:200'],
             'phone'          => ['nullable', 'string', 'max:30'],
             'email'          => ['nullable', 'email', 'max:255'],
-            'websiteUrl'     => ['nullable', 'url', 'max:500'],
-            'contactFormUrl' => ['nullable', 'url', 'max:500'],
-            'gmapUrl'        => ['nullable', 'url', 'max:500'],
+            // BulkImport と揃えて string のみ。Google Places から渡される URL や旧 localStorage
+            // データに `url` validation で落ちるパターン (例: gmapUrl がプロトコル無し) があり、
+            // 個別 POST で 422 silent fail → リスト未反映の事象を引き起こしていたため緩和。
+            // 表示側は isUrl() で http(s)// を都度チェックしているので保存できても害なし。
+            'websiteUrl'     => ['nullable', 'string', 'max:500'],
+            'contactFormUrl' => ['nullable', 'string', 'max:500'],
+            'gmapUrl'        => ['nullable', 'string', 'max:500'],
             'type'           => ['nullable', 'string', 'max:30'],
             'priority'       => ['nullable', 'in:S,A,B,C'],
             'status'         => ['nullable', 'string', 'max:20'],
